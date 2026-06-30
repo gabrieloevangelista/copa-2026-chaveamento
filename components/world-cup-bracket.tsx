@@ -1,28 +1,28 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { RotateCcw, X, Volume2, VolumeX } from "lucide-react"
+import { RotateCcw, X, Volume2, VolumeX, Calendar } from "lucide-react"
 import confetti from "canvas-confetti"
 import { TEAMS, type Team, flagUrl } from "@/components/teams"
 
 // Anéis do mais externo (32 times) ao mais interno (2 finalistas).
-// radius = distância do centro em % da largura do palco; size = tamanho em cqmin.
+// radius = distância do centro em % da largura do palco; size = tamanho em % do palco.
 const RINGS = [
-  { count: 32, radius: 45, size: 7.4 }, // 16-avos
-  { count: 16, radius: 35.5, size: 6.8 }, // oitavas
-  { count: 8, radius: 26.5, size: 6.4 }, // quartas
-  { count: 4, radius: 18, size: 6 }, // semis
-  { count: 2, radius: 10, size: 5.8 }, // final
+  { count: 32, radius: 42.5, size: 6.0 }, // 16-avos
+  { count: 16, radius: 34.0, size: 5.4 }, // oitavas
+  { count: 8, radius: 25.5, size: 5.0 }, // quartas
+  { count: 4, radius: 17.5, size: 4.6 }, // semis
+  { count: 2, radius: 10.5, size: 4.2 }, // final
 ]
 
 const GOLD = "oklch(0.82 0.13 80)"
 
 // Rótulos das fases posicionados nos espaços entre os anéis (no eixo superior).
 const PHASE_LABELS = [
-  { text: "Oitavas", radius: (RINGS[0].radius + RINGS[1].radius) / 2 },
-  { text: "Quartas", radius: (RINGS[1].radius + RINGS[2].radius) / 2 },
-  { text: "Semis", radius: (RINGS[2].radius + RINGS[3].radius) / 2 },
-  { text: "Final", radius: (RINGS[3].radius + RINGS[4].radius) / 2 },
+  { text: "Oitavas", date: "04 a 07/07", radius: (RINGS[0].radius + RINGS[1].radius) / 2 },
+  { text: "Quartas", date: "09 a 11/07", radius: (RINGS[1].radius + RINGS[2].radius) / 2 },
+  { text: "Semis", date: "14 e 15/07", radius: (RINGS[2].radius + RINGS[3].radius) / 2 },
+  { text: "Final", date: "19 de Julho", radius: (RINGS[3].radius + RINGS[4].radius) / 2 },
 ]
 
 const round = (n: number) => Math.round(n * 1000) / 1000
@@ -43,6 +43,37 @@ function nodePos(ring: number, index: number) {
   return pointOnRing(RINGS[ring].radius, nodeAngle(ring, index))
 }
 
+function getMatchDate(ring: number, index: number): string | null {
+  if (ring === 0) return null
+  if (ring === 1) {
+    const matchIdx = Math.floor(index / 2)
+    if (matchIdx === 0) return "04 de Julho"
+    if (matchIdx === 1) return "06 de Julho"
+    if (matchIdx === 2) return "06 de Julho"
+    if (matchIdx === 3) return "04 de Julho"
+    if (matchIdx === 4) return "05 de Julho"
+    if (matchIdx === 5) return "05 de Julho"
+    if (matchIdx === 6) return "07 de Julho"
+    if (matchIdx === 7) return "07 de Julho"
+  }
+  if (ring === 2) {
+    const matchIdx = Math.floor(index / 2)
+    if (matchIdx === 0) return "09 de Julho"
+    if (matchIdx === 1) return "10 de Julho"
+    if (matchIdx === 2) return "10 de Julho"
+    if (matchIdx === 3) return "11 de Julho"
+  }
+  if (ring === 3) {
+    const matchIdx = Math.floor(index / 2)
+    if (matchIdx === 0) return "14 de Julho"
+    if (matchIdx === 1) return "15 de Julho"
+  }
+  if (ring === 4) {
+    return "19 de Julho"
+  }
+  return null
+}
+
 type Winners = Record<string, Team>
 
 const STORAGE_KEY = "fifa-2026-bracket"
@@ -51,6 +82,7 @@ export function WorldCupBracket() {
   const [winners, setWinners] = useState<Winners>({})
   const [champion, setChampion] = useState<Team | null>(null)
   const [showCelebration, setShowCelebration] = useState(false)
+  const [showCalendar, setShowCalendar] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
   const [isAudioPlaying, setIsAudioPlaying] = useState(true)
   const [scale, setScale] = useState(1)
@@ -61,13 +93,117 @@ export function WorldCupBracket() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const canvasRef = useRef<HTMLDivElement | null>(null)
 
+  // Touch references to track touch state
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
+  const pinchStartDistRef = useRef<number | null>(null)
+  const scaleStartRef = useRef<number>(1)
+  const dragPosStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+
+  // Active event listeners for passive-avoidance wheel and touch moves
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      setScale((prev) => Math.max(0.5, Math.min(3, prev - e.deltaY * 0.001)))
+    }
+
+    const handleTouchMoveDefault = (e: TouchEvent) => {
+      // Prevent screen scrolling when dragging the canvas
+      if (e.touches.length <= 2) {
+        e.preventDefault()
+      }
+    }
+
+    canvas.addEventListener("wheel", handleWheel, { passive: false })
+    canvas.addEventListener("touchmove", handleTouchMoveDefault, { passive: false })
+
+    return () => {
+      canvas.removeEventListener("wheel", handleWheel)
+      canvas.removeEventListener("touchmove", handleTouchMoveDefault)
+    }
+  }, [])
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0]
+      touchStartRef.current = { x: touch.clientX, y: touch.clientY }
+      dragPosStartRef.current = { ...dragPos }
+      pinchStartDistRef.current = null
+    } else if (e.touches.length === 2) {
+      const touch1 = e.touches[0]
+      const touch2 = e.touches[1]
+      const dist = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY)
+      pinchStartDistRef.current = dist
+      scaleStartRef.current = scale
+      
+      const midX = (touch1.clientX + touch2.clientX) / 2
+      const midY = (touch1.clientY + touch2.clientY) / 2
+      touchStartRef.current = { x: midX, y: midY }
+      dragPosStartRef.current = { ...dragPos }
+    }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 1 && touchStartRef.current) {
+      const touch = e.touches[0]
+      const deltaX = touch.clientX - touchStartRef.current.x
+      const deltaY = touch.clientY - touchStartRef.current.y
+      setDragPos({
+        x: dragPosStartRef.current.x + deltaX,
+        y: dragPosStartRef.current.y + deltaY,
+      })
+    } else if (e.touches.length === 2 && pinchStartDistRef.current && touchStartRef.current) {
+      const touch1 = e.touches[0]
+      const touch2 = e.touches[1]
+      const dist = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY)
+      
+      const factor = dist / pinchStartDistRef.current
+      const newScale = Math.max(0.5, Math.min(3, scaleStartRef.current * factor))
+      setScale(newScale)
+      
+      const midX = (touch1.clientX + touch2.clientX) / 2
+      const midY = (touch1.clientY + touch2.clientY) / 2
+      const deltaX = midX - touchStartRef.current.x
+      const deltaY = midY - touchStartRef.current.y
+      setDragPos({
+        x: dragPosStartRef.current.x + deltaX,
+        y: dragPosStartRef.current.y + deltaY,
+      })
+    }
+  }
+
+  const handleTouchEnd = () => {
+    touchStartRef.current = null
+    pinchStartDistRef.current = null
+  }
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return
+    setIsDragging(true)
+    setDragStart({ x: e.clientX - dragPos.x, y: e.clientY - dragPos.y })
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return
+    setDragPos({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y,
+    })
+  }
+
+  const handleMouseUp = () => {
+    setIsDragging(false)
+  }
+
   // Estado pré-carregado: Brasil, Marrocos, Suíça, Paraguai, Canadá nas oitavas
   const DEFAULT_WINNERS: Winners = {
-    "1-0": TEAMS[16], // Brasil (16) vence Japão (17)
-    "1-2": TEAMS[5], // Marrocos (5) vence Portugal (6) 
-    "1-4": TEAMS[31], // Suíça (31) vence Áustria (30)
-    "1-6": TEAMS[3], // Paraguai (3) vence Alemanha (2)
-    "1-8": TEAMS[1], // Canadá (1) vence Suécia (0)
+    "1-0": TEAMS[1],   // Canadá (1) vence África do Sul (0)
+    "1-1": TEAMS[3],   // Marrocos (3) vence Holanda (2)
+    "1-7": TEAMS[14],  // Paraguai (14) vence Alemanha (15)
+    "1-8": TEAMS[16],  // Brasil (16) vence Japão (17)
+    "1-14": TEAMS[29], // Suíça (29) vence Argélia (28)
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -77,7 +213,14 @@ export function WorldCupBracket() {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) {
         const { winners: w, champion: c } = JSON.parse(saved)
-        setWinners(w || {})
+        const mappedWinners: Winners = {}
+        if (w) {
+          for (const [key, val] of Object.entries(w)) {
+            const fullTeam = TEAMS.find((t) => t.id === (val as any).id)
+            if (fullTeam) mappedWinners[key] = fullTeam
+          }
+        }
+        setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
       } else {
         // Primeira vez: usar estado pré-carregado
@@ -147,9 +290,9 @@ export function WorldCupBracket() {
       lastChampionId.current = champion.id
       setShowCelebration(true)
       fireConfetti()
-      // Toca a trilha da Copa a partir de 0:34 desmutado
+      // Toca a trilha da Copa a partir de 0:34.5 desmutado
       if (audioRef.current) {
-        audioRef.current.currentTime = 34
+        audioRef.current.currentTime = 34.5
         audioRef.current.muted = false
         const playPromise = audioRef.current.play()
         if (playPromise !== undefined) {
@@ -205,7 +348,7 @@ export function WorldCupBracket() {
   }
 
   function reset() {
-    setWinners({})
+    setWinners(DEFAULT_WINNERS)
     setChampion(null)
     if (typeof window !== "undefined") {
       localStorage.removeItem(STORAGE_KEY)
@@ -330,23 +473,28 @@ export function WorldCupBracket() {
   const totalPicks = 16 + 8 + 4 + 2 + 1 // 31 confrontos no total
 
   return (
-    <div className="relative w-full h-full flex flex-col bg-background">
-      {/* Barra de controle fixa no mobile */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex w-full max-w-none flex-wrap items-center justify-between gap-x-4 gap-y-2 bg-background/95 px-3 py-2 backdrop-blur sm:relative sm:max-w-[1000px] sm:bg-transparent sm:backdrop-blur-none sm:py-0 sm:px-4">
-        <div className="flex items-center gap-2 sm:gap-3">
+    <div className="relative w-full h-full flex flex-col bg-background overflow-hidden select-none">
+      {/* Top Header Bar */}
+      <header className="fixed top-0 left-0 right-0 z-40 w-full bg-background/90 px-4 py-3 border-b border-border/40 backdrop-blur-md flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
           <img
             src="/images/fifa-2026-logo.jpg"
             alt="Logo FIFA World Cup 2026"
-            className="size-9 rounded-md object-cover sm:size-12"
+            className="size-9 rounded-md object-cover md:size-11"
           />
-          <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-gold-soft sm:tracking-[0.3em] sm:text-xs">
-            Copa do Mundo 2026
-          </p>
+          <span className="text-left">
+            <span className="block text-[8px] font-bold uppercase tracking-[0.2em] text-gold-soft leading-none">
+              FIFA World Cup
+            </span>
+            <span className="block font-heading text-sm font-bold text-foreground">
+              Copa do Mundo 2026
+            </span>
+          </span>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-3">
           {champion ? (
-            <div className="flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 py-1 pl-1.5 pr-3 sm:pr-4">
+            <div className="flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 py-1 pl-1.5 pr-3">
               <span className="flex size-7 items-center justify-center overflow-hidden rounded-full bg-card ring-2 ring-gold">
                 <img
                   src={flagUrl(champion.slug) || "/placeholder.svg"}
@@ -355,67 +503,73 @@ export function WorldCupBracket() {
                 />
               </span>
               <span className="text-left leading-none">
-                <span className="block text-[9px] font-medium uppercase tracking-widest text-gold-soft">
+                <span className="block text-[8px] font-medium uppercase tracking-widest text-gold-soft">
                   Campeão
                 </span>
-                <span className="block font-heading text-sm font-bold text-foreground">
+                <span className="block font-heading text-xs font-bold text-foreground">
                   {champion.name}
                 </span>
               </span>
             </div>
           ) : (
-            <span className="text-[11px] text-muted-foreground sm:text-xs">
-              {filledCount}/{totalPicks}
-              <span className="hidden sm:inline"> confrontos</span>
+            <span className="text-xs text-muted-foreground font-medium">
+              {filledCount}/{totalPicks} <span className="hidden sm:inline">confrontos</span>
             </span>
           )}
 
-          <button
-            type="button"
-            onClick={reset}
-            aria-label="Reiniciar"
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent sm:px-3"
-          >
-            <RotateCcw className="size-3.5" />
-            <span className="hidden sm:inline">Reiniciar</span>
-          </button>
-        </div>
-      </div>
+          {/* Desktop Actions (hidden on mobile) */}
+          <div className="hidden md:flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowCalendar(true)}
+              aria-label="Calendário"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+            >
+              <Calendar className="size-3.5" />
+              <span>Calendário</span>
+            </button>
 
-      {/* Palco radial com drag/zoom para mobile */}
+            <button
+              type="button"
+              onClick={reset}
+              aria-label="Reiniciar"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+            >
+              <RotateCcw className="size-3.5" />
+              <span>Reiniciar</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={toggleAudio}
+              aria-label={isAudioPlaying ? "Mudar para Mudo" : "Mudar para Áudio"}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+            >
+              {isAudioPlaying ? <Volume2 className="size-3.5 text-gold-soft" /> : <VolumeX className="size-3.5" />}
+              <span>Música</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Palco radial com drag/zoom para mobile e desktop */}
       <div 
         ref={canvasRef}
-        className="hidden-scrollbar w-full overflow-hidden [container-type:inline-size]"
+        className="hidden-scrollbar absolute inset-0 w-full h-full overflow-hidden flex items-center justify-center z-10"
         style={{
-          width: "clamp(350px, 75vw, 900px)",
-          height: "clamp(350px, 75vw, 900px)",
           userSelect: "none",
           cursor: isDragging ? "grabbing" : "grab",
-          margin: "0 auto",
         }}
-        onMouseDown={(e) => {
-          if (typeof window !== "undefined" && window.innerWidth > 768) return
-          setIsDragging(true)
-          setDragStart({ x: e.clientX - dragPos.x, y: e.clientY - dragPos.y })
-        }}
-        onMouseMove={(e) => {
-          if (!isDragging || typeof window === "undefined" || window.innerWidth > 768) return
-          setDragPos({
-            x: e.clientX - dragStart.x,
-            y: e.clientY - dragStart.y,
-          })
-        }}
-        onMouseUp={() => setIsDragging(false)}
-        onMouseLeave={() => setIsDragging(false)}
-        onWheel={(e) => {
-          if (typeof window !== "undefined" && window.innerWidth > 768) return
-          e.preventDefault()
-          const newScale = Math.max(0.5, Math.min(3, scale - e.deltaY * 0.001))
-          setScale(newScale)
-        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
       >
         <div 
-          className="relative size-full flex items-center justify-center" 
+          className="relative w-full max-w-[900px] aspect-square flex items-center justify-center" 
           style={{ 
             transform: `translate(${dragPos.x}px, ${dragPos.y}px) scale(${scale})`,
             transformOrigin: "center",
@@ -502,21 +656,35 @@ export function WorldCupBracket() {
             ))}
             {/* Rótulos das fases (no eixo superior, entre os anéis) */}
             {PHASE_LABELS.map((label) => (
-              <text
-                key={label.text}
-                x={50}
-                y={50 - label.radius}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill={GOLD}
-                fillOpacity={0.85}
-                fontSize={1.5}
-                fontWeight={700}
-                letterSpacing={0.25}
-                style={{ textTransform: "uppercase" }}
-              >
-                {label.text}
-              </text>
+              <g key={label.text}>
+                <text
+                  x={50}
+                  y={50 - label.radius - 0.7}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill={GOLD}
+                  fillOpacity={0.85}
+                  fontSize={1.2}
+                  fontWeight={700}
+                  letterSpacing={0.25}
+                  style={{ textTransform: "uppercase" }}
+                >
+                  {label.text}
+                </text>
+                <text
+                  x={50}
+                  y={50 - label.radius + 0.8}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill={GOLD}
+                  fillOpacity={0.55}
+                  fontSize={0.7}
+                  fontWeight={500}
+                  letterSpacing={0.1}
+                >
+                  {label.date}
+                </text>
+              </g>
             ))}
           </svg>
 
@@ -524,11 +692,11 @@ export function WorldCupBracket() {
           <div
             className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold blur-2xl transition-all duration-700 ${
               champion
-                ? "size-[55%] opacity-60 animate-pulse"
-                : "size-[34%] opacity-20"
+                ? "size-[45%] opacity-60 animate-pulse"
+                : "size-[26%] opacity-20"
             }`}
           />
-          <div className="absolute left-1/2 top-1/2 z-10 flex size-[20%] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
+          <div className="absolute left-1/2 top-1/2 z-10 flex size-[15%] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
             <img
               src="/images/trophy.png"
               alt="Taça da Copa do Mundo"
@@ -556,6 +724,7 @@ export function WorldCupBracket() {
                   top={pos.top}
                   advanced={advanced}
                   lost={lost}
+                  date={getMatchDate(ring, index)}
                   onClick={() => pick(ring, index)}
                 />
               )
@@ -564,44 +733,81 @@ export function WorldCupBracket() {
         </div>
       </div>
 
-      {/* Controles de zoom no mobile */}
-      <div className="fixed bottom-16 right-3 z-40 flex flex-col gap-1 sm:hidden">
+      {/* Controles de zoom flutuantes */}
+      <div className="fixed bottom-24 right-3 z-40 flex flex-col gap-1.5 md:hidden">
         <button
+          type="button"
           onClick={() => setScale(Math.min(3, scale + 0.2))}
-          className="inline-flex size-8 items-center justify-center rounded-full bg-gold text-background transition-transform hover:scale-110"
+          className="inline-flex size-8 items-center justify-center rounded-full bg-gold text-background font-bold transition-transform hover:scale-110 shadow-lg"
           title="Ampliar"
         >
           +
         </button>
         <button
+          type="button"
           onClick={() => setScale(Math.max(0.5, scale - 0.2))}
-          className="inline-flex size-8 items-center justify-center rounded-full bg-gold text-background transition-transform hover:scale-110"
+          className="inline-flex size-8 items-center justify-center rounded-full bg-gold text-background font-bold transition-transform hover:scale-110 shadow-lg"
           title="Reduzir"
         >
           −
         </button>
         <button
+          type="button"
           onClick={() => { setScale(1); setDragPos({ x: 0, y: 0 }); }}
-          className="inline-flex size-8 items-center justify-center rounded-full bg-gold/70 text-background text-xs font-bold transition-transform hover:scale-110"
+          className="inline-flex size-8 items-center justify-center rounded-full bg-gold/70 text-background text-xs font-bold transition-transform hover:scale-110 shadow-lg"
           title="Reset"
         >
           ↺
         </button>
       </div>
 
-      {/* Footer com logo e link BBM Space - fixo no mobile */}
+      {/* Bottom Tabbar for Mobile */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/90 border-t border-border/40 backdrop-blur-md flex items-center justify-around py-2 pb-safe md:hidden">
+        <button
+          type="button"
+          onClick={() => setShowCalendar(true)}
+          className="flex flex-col items-center gap-1 text-[10px] font-medium text-muted-foreground hover:text-gold-soft transition-colors"
+        >
+          <Calendar className="size-5" />
+          <span>Calendário</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={reset}
+          className="flex flex-col items-center gap-1 text-[10px] font-medium text-muted-foreground hover:text-gold-soft transition-colors"
+        >
+          <RotateCcw className="size-5" />
+          <span>Reiniciar</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={toggleAudio}
+          className="flex flex-col items-center gap-1 text-[10px] font-medium text-muted-foreground hover:text-gold-soft transition-colors"
+        >
+          {isAudioPlaying ? (
+            <Volume2 className="size-5 text-gold-soft animate-pulse" />
+          ) : (
+            <VolumeX className="size-5" />
+          )}
+          <span>Música</span>
+        </button>
+      </nav>
+
+      {/* Footer com logo e link BBM Space */}
       <a
         href="https://bbmspace.com"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-center gap-1.5 bg-background/95 px-2 py-1.5 text-xs font-medium text-muted-foreground/70 transition-colors hover:text-gold-soft backdrop-blur sm:relative sm:bg-transparent sm:backdrop-blur-none"
+        className="fixed bottom-14 left-0 right-0 md:bottom-2 z-30 flex items-center justify-center gap-1.5 px-2 py-1 text-[10px] font-medium text-muted-foreground/50 transition-colors hover:text-gold-soft md:text-xs md:relative md:bg-transparent md:py-1.5"
         title="BBM Space"
       >
         <span>Powered by</span>
         <img
           src="/images/bbm-space-logo.png"
           alt="BBM Space logo"
-          className="size-4 rounded transition-transform group-hover:scale-110"
+          className="size-3.5 rounded transition-transform group-hover:scale-110"
         />
         <span>BBM Space</span>
       </a>
@@ -684,6 +890,142 @@ export function WorldCupBracket() {
           </div>
         </div>
       )}
+
+      {/* Pop-up do Calendário */}
+      {showCalendar && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Calendário da Fase Final"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
+          onClick={() => setShowCalendar(false)}
+        >
+          <div
+            className="relative flex w-full max-w-md flex-col items-center gap-6 overflow-hidden rounded-2xl border border-gold/40 bg-card px-6 py-8 text-center shadow-[0_0_60px_oklch(0.82_0.13_80/0.35)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Brilho de fundo */}
+            <div className="pointer-events-none absolute left-1/2 top-1/2 size-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/5 blur-3xl" />
+
+            <button
+              type="button"
+              onClick={() => setShowCalendar(false)}
+              aria-label="Fechar"
+              className="absolute right-3 top-3 z-10 inline-flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              <X className="size-4" />
+            </button>
+
+            <h3 className="relative z-10 font-heading text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+              <Calendar className="size-5 text-gold-soft" />
+              Calendário da Fase Final
+            </h3>
+
+            {/* Linha do tempo / Agenda */}
+            <div className="relative z-10 w-full text-left flex flex-col gap-4 mt-2">
+              <div className="relative pl-6 border-l border-gold/20 flex flex-col gap-5">
+                
+                {/* Item 1 */}
+                <div className="relative">
+                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-gold border-2 border-card" />
+                  <span className="block text-xs font-bold uppercase tracking-wider text-gold-soft">
+                    04 a 07 de Julho
+                  </span>
+                  <span className="text-sm font-semibold text-foreground">
+                    Oitavas de Final
+                  </span>
+                </div>
+
+                {/* Item 2 */}
+                <div className="relative opacity-60">
+                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-muted border-2 border-card" />
+                  <span className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    08 de Julho
+                  </span>
+                  <span className="text-sm text-foreground">
+                    Descanso (Sem jogos)
+                  </span>
+                </div>
+
+                {/* Item 3 */}
+                <div className="relative">
+                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-gold border-2 border-card" />
+                  <span className="block text-xs font-bold uppercase tracking-wider text-gold-soft">
+                    09 a 11 de Julho
+                  </span>
+                  <span className="text-sm font-semibold text-foreground">
+                    Quartas de Final
+                  </span>
+                </div>
+
+                {/* Item 4 */}
+                <div className="relative opacity-60">
+                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-muted border-2 border-card" />
+                  <span className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    12 e 13 de Julho
+                  </span>
+                  <span className="text-sm text-foreground">
+                    Descanso (Sem jogos)
+                  </span>
+                </div>
+
+                {/* Item 5 */}
+                <div className="relative">
+                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-gold border-2 border-card" />
+                  <span className="block text-xs font-bold uppercase tracking-wider text-gold-soft">
+                    14 e 15 de Julho
+                  </span>
+                  <span className="text-sm font-semibold text-foreground">
+                    Semifinais
+                  </span>
+                </div>
+
+                {/* Item 6 */}
+                <div className="relative opacity-60">
+                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-muted border-2 border-card" />
+                  <span className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    16 e 17 de Julho
+                  </span>
+                  <span className="text-sm text-foreground">
+                    Descanso (Sem jogos)
+                  </span>
+                </div>
+
+                {/* Item 7 */}
+                <div className="relative">
+                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-gold border-2 border-card" />
+                  <span className="block text-xs font-bold uppercase tracking-wider text-gold-soft">
+                    18 de Julho
+                  </span>
+                  <span className="text-sm font-semibold text-foreground">
+                    Disputa do 3º Lugar
+                  </span>
+                </div>
+
+                {/* Item 8 */}
+                <div className="relative">
+                  <div className="absolute -left-[29px] top-1 size-3.5 rounded-full bg-gold shadow-[0_0_8px_oklch(0.82_0.13_80)] border-2 border-card" />
+                  <span className="block text-xs font-bold uppercase tracking-wider text-gold-soft">
+                    19 de Julho
+                  </span>
+                  <span className="text-sm font-bold text-foreground">
+                    Grande Final
+                  </span>
+                </div>
+
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowCalendar(false)}
+              className="relative z-10 w-full rounded-full border border-gold/40 bg-gold/10 py-2 text-sm font-semibold text-gold transition-colors hover:bg-gold hover:text-background mt-2"
+            >
+              Fechar Calendário
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -695,6 +1037,7 @@ function Node({
   top,
   advanced,
   lost,
+  date,
   onClick,
 }: {
   team: Team | null
@@ -703,6 +1046,7 @@ function Node({
   top: number
   advanced: boolean
   lost: boolean
+  date: string | null
   onClick: () => void
 }) {
   return (
@@ -710,14 +1054,22 @@ function Node({
       type="button"
       onClick={onClick}
       disabled={!team}
-      title={team?.name ?? "Aguardando confronto"}
-      aria-label={team ? `Avançar ${team.name}` : "Aguardando confronto"}
+      title={
+        team
+          ? `${team.name}${date ? ` (Jogo: ${date})` : ""}`
+          : `Aguardando confronto${date ? ` (${date})` : ""}`
+      }
+      aria-label={
+        team
+          ? `Avançar ${team.name}${date ? ` - Jogo em ${date}` : ""}`
+          : `Aguardando confronto${date ? ` em ${date}` : ""}`
+      }
       className="absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold enabled:hover:scale-110"
       style={{
         left: `${left}%`,
         top: `${top}%`,
-        width: `${size}cqmin`,
-        height: `${size}cqmin`,
+        width: `${size}%`,
+        aspectRatio: "1 / 1",
       }}
     >
       {team ? (
