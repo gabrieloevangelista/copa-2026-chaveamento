@@ -237,12 +237,13 @@ export function WorldCupBracket() {
     setIsDragging(false)
   }
 
-  // Estado pré-carregado: Brasil, Marrocos, Suíça, Paraguai, Canadá nas oitavas
+  // Estado pré-carregado: Brasil, Marrocos, Suíça, Paraguai, Canadá, Noruega nas oitavas
   const DEFAULT_WINNERS: Winners = {
     "1-0": TEAMS[1],   // Canadá (1) vence África do Sul (0)
     "1-1": TEAMS[3],   // Marrocos (3) vence Holanda (2)
     "1-7": TEAMS[14],  // Paraguai (14) vence Alemanha (15)
     "1-8": TEAMS[16],  // Brasil (16) vence Japão (17)
+    "1-9": TEAMS[19],  // Noruega (19) vence Costa do Marfim (18)
     "1-14": TEAMS[29], // Suíça (29) vence Argélia (28)
   }
 
