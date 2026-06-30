@@ -2,7 +2,7 @@ import { WorldCupBracket } from "@/components/world-cup-bracket"
 
 export default function Page() {
   return (
-    <main className="flex w-full flex-col items-center justify-center overflow-y-auto bg-background pt-14 pb-16 sm:py-3 lg:py-1" style={{ minHeight: "100dvh" }}>
+    <main className="w-full bg-background" style={{ height: "100dvh", overflow: "hidden" }}>
       <WorldCupBracket />
     </main>
   )

@@ -330,7 +330,7 @@ export function WorldCupBracket() {
   const totalPicks = 16 + 8 + 4 + 2 + 1 // 31 confrontos no total
 
   return (
-    <div className="flex w-full flex-col items-center gap-2 sm:gap-3">
+    <div className="relative w-full h-full flex flex-col bg-background">
       {/* Barra de controle fixa no mobile */}
       <div className="fixed top-0 left-0 right-0 z-40 flex w-full max-w-none flex-wrap items-center justify-between gap-x-4 gap-y-2 bg-background/95 px-3 py-2 backdrop-blur sm:relative sm:max-w-[1000px] sm:bg-transparent sm:backdrop-blur-none sm:py-0 sm:px-4">
         <div className="flex items-center gap-2 sm:gap-3">
