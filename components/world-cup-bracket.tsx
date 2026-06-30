@@ -16,6 +16,14 @@ const RINGS = [
 
 const GOLD = "oklch(0.82 0.13 80)"
 
+// Rótulos das fases posicionados nos espaços entre os anéis (no eixo superior).
+const PHASE_LABELS = [
+  { text: "Oitavas", radius: (RINGS[0].radius + RINGS[1].radius) / 2 },
+  { text: "Quartas", radius: (RINGS[1].radius + RINGS[2].radius) / 2 },
+  { text: "Semis", radius: (RINGS[2].radius + RINGS[3].radius) / 2 },
+  { text: "Final", radius: (RINGS[3].radius + RINGS[4].radius) / 2 },
+]
+
 const round = (n: number) => Math.round(n * 1000) / 1000
 
 function nodeAngle(ring: number, index: number) {
@@ -79,9 +87,10 @@ export function WorldCupBracket() {
     setChampion(null)
   }
 
-  // Chave interligada em árvore: de cada seleção sai uma linha reta até o nó
-  // da etapa seguinte. Os dois irmãos convergem para o mesmo nó (formato "V").
-  const connectors = useMemo(() => {
+  // Chave interligada: um arco liga os dois confrontos de cada par e um
+  // conector radial leva do meio do arco até o nó da etapa seguinte.
+  const { arcs, connectors } = useMemo(() => {
+    const arcs: { d: string; active: boolean; key: string }[] = []
     const connectors: {
       x1: number
       y1: number
@@ -92,39 +101,54 @@ export function WorldCupBracket() {
     }[] = []
 
     for (let ring = 0; ring < 4; ring++) {
+      const { radius } = RINGS[ring]
       const parentRing = ring + 1
-      for (let i = 0; i < RINGS[ring].count; i++) {
-        const from = nodePos(ring, i)
-        const parentIndex = Math.floor(i / 2)
-        const to = nodePos(parentRing, parentIndex)
-        const child = teamAt(ring, i)
-        const parentWinner = winners[`${parentRing}-${parentIndex}`]
+      for (let p = 0; p < RINGS[parentRing].count; p++) {
+        const aIdx = p * 2
+        const bIdx = p * 2 + 1
+        const aAngle = nodeAngle(ring, aIdx)
+        const bAngle = nodeAngle(ring, bIdx)
+        const a = pointOnRing(radius, aAngle)
+        const b = pointOnRing(radius, bAngle)
+        arcs.push({
+          key: `arc-${ring}-${p}`,
+          d: `M ${a.left} ${a.top} A ${radius} ${radius} 0 0 1 ${b.left} ${b.top}`,
+          active: !!winners[`${parentRing}-${p}`],
+        })
+        const midAngle = (aAngle + bAngle) / 2
+        const mid = pointOnRing(radius, midAngle)
+        const parent = nodePos(parentRing, p)
         connectors.push({
-          key: `con-${ring}-${i}`,
-          x1: from.left,
-          y1: from.top,
-          x2: to.left,
-          y2: to.top,
-          active: !!child && parentWinner?.id === child.id,
+          key: `con-${ring}-${p}`,
+          x1: mid.left,
+          y1: mid.top,
+          x2: parent.left,
+          y2: parent.top,
+          active: !!winners[`${parentRing}-${p}`],
         })
       }
     }
 
-    // Finalistas até o centro (a taça).
-    for (let i = 0; i < 2; i++) {
-      const from = nodePos(4, i)
-      const finalist = teamAt(4, i)
-      connectors.push({
-        key: `con-final-${i}`,
-        x1: from.left,
-        y1: from.top,
-        x2: 50,
-        y2: 50,
-        active: !!finalist && champion?.id === finalist.id,
-      })
-    }
+    // Final: arco ligando os dois finalistas e conector até a taça (centro).
+    const fRadius = RINGS[4].radius
+    const fa = pointOnRing(fRadius, nodeAngle(4, 0))
+    const fb = pointOnRing(fRadius, nodeAngle(4, 1))
+    arcs.push({
+      key: "arc-final",
+      d: `M ${fa.left} ${fa.top} A ${fRadius} ${fRadius} 0 0 1 ${fb.left} ${fb.top}`,
+      active: !!champion,
+    })
+    const midFinal = pointOnRing(fRadius, (nodeAngle(4, 0) + nodeAngle(4, 1)) / 2)
+    connectors.push({
+      key: "con-final",
+      x1: midFinal.left,
+      y1: midFinal.top,
+      x2: 50,
+      y2: 50,
+      active: !!champion,
+    })
 
-    return connectors
+    return { arcs, connectors }
   }, [winners, champion])
 
   // Pequenos pontos de junção em cada nó interno (oitavas → final).
@@ -248,7 +272,20 @@ export function WorldCupBracket() {
               strokeWidth={0.22}
               filter="url(#goldGlow)"
             />
-            {/* Linhas retas ligando cada seleção ao nó da etapa seguinte */}
+            {/* Arcos ligando cada par de confrontos da etapa */}
+            {arcs.map((a) => (
+              <path
+                key={a.key}
+                d={a.d}
+                fill="none"
+                stroke={GOLD}
+                strokeOpacity={a.active ? 1 : 0.75}
+                strokeWidth={a.active ? 0.7 : 0.5}
+                strokeLinecap="round"
+                filter={a.active ? "url(#goldGlowStrong)" : "url(#goldGlow)"}
+              />
+            ))}
+            {/* Conectores do arco até a etapa seguinte */}
             {connectors.map((c) => (
               <line
                 key={c.key}
@@ -274,6 +311,24 @@ export function WorldCupBracket() {
                 fillOpacity={j.active ? 1 : 0.5}
                 filter={j.active ? "url(#goldGlowStrong)" : "url(#goldGlow)"}
               />
+            ))}
+            {/* Rótulos das fases (no eixo superior, entre os anéis) */}
+            {PHASE_LABELS.map((label) => (
+              <text
+                key={label.text}
+                x={50}
+                y={50 - label.radius}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill={GOLD}
+                fillOpacity={0.85}
+                fontSize={1.5}
+                fontWeight={700}
+                letterSpacing={0.25}
+                style={{ textTransform: "uppercase" }}
+              >
+                {label.text}
+              </text>
             ))}
           </svg>
 
