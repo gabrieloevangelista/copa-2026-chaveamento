@@ -478,10 +478,22 @@ export function WorldCupBracket() {
         </div>
       </div>
 
-      {/* Assinatura */}
-      <span className="font-heading text-sm font-bold tracking-tight text-muted-foreground/70">
-        es
-      </span>
+      {/* Footer com logo e link BBM Space */}
+      <a
+        href="https://bbmspace.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-muted-foreground/70 transition-colors hover:text-gold-soft"
+        title="BBM Space"
+      >
+        <span>Powered by</span>
+        <img
+          src="/images/bbm-space-logo.png"
+          alt="BBM Space logo"
+          className="size-4 rounded transition-transform group-hover:scale-110"
+        />
+        <span>BBM Space</span>
+      </a>
 
       {/* Pop-up de celebração do campeão */}
       {champion && showCelebration && (
