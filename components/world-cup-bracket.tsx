@@ -910,7 +910,7 @@ export function WorldCupBracket() {
         href="https://bbmspace.com"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-14 left-0 right-0 md:bottom-2 z-30 flex items-center justify-center gap-1.5 px-2 py-1 text-[10px] font-medium text-muted-foreground/50 transition-colors hover:text-gold-soft md:text-xs md:relative md:bg-transparent md:py-1.5"
+        className="fixed bottom-20 left-0 right-0 md:bottom-2 z-30 flex items-center justify-center gap-1.5 px-2 py-1 text-[10px] font-medium text-muted-foreground/50 transition-colors hover:text-gold-soft md:text-xs md:relative md:bg-transparent md:py-1.5"
         title="BBM Space"
       >
         <span>Powered by</span>
