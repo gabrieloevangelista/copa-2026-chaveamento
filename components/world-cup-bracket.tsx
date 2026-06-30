@@ -387,9 +387,11 @@ export function WorldCupBracket() {
         ref={canvasRef}
         className="hidden-scrollbar w-full overflow-hidden [container-type:inline-size]"
         style={{
-          height: "clamp(400px, 80vh, 90vh)",
+          width: "clamp(350px, 75vw, 900px)",
+          height: "clamp(350px, 75vw, 900px)",
           userSelect: "none",
           cursor: isDragging ? "grabbing" : "grab",
+          margin: "0 auto",
         }}
         onMouseDown={(e) => {
           if (typeof window !== "undefined" && window.innerWidth > 768) return
@@ -413,14 +415,11 @@ export function WorldCupBracket() {
         }}
       >
         <div 
-          className="relative mx-auto flex items-center justify-center" 
+          className="relative size-full flex items-center justify-center" 
           style={{ 
-            width: "clamp(350px, 75vw, 900px)", 
-            aspectRatio: "1 / 1",
             transform: `translate(${dragPos.x}px, ${dragPos.y}px) scale(${scale})`,
             transformOrigin: "center",
             transition: isDragging ? "none" : "transform 0.1s ease-out",
-            height: "100%",
           }}
         >
           {/* Linhas conectoras */}
