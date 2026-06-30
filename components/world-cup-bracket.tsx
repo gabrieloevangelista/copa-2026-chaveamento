@@ -569,13 +569,23 @@ export function WorldCupBracket() {
               Campeão Mundial 2026
             </p>
 
-            {/* Taça + bandeira em destaque */}
-            <div className="relative z-10 flex items-center justify-center gap-5">
+            {/* Taça animada + taça oficial + bandeira em destaque */}
+            <div className="relative z-10 flex items-center justify-center gap-6">
+              {/* GIF animado */}
+              <img
+                src="/images/fifa-world-cup-2026-trophy.gif"
+                alt="Troféu Copa 2026 animado"
+                className="h-32 w-auto object-contain"
+              />
+              
+              {/* Taça oficial */}
               <img
                 src="/images/trophy.png"
                 alt="Taça da Copa do Mundo"
                 className="h-40 w-auto object-contain drop-shadow-[0_0_30px_oklch(0.85_0.15_82/0.9)]"
               />
+              
+              {/* Bandeira do campeão */}
               <span className="flex size-28 items-center justify-center overflow-hidden rounded-full bg-card ring-4 ring-gold shadow-[0_0_30px_oklch(0.82_0.13_80/0.7)]">
                 <img
                   src={flagUrl(champion.slug) || "/placeholder.svg"}
