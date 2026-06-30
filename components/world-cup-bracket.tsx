@@ -1,7 +1,8 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import { RotateCcw } from "lucide-react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { RotateCcw, X } from "lucide-react"
+import confetti from "canvas-confetti"
 import { TEAMS, type Team, flagUrl } from "@/components/teams"
 
 // Anéis do mais externo (32 times) ao mais interno (2 finalistas).
@@ -47,6 +48,55 @@ type Winners = Record<string, Team>
 export function WorldCupBracket() {
   const [winners, setWinners] = useState<Winners>({})
   const [champion, setChampion] = useState<Team | null>(null)
+  const [showCelebration, setShowCelebration] = useState(false)
+  const lastChampionId = useRef<number | null>(null)
+
+  // Dispara o confete em ondas a partir das laterais.
+  const fireConfetti = useCallback(() => {
+    const end = Date.now() + 1500
+    const colors = ["#e9b949", "#f5d76e", "#ffffff", "#16a34a"]
+    const frame = () => {
+      confetti({
+        particleCount: 4,
+        angle: 60,
+        spread: 60,
+        startVelocity: 55,
+        origin: { x: 0, y: 0.7 },
+        colors,
+      })
+      confetti({
+        particleCount: 4,
+        angle: 120,
+        spread: 60,
+        startVelocity: 55,
+        origin: { x: 1, y: 0.7 },
+        colors,
+      })
+      if (Date.now() < end) requestAnimationFrame(frame)
+    }
+    frame()
+    // Estouro central dourado
+    confetti({
+      particleCount: 160,
+      spread: 100,
+      startVelocity: 45,
+      origin: { x: 0.5, y: 0.45 },
+      colors,
+    })
+  }, [])
+
+  // Ao coroar um novo campeão: celebração + pop-up.
+  useEffect(() => {
+    if (champion && champion.id !== lastChampionId.current) {
+      lastChampionId.current = champion.id
+      setShowCelebration(true)
+      fireConfetti()
+    }
+    if (!champion) {
+      lastChampionId.current = null
+      setShowCelebration(false)
+    }
+  }, [champion, fireConfetti])
 
   const teamAt = (ring: number, index: number): Team | null => {
     if (ring === 0) return TEAMS[index]
@@ -333,12 +383,22 @@ export function WorldCupBracket() {
           </svg>
 
           {/* Brilho central + taça */}
-          <div className="pointer-events-none absolute left-1/2 top-1/2 size-[34%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/20 blur-2xl" />
+          <div
+            className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold blur-2xl transition-all duration-700 ${
+              champion
+                ? "size-[55%] opacity-60 animate-pulse"
+                : "size-[34%] opacity-20"
+            }`}
+          />
           <div className="absolute left-1/2 top-1/2 z-10 flex size-[20%] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
             <img
               src="/images/trophy.png"
               alt="Taça da Copa do Mundo"
-              className="size-full object-contain drop-shadow-[0_0_18px_oklch(0.82_0.13_80/0.55)]"
+              className={`size-full object-contain transition-all duration-700 ${
+                champion
+                  ? "scale-110 drop-shadow-[0_0_38px_oklch(0.85_0.15_82/0.95)]"
+                  : "drop-shadow-[0_0_18px_oklch(0.82_0.13_80/0.55)]"
+              }`}
             />
           </div>
 
@@ -368,6 +428,66 @@ export function WorldCupBracket() {
       <span className="font-heading text-sm font-bold tracking-tight text-muted-foreground/70">
         es
       </span>
+
+      {/* Pop-up de celebração do campeão */}
+      {champion && showCelebration && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Campeão: ${champion.name}`}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
+          onClick={() => setShowCelebration(false)}
+        >
+          <div
+            className="relative flex w-full max-w-md flex-col items-center gap-6 overflow-hidden rounded-2xl border border-gold/40 bg-card px-6 py-10 text-center shadow-[0_0_60px_oklch(0.82_0.13_80/0.35)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Brilho de fundo do card */}
+            <div className="pointer-events-none absolute left-1/2 top-1/2 size-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/15 blur-3xl" />
+
+            <button
+              type="button"
+              onClick={() => setShowCelebration(false)}
+              aria-label="Fechar"
+              className="absolute right-3 top-3 z-10 inline-flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              <X className="size-4" />
+            </button>
+
+            <p className="relative z-10 text-xs font-medium uppercase tracking-[0.4em] text-gold-soft">
+              Campeão Mundial 2026
+            </p>
+
+            {/* Taça + bandeira em destaque */}
+            <div className="relative z-10 flex items-center justify-center gap-5">
+              <img
+                src="/images/trophy.png"
+                alt="Taça da Copa do Mundo"
+                className="h-40 w-auto object-contain drop-shadow-[0_0_30px_oklch(0.85_0.15_82/0.9)]"
+              />
+              <span className="flex size-28 items-center justify-center overflow-hidden rounded-full bg-card ring-4 ring-gold shadow-[0_0_30px_oklch(0.82_0.13_80/0.7)]">
+                <img
+                  src={flagUrl(champion.slug) || "/placeholder.svg"}
+                  alt={`Bandeira ${champion.name}`}
+                  className="size-full scale-[1.45] rounded-full object-cover"
+                />
+              </span>
+            </div>
+
+            <h2 className="relative z-10 text-balance font-heading text-3xl font-bold tracking-tight text-foreground">
+              {champion.name}
+            </h2>
+
+            <button
+              type="button"
+              onClick={() => setShowCelebration(false)}
+              className="relative z-10 inline-flex items-center justify-center rounded-full bg-gold px-6 py-2 text-sm font-semibold text-background transition-transform hover:scale-105"
+            >
+              Comemorar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
