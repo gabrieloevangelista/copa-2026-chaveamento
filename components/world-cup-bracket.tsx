@@ -52,9 +52,23 @@ export function WorldCupBracket() {
   const [champion, setChampion] = useState<Team | null>(null)
   const [showCelebration, setShowCelebration] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+  const [isAudioPlaying, setIsAudioPlaying] = useState(true)
+  const [scale, setScale] = useState(1)
+  const [dragPos, setDragPos] = useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const lastChampionId = useRef<number | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const canvasRef = useRef<HTMLDivElement | null>(null)
+
+  // Estado pré-carregado: Brasil, Marrocos, Suíça, Paraguai, Canadá nas oitavas
+  const DEFAULT_WINNERS: Winners = {
+    "1-0": TEAMS[16], // Brasil (16) vence Japão (17)
+    "1-2": TEAMS[5], // Marrocos (5) vence Portugal (6) 
+    "1-4": TEAMS[31], // Suíça (31) vence Áustria (30)
+    "1-6": TEAMS[3], // Paraguai (3) vence Alemanha (2)
+    "1-8": TEAMS[1], // Canadá (1) vence Suécia (0)
+  }
 
   // Recupera o estado do localStorage ao montar.
   useEffect(() => {
@@ -65,6 +79,9 @@ export function WorldCupBracket() {
         const { winners: w, champion: c } = JSON.parse(saved)
         setWinners(w || {})
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
+      } else {
+        // Primeira vez: usar estado pré-carregado
+        setWinners(DEFAULT_WINNERS)
       }
     } catch (e) {
       console.error("[v0] Erro ao recuperar estado:", e)
@@ -130,13 +147,14 @@ export function WorldCupBracket() {
       lastChampionId.current = champion.id
       setShowCelebration(true)
       fireConfetti()
-      // Toca a trilha da Copa a partir de 0:34 (com fallback para autoplay restrito)
+      // Toca a trilha da Copa a partir de 0:34 desmutado
       if (audioRef.current) {
         audioRef.current.currentTime = 34
+        audioRef.current.muted = false
         const playPromise = audioRef.current.play()
         if (playPromise !== undefined) {
           playPromise.catch(() => {
-            console.log("[v0] Autoplay bloqueado, clique para ativar som")
+            console.log("[v0] Autoplay bloqueado")
           })
         }
       }
@@ -313,8 +331,8 @@ export function WorldCupBracket() {
 
   return (
     <div className="flex w-full flex-col items-center gap-2 sm:gap-3">
-      {/* Barra de controle compacta */}
-      <div className="flex w-full max-w-[1000px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-3 sm:px-4">
+      {/* Barra de controle fixa no mobile */}
+      <div className="fixed top-0 left-0 right-0 z-40 flex w-full max-w-none flex-wrap items-center justify-between gap-x-4 gap-y-2 bg-background/95 px-3 py-2 backdrop-blur sm:relative sm:max-w-[1000px] sm:bg-transparent sm:backdrop-blur-none sm:py-0 sm:px-4">
         <div className="flex items-center gap-2 sm:gap-3">
           <img
             src="/images/fifa-2026-logo.jpg"
@@ -364,9 +382,47 @@ export function WorldCupBracket() {
         </div>
       </div>
 
-      {/* Palco radial */}
-      <div className="w-full px-2 [container-type:inline-size]">
-        <div className="relative mx-auto" style={{ width: "clamp(300px, 70vw, 900px)", aspectRatio: "1 / 1" }}>
+      {/* Palco radial com drag/zoom para mobile */}
+      <div 
+        ref={canvasRef}
+        className="hidden-scrollbar w-full overflow-hidden [container-type:inline-size]"
+        style={{
+          height: "clamp(400px, 80vh, 90vh)",
+          userSelect: "none",
+          cursor: isDragging ? "grabbing" : "grab",
+        }}
+        onMouseDown={(e) => {
+          if (typeof window !== "undefined" && window.innerWidth > 768) return
+          setIsDragging(true)
+          setDragStart({ x: e.clientX - dragPos.x, y: e.clientY - dragPos.y })
+        }}
+        onMouseMove={(e) => {
+          if (!isDragging || typeof window === "undefined" || window.innerWidth > 768) return
+          setDragPos({
+            x: e.clientX - dragStart.x,
+            y: e.clientY - dragStart.y,
+          })
+        }}
+        onMouseUp={() => setIsDragging(false)}
+        onMouseLeave={() => setIsDragging(false)}
+        onWheel={(e) => {
+          if (typeof window !== "undefined" && window.innerWidth > 768) return
+          e.preventDefault()
+          const newScale = Math.max(0.5, Math.min(3, scale - e.deltaY * 0.001))
+          setScale(newScale)
+        }}
+      >
+        <div 
+          className="relative mx-auto flex items-center justify-center" 
+          style={{ 
+            width: "clamp(350px, 75vw, 900px)", 
+            aspectRatio: "1 / 1",
+            transform: `translate(${dragPos.x}px, ${dragPos.y}px) scale(${scale})`,
+            transformOrigin: "center",
+            transition: isDragging ? "none" : "transform 0.1s ease-out",
+            height: "100%",
+          }}
+        >
           {/* Linhas conectoras */}
           <svg
             viewBox="0 0 100 100"
@@ -509,12 +565,37 @@ export function WorldCupBracket() {
         </div>
       </div>
 
-      {/* Footer com logo e link BBM Space */}
+      {/* Controles de zoom no mobile */}
+      <div className="fixed bottom-16 right-3 z-40 flex flex-col gap-1 sm:hidden">
+        <button
+          onClick={() => setScale(Math.min(3, scale + 0.2))}
+          className="inline-flex size-8 items-center justify-center rounded-full bg-gold text-background transition-transform hover:scale-110"
+          title="Ampliar"
+        >
+          +
+        </button>
+        <button
+          onClick={() => setScale(Math.max(0.5, scale - 0.2))}
+          className="inline-flex size-8 items-center justify-center rounded-full bg-gold text-background transition-transform hover:scale-110"
+          title="Reduzir"
+        >
+          −
+        </button>
+        <button
+          onClick={() => { setScale(1); setDragPos({ x: 0, y: 0 }); }}
+          className="inline-flex size-8 items-center justify-center rounded-full bg-gold/70 text-background text-xs font-bold transition-transform hover:scale-110"
+          title="Reset"
+        >
+          ↺
+        </button>
+      </div>
+
+      {/* Footer com logo e link BBM Space - fixo no mobile */}
       <a
         href="https://bbmspace.com"
         target="_blank"
         rel="noopener noreferrer"
-        className="group flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-muted-foreground/70 transition-colors hover:text-gold-soft"
+        className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-center gap-1.5 bg-background/95 px-2 py-1.5 text-xs font-medium text-muted-foreground/70 transition-colors hover:text-gold-soft backdrop-blur sm:relative sm:bg-transparent sm:backdrop-blur-none"
         title="BBM Space"
       >
         <span>Powered by</span>
@@ -580,24 +661,14 @@ export function WorldCupBracket() {
               {champion.name}
             </h2>
 
-            {/* GIF + bandeira em destaque na parte inferior */}
-            <div className="relative z-10 flex items-center justify-center gap-8">
-              {/* GIF animado */}
+            {/* Bandeira do campeão em destaque */}
+            <span className="relative z-10 flex size-36 items-center justify-center overflow-hidden rounded-full bg-card ring-4 ring-gold shadow-[0_0_30px_oklch(0.82_0.13_80/0.7)]">
               <img
-                src="/images/fifa-world-cup-2026-trophy.gif"
-                alt="Troféu Copa 2026 animado"
-                className="h-28 w-auto object-contain"
+                src={flagUrl(champion.slug) || "/placeholder.svg"}
+                alt={`Bandeira ${champion.name}`}
+                className="size-full scale-[1.45] rounded-full object-cover"
               />
-              
-              {/* Bandeira do campeão */}
-              <span className="flex size-32 items-center justify-center overflow-hidden rounded-full bg-card ring-4 ring-gold shadow-[0_0_30px_oklch(0.82_0.13_80/0.7)]">
-                <img
-                  src={flagUrl(champion.slug) || "/placeholder.svg"}
-                  alt={`Bandeira ${champion.name}`}
-                  className="size-full scale-[1.45] rounded-full object-cover"
-                />
-              </span>
-            </div>
+            </span>
 
             <button
               type="button"
