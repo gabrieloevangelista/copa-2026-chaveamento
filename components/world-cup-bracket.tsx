@@ -513,6 +513,52 @@ export function WorldCupBracket() {
   const filledCount = Object.keys(winners).length + (champion ? 1 : 0)
   const totalPicks = 16 + 8 + 4 + 2 + 1 // 31 confrontos no total
 
+  const getThirdPlaceTeams = () => {
+    const s1_a = teamAt(3, 0)
+    const s1_b = teamAt(3, 1)
+    const s1_winner = winners["4-0"] ?? null
+    const s2_a = teamAt(3, 2)
+    const s2_b = teamAt(3, 3)
+    const s2_winner = winners["4-1"] ?? null
+
+    let teamA: Team | null = null
+    if (s1_a && s1_b && s1_winner) {
+      teamA = s1_a.id === s1_winner.id ? s1_b : s1_a
+    }
+    let teamB: Team | null = null
+    if (s2_a && s2_b && s2_winner) {
+      teamB = s2_a.id === s2_winner.id ? s2_b : s2_a
+    }
+    return { teamA, teamB }
+  }
+
+  const getCalendarMatches = () => {
+    const thirdPlace = getThirdPlaceTeams()
+    
+    return [
+      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "14:00", t1: teamAt(1, 0), t2: teamAt(1, 1) },
+      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", t1: teamAt(1, 6), t2: teamAt(1, 7) },
+      { phase: "Oitavas de final", date: "Dom., 05/07", time: "17:00", t1: teamAt(1, 8), t2: teamAt(1, 9) },
+      { phase: "Oitavas de final", date: "Dom., 05/07", time: "21:00", t1: teamAt(1, 10), t2: teamAt(1, 11) },
+      { phase: "Oitavas de final", date: "Seg., 06/07", time: "16:00", t1: teamAt(1, 2), t2: teamAt(1, 3) },
+      { phase: "Oitavas de final", date: "Seg., 06/07", time: "21:00", t1: teamAt(1, 4), t2: teamAt(1, 5) },
+      { phase: "Oitavas de final", date: "Ter., 07/07", time: "13:00", t1: teamAt(1, 12), t2: teamAt(1, 13) },
+      { phase: "Oitavas de final", date: "Ter., 07/07", time: "17:00", t1: teamAt(1, 14), t2: teamAt(1, 15) },
+      
+      { phase: "Quartas de final", date: "Qui., 09/07", time: "17:00", t1: teamAt(2, 0), t2: teamAt(2, 1) },
+      { phase: "Quartas de final", date: "Sex., 10/07", time: "16:00", t1: teamAt(2, 2), t2: teamAt(2, 3) },
+      { phase: "Quartas de final", date: "Sáb., 11/07", time: "18:00", t1: teamAt(2, 4), t2: teamAt(2, 5) },
+      { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", t1: teamAt(2, 6), t2: teamAt(2, 7) },
+      
+      { phase: "Semifinal", date: "Ter., 14/07", time: "16:00", t1: teamAt(3, 0), t2: teamAt(3, 1) },
+      { phase: "Semifinal", date: "Qua., 15/07", time: "16:00", t1: teamAt(3, 2), t2: teamAt(3, 3) },
+      
+      { phase: "Disputa 3º Lugar", date: "Sáb., 18/07", time: "18:00", t1: thirdPlace.teamA, t2: thirdPlace.teamB },
+      
+      { phase: "Final", date: "Dom., 19/07", time: "16:00", t1: teamAt(4, 0), t2: teamAt(4, 1) }
+    ]
+  }
+
   return (
     <div className="relative w-full h-full flex flex-col bg-background overflow-hidden select-none">
       {/* Top Header Bar */}
@@ -965,7 +1011,7 @@ export function WorldCupBracket() {
           onClick={() => setShowCalendar(false)}
         >
           <div
-            className="relative flex w-full max-w-md flex-col items-center gap-6 overflow-hidden rounded-2xl border border-gold/40 bg-card px-6 py-8 text-center shadow-[0_0_60px_oklch(0.82_0.13_80/0.35)]"
+            className="relative flex w-full max-w-md flex-col items-center gap-4 overflow-hidden rounded-2xl border border-gold/40 bg-card px-4 py-6 text-center shadow-[0_0_60px_oklch(0.82_0.13_80/0.35)]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Brilho de fundo */}
@@ -980,104 +1026,62 @@ export function WorldCupBracket() {
               <X className="size-4" />
             </button>
 
-            <h3 className="relative z-10 font-heading text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+            <h3 className="relative z-10 font-heading text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
               <Calendar className="size-5 text-gold-soft" />
               Calendário da Fase Final
             </h3>
 
             {/* Linha do tempo / Agenda */}
-            <div className="relative z-10 w-full text-left flex flex-col gap-4 mt-2">
-              <div className="relative pl-6 border-l border-gold/20 flex flex-col gap-5">
-                
-                {/* Item 1 */}
-                <div className="relative">
-                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-gold border-2 border-card" />
-                  <span className="block text-xs font-bold uppercase tracking-wider text-gold-soft">
-                    04 a 07 de Julho
-                  </span>
-                  <span className="text-sm font-semibold text-foreground">
-                    Oitavas de Final
-                  </span>
+            <div className="relative z-10 w-full flex flex-col gap-3 overflow-y-auto max-h-[50vh] pr-1.5 mt-2 hidden-scrollbar">
+              {getCalendarMatches().map((match, idx) => (
+                <div 
+                  key={idx} 
+                  className={`flex flex-col gap-2 p-2.5 rounded-lg border border-border/40 bg-background/50 text-left transition-colors hover:bg-background/85 ${
+                    match.phase === "Final" ? "border-gold/30 bg-gold/5 shadow-[0_0_10px_oklch(0.82_0.13_80/0.1)] animate-pulse" : ""
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+                    <span className={match.phase === "Final" ? "text-gold-soft" : ""}>{match.phase}</span>
+                    <span>{match.date} às {match.time}</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between gap-2 text-xs font-semibold text-foreground">
+                    {/* Time 1 */}
+                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                      {match.t1 ? (
+                        <>
+                          <img
+                            src={flagUrl(match.t1.slug)}
+                            alt=""
+                            className="size-4 rounded-full object-cover ring-1 ring-border"
+                          />
+                          <span className="truncate">{match.t1.name}</span>
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground/60 italic font-normal">A definir</span>
+                      )}
+                    </div>
+                    
+                    <span className="text-[10px] text-muted-foreground font-bold px-1.5">×</span>
+                    
+                    {/* Time 2 */}
+                    <div className="flex items-center gap-1.5 flex-1 justify-end min-w-0 text-right">
+                      {match.t2 ? (
+                        <>
+                          <span className="truncate">{match.t2.name}</span>
+                          <img
+                            src={flagUrl(match.t2.slug)}
+                            alt=""
+                            className="size-4 rounded-full object-cover ring-1 ring-border"
+                          />
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground/60 italic font-normal">A definir</span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-
-                {/* Item 2 */}
-                <div className="relative opacity-60">
-                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-muted border-2 border-card" />
-                  <span className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    08 de Julho
-                  </span>
-                  <span className="text-sm text-foreground">
-                    Descanso (Sem jogos)
-                  </span>
-                </div>
-
-                {/* Item 3 */}
-                <div className="relative">
-                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-gold border-2 border-card" />
-                  <span className="block text-xs font-bold uppercase tracking-wider text-gold-soft">
-                    09 a 11 de Julho
-                  </span>
-                  <span className="text-sm font-semibold text-foreground">
-                    Quartas de Final
-                  </span>
-                </div>
-
-                {/* Item 4 */}
-                <div className="relative opacity-60">
-                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-muted border-2 border-card" />
-                  <span className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    12 e 13 de Julho
-                  </span>
-                  <span className="text-sm text-foreground">
-                    Descanso (Sem jogos)
-                  </span>
-                </div>
-
-                {/* Item 5 */}
-                <div className="relative">
-                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-gold border-2 border-card" />
-                  <span className="block text-xs font-bold uppercase tracking-wider text-gold-soft">
-                    14 e 15 de Julho
-                  </span>
-                  <span className="text-sm font-semibold text-foreground">
-                    Semifinais
-                  </span>
-                </div>
-
-                {/* Item 6 */}
-                <div className="relative opacity-60">
-                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-muted border-2 border-card" />
-                  <span className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    16 e 17 de Julho
-                  </span>
-                  <span className="text-sm text-foreground">
-                    Descanso (Sem jogos)
-                  </span>
-                </div>
-
-                {/* Item 7 */}
-                <div className="relative">
-                  <div className="absolute -left-[29px] top-1 size-3 rounded-full bg-gold border-2 border-card" />
-                  <span className="block text-xs font-bold uppercase tracking-wider text-gold-soft">
-                    18 de Julho
-                  </span>
-                  <span className="text-sm font-semibold text-foreground">
-                    Disputa do 3º Lugar
-                  </span>
-                </div>
-
-                {/* Item 8 */}
-                <div className="relative">
-                  <div className="absolute -left-[29px] top-1 size-3.5 rounded-full bg-gold shadow-[0_0_8px_oklch(0.82_0.13_80)] border-2 border-card" />
-                  <span className="block text-xs font-bold uppercase tracking-wider text-gold-soft">
-                    19 de Julho
-                  </span>
-                  <span className="text-sm font-bold text-foreground">
-                    Grande Final
-                  </span>
-                </div>
-
-              </div>
+              ))}
             </div>
 
             <button
