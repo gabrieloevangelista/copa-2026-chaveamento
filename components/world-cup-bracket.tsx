@@ -233,21 +233,21 @@ export function WorldCupBracket() {
   return (
     <div className="flex w-full flex-col items-center gap-3">
       {/* Barra de controle compacta */}
-      <div className="flex w-full max-w-[1000px] items-center justify-between gap-4 px-4">
-        <div className="flex items-center gap-3">
+      <div className="flex w-full max-w-[1000px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-3 sm:px-4">
+        <div className="flex items-center gap-2 sm:gap-3">
           <img
             src="/images/fifa-2026-logo.jpg"
             alt="Logo FIFA World Cup 2026"
-            className="size-10 rounded-md object-cover sm:size-12"
+            className="size-9 rounded-md object-cover sm:size-12"
           />
-          <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-gold-soft sm:text-xs">
+          <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-gold-soft sm:tracking-[0.3em] sm:text-xs">
             Copa do Mundo 2026
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {champion ? (
-            <div className="flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 py-1 pl-1.5 pr-4">
+            <div className="flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 py-1 pl-1.5 pr-3 sm:pr-4">
               <span className="flex size-7 items-center justify-center overflow-hidden rounded-full bg-card ring-2 ring-gold">
                 <img
                   src={flagUrl(champion.slug) || "/placeholder.svg"}
@@ -265,18 +265,20 @@ export function WorldCupBracket() {
               </span>
             </div>
           ) : (
-            <span className="text-xs text-muted-foreground">
-              {filledCount}/{totalPicks} confrontos
+            <span className="text-[11px] text-muted-foreground sm:text-xs">
+              {filledCount}/{totalPicks}
+              <span className="hidden sm:inline"> confrontos</span>
             </span>
           )}
 
           <button
             type="button"
             onClick={reset}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+            aria-label="Reiniciar"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent sm:px-3"
           >
             <RotateCcw className="size-3.5" />
-            Reiniciar
+            <span className="hidden sm:inline">Reiniciar</span>
           </button>
         </div>
       </div>
