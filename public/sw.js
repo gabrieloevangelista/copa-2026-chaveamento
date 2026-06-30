@@ -1,4 +1,4 @@
-const CACHE_NAME = "copa-2026-cache-v1"
+const CACHE_NAME = "copa-2026-cache-v2"
 const ASSETS_TO_CACHE = [
   "/",
   "/manifest.json",
