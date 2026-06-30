@@ -85,6 +85,7 @@ export function WorldCupBracket() {
   const [showCalendar, setShowCalendar] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   const [showInstallBtn, setShowInstallBtn] = useState(false)
+  const [showIOSPrompt, setShowIOSPrompt] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
   const [isAudioPlaying, setIsAudioPlaying] = useState(true)
   const [scale, setScale] = useState(1)
@@ -116,6 +117,14 @@ export function WorldCupBracket() {
     }
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
+
+    // Detect iOS Safari to show manual install instruction banner
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches || (navigator as any).standalone
+    if (isIOS && !isStandalone) {
+      setShowIOSPrompt(true)
+    }
+
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
     }
@@ -1078,6 +1087,26 @@ export function WorldCupBracket() {
               Fechar Calendário
             </button>
           </div>
+        </div>
+      )}
+
+      {/* iOS Install Prompt Banner */}
+      {showIOSPrompt && (
+        <div className="fixed bottom-16 left-4 right-4 z-50 rounded-xl border border-gold/40 bg-card/95 p-4 shadow-xl backdrop-blur md:hidden flex items-start gap-3">
+          <div className="flex-1 text-left">
+            <h4 className="text-xs font-bold text-gold-soft uppercase tracking-wider">Instalar no iPhone</h4>
+            <p className="text-[11px] text-foreground mt-1 leading-normal">
+              Adicione à sua tela de início para abrir como app: toque no botão de <strong>Compartilhar</strong> (ícone com seta <span className="inline-block translate-y-0.5">📤</span>) e selecione <strong>"Adicionar à Tela de Início"</strong> (ícone <span className="inline-block translate-y-0.5">➕</span>).
+            </p>
+          </div>
+          <button 
+            type="button" 
+            onClick={() => setShowIOSPrompt(false)} 
+            className="text-muted-foreground hover:text-foreground p-0.5"
+            aria-label="Fechar dica"
+          >
+            <X className="size-4" />
+          </button>
         </div>
       )}
     </div>
