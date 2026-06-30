@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { RotateCcw, X, Volume2, VolumeX, Calendar } from "lucide-react"
+import { RotateCcw, X, Volume2, VolumeX, Calendar, Download } from "lucide-react"
 import confetti from "canvas-confetti"
 import { TEAMS, type Team, flagUrl } from "@/components/teams"
 
@@ -83,6 +83,8 @@ export function WorldCupBracket() {
   const [champion, setChampion] = useState<Team | null>(null)
   const [showCelebration, setShowCelebration] = useState(false)
   const [showCalendar, setShowCalendar] = useState(false)
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [showInstallBtn, setShowInstallBtn] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
   const [isAudioPlaying, setIsAudioPlaying] = useState(true)
   const [scale, setScale] = useState(1)
@@ -98,6 +100,35 @@ export function WorldCupBracket() {
   const pinchStartDistRef = useRef<number | null>(null)
   const scaleStartRef = useRef<number>(1)
   const dragPosStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+
+  // Register Service Worker and listen to Install prompt
+  useEffect(() => {
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js")
+        .then((reg) => console.log("Service Worker registrado com escopo:", reg.scope))
+        .catch((err) => console.error("Falha ao registrar Service Worker:", err))
+    }
+
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault()
+      setDeferredPrompt(e)
+      setShowInstallBtn(true)
+    }
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
+    }
+  }, [])
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return
+    deferredPrompt.prompt()
+    const { outcome } = await deferredPrompt.userChoice
+    console.log(`Escolha de instalação do usuário: ${outcome}`)
+    setDeferredPrompt(null)
+    setShowInstallBtn(false)
+  }
 
   // Active event listeners for passive-avoidance wheel and touch moves
   useEffect(() => {
@@ -519,6 +550,18 @@ export function WorldCupBracket() {
 
           {/* Desktop Actions (hidden on mobile) */}
           <div className="hidden md:flex items-center gap-2">
+            {showInstallBtn && (
+              <button
+                type="button"
+                onClick={handleInstallClick}
+                aria-label="Instalar Aplicativo"
+                className="inline-flex items-center gap-2 rounded-full border border-gold/60 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition-colors hover:bg-gold hover:text-background"
+              >
+                <Download className="size-3.5" />
+                <span>Instalar App</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={() => setShowCalendar(true)}
@@ -763,6 +806,17 @@ export function WorldCupBracket() {
 
       {/* Bottom Tabbar for Mobile */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/90 border-t border-border/40 backdrop-blur-md flex items-center justify-around py-2 pb-safe md:hidden">
+        {showInstallBtn && (
+          <button
+            type="button"
+            onClick={handleInstallClick}
+            className="flex flex-col items-center gap-1 text-[10px] font-semibold text-gold hover:text-gold-soft transition-colors"
+          >
+            <Download className="size-5" />
+            <span>Instalar</span>
+          </button>
+        )}
+
         <button
           type="button"
           onClick={() => setShowCalendar(true)}
