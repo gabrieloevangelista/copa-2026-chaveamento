@@ -130,9 +130,9 @@ export function WorldCupBracket() {
       lastChampionId.current = champion.id
       setShowCelebration(true)
       fireConfetti()
-      // Toca a trilha da Copa (com fallback para autoplay restrito)
+      // Toca a trilha da Copa a partir de 0:34 (com fallback para autoplay restrito)
       if (audioRef.current) {
-        audioRef.current.currentTime = 0
+        audioRef.current.currentTime = 34
         const playPromise = audioRef.current.play()
         if (playPromise !== undefined) {
           playPromise.catch(() => {
