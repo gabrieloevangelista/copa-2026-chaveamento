@@ -366,7 +366,7 @@ export function WorldCupBracket() {
 
       {/* Palco radial */}
       <div className="w-full px-2 [container-type:inline-size]">
-        <div className="relative mx-auto w-full max-w-[85vw]" style={{ aspectRatio: "1 / 1", minHeight: "300px" }}>
+        <div className="relative mx-auto" style={{ width: "clamp(300px, 70vw, 900px)", aspectRatio: "1 / 1" }}>
           {/* Linhas conectoras */}
           <svg
             viewBox="0 0 100 100"
