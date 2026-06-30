@@ -79,10 +79,9 @@ export function WorldCupBracket() {
     setChampion(null)
   }
 
-  // Chave interligada: um arco liga os dois confrontos de cada par e um
-  // conector radial leva do meio do arco até o nó da etapa seguinte.
-  const { arcs, connectors } = useMemo(() => {
-    const arcs: { d: string; active: boolean; key: string }[] = []
+  // Chave interligada em árvore: de cada seleção sai uma linha reta até o nó
+  // da etapa seguinte. Os dois irmãos convergem para o mesmo nó (formato "V").
+  const connectors = useMemo(() => {
     const connectors: {
       x1: number
       y1: number
@@ -93,56 +92,39 @@ export function WorldCupBracket() {
     }[] = []
 
     for (let ring = 0; ring < 4; ring++) {
-      const { count, radius } = RINGS[ring]
       const parentRing = ring + 1
-      for (let p = 0; p < RINGS[parentRing].count; p++) {
-        const aIdx = p * 2
-        const bIdx = p * 2 + 1
-        const aAngle = nodeAngle(ring, aIdx)
-        const bAngle = nodeAngle(ring, bIdx)
-        const a = pointOnRing(radius, aAngle)
-        const b = pointOnRing(radius, bAngle)
-        // arco curto ao longo do anel ligando os dois irmãos
-        arcs.push({
-          key: `arc-${ring}-${p}`,
-          d: `M ${a.left} ${a.top} A ${radius} ${radius} 0 0 1 ${b.left} ${b.top}`,
-          active: !!winners[`${parentRing}-${p}`],
-        })
-        // conector do meio do arco até o nó pai
-        const midAngle = (aAngle + bAngle) / 2
-        const mid = pointOnRing(radius, midAngle)
-        const parent = nodePos(parentRing, p)
+      for (let i = 0; i < RINGS[ring].count; i++) {
+        const from = nodePos(ring, i)
+        const parentIndex = Math.floor(i / 2)
+        const to = nodePos(parentRing, parentIndex)
+        const child = teamAt(ring, i)
+        const parentWinner = winners[`${parentRing}-${parentIndex}`]
         connectors.push({
-          key: `con-${ring}-${p}`,
-          x1: mid.left,
-          y1: mid.top,
-          x2: parent.left,
-          y2: parent.top,
-          active: !!winners[`${parentRing}-${p}`],
+          key: `con-${ring}-${i}`,
+          x1: from.left,
+          y1: from.top,
+          x2: to.left,
+          y2: to.top,
+          active: !!child && parentWinner?.id === child.id,
         })
       }
     }
 
-    // Final: arco ligando os dois finalistas e conector até a taça (centro).
-    const fRadius = RINGS[4].radius
-    const fa = pointOnRing(fRadius, nodeAngle(4, 0))
-    const fb = pointOnRing(fRadius, nodeAngle(4, 1))
-    arcs.push({
-      key: "arc-final",
-      d: `M ${fa.left} ${fa.top} A ${fRadius} ${fRadius} 0 0 1 ${fb.left} ${fb.top}`,
-      active: !!champion,
-    })
-    const midFinal = pointOnRing(fRadius, (nodeAngle(4, 0) + nodeAngle(4, 1)) / 2)
-    connectors.push({
-      key: "con-final",
-      x1: midFinal.left,
-      y1: midFinal.top,
-      x2: 50,
-      y2: 50,
-      active: !!champion,
-    })
+    // Finalistas até o centro (a taça).
+    for (let i = 0; i < 2; i++) {
+      const from = nodePos(4, i)
+      const finalist = teamAt(4, i)
+      connectors.push({
+        key: `con-final-${i}`,
+        x1: from.left,
+        y1: from.top,
+        x2: 50,
+        y2: 50,
+        active: !!finalist && champion?.id === finalist.id,
+      })
+    }
 
-    return { arcs, connectors }
+    return connectors
   }, [winners, champion])
 
   // Pequenos pontos de junção em cada nó interno (oitavas → final).
@@ -266,20 +248,7 @@ export function WorldCupBracket() {
               strokeWidth={0.22}
               filter="url(#goldGlow)"
             />
-            {/* Arcos ligando cada par de confrontos da etapa */}
-            {arcs.map((a) => (
-              <path
-                key={a.key}
-                d={a.d}
-                fill="none"
-                stroke={GOLD}
-                strokeOpacity={a.active ? 1 : 0.75}
-                strokeWidth={a.active ? 0.7 : 0.5}
-                strokeLinecap="round"
-                filter={a.active ? "url(#goldGlowStrong)" : "url(#goldGlow)"}
-              />
-            ))}
-            {/* Conectores do arco até a etapa seguinte */}
+            {/* Linhas retas ligando cada seleção ao nó da etapa seguinte */}
             {connectors.map((c) => (
               <line
                 key={c.key}
