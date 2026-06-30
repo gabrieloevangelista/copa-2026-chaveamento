@@ -195,16 +195,38 @@ export function WorldCupBracket() {
             className="absolute inset-0 size-full"
             aria-hidden="true"
           >
+            <defs>
+              <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow
+                  dx="0"
+                  dy="0"
+                  stdDeviation="0.5"
+                  floodColor="oklch(0.82 0.13 80)"
+                  floodOpacity="0.55"
+                />
+              </filter>
+              <filter id="goldGlowStrong" x="-80%" y="-80%" width="260%" height="260%">
+                <feDropShadow
+                  dx="0"
+                  dy="0"
+                  stdDeviation="0.9"
+                  floodColor="oklch(0.82 0.13 80)"
+                  floodOpacity="0.9"
+                />
+              </filter>
+            </defs>
+
             {/* Anel fino ao redor da taça */}
             <circle
               cx={50}
               cy={50}
               r={10}
               fill="none"
-              className="stroke-line/50"
+              className="stroke-gold/40"
               strokeWidth={0.22}
+              filter="url(#goldGlow)"
             />
-            {/* Segmentos do chaveamento */}
+            {/* Segmentos do chaveamento (com leve glow dourado) */}
             {lines.map((l) => (
               <line
                 key={l.key}
@@ -212,9 +234,10 @@ export function WorldCupBracket() {
                 y1={l.y1}
                 x2={l.x2}
                 y2={l.y2}
-                className={l.active ? "stroke-gold" : "stroke-line/75"}
-                strokeWidth={l.active ? 0.45 : 0.3}
+                className={l.active ? "stroke-gold" : "stroke-gold/55"}
+                strokeWidth={l.active ? 0.55 : 0.36}
                 strokeLinecap="round"
+                filter={l.active ? "url(#goldGlowStrong)" : "url(#goldGlow)"}
               />
             ))}
             {/* Pontos de junção em cada nó */}
@@ -223,8 +246,9 @@ export function WorldCupBracket() {
                 key={j.key}
                 cx={j.x}
                 cy={j.y}
-                r={j.active ? 0.55 : 0.42}
-                className={j.active ? "fill-gold" : "fill-line"}
+                r={j.active ? 0.6 : 0.42}
+                className={j.active ? "fill-gold" : "fill-gold/45"}
+                filter={j.active ? "url(#goldGlowStrong)" : "url(#goldGlow)"}
               />
             ))}
           </svg>
@@ -311,7 +335,7 @@ function Node({
             src={flagUrl(team.slug) || "/placeholder.svg"}
             alt={`Bandeira ${team.name}`}
             loading="lazy"
-            className="size-full scale-110 rounded-full object-cover"
+            className="size-full scale-[1.45] rounded-full object-cover"
           />
         </span>
       ) : null}
