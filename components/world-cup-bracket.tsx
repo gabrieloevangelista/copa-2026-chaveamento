@@ -45,11 +45,48 @@ function nodePos(ring: number, index: number) {
 
 type Winners = Record<string, Team>
 
+const STORAGE_KEY = "fifa-2026-bracket"
+
 export function WorldCupBracket() {
   const [winners, setWinners] = useState<Winners>({})
   const [champion, setChampion] = useState<Team | null>(null)
   const [showCelebration, setShowCelebration] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
   const lastChampionId = useRef<number | null>(null)
+
+  // Recupera o estado do localStorage ao montar.
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        const { winners: w, champion: c } = JSON.parse(saved)
+        setWinners(w || {})
+        if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
+      }
+    } catch (e) {
+      console.error("[v0] Erro ao recuperar estado:", e)
+    }
+    setIsLoaded(true)
+  }, [])
+
+  // Salva o estado sempre que winners ou champion mudam.
+  useEffect(() => {
+    if (!isLoaded || typeof window === "undefined") return
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          winners: Object.fromEntries(
+            Object.entries(winners).map(([k, team]) => [k, { id: team.id }])
+          ),
+          champion: champion ? { id: champion.id } : null,
+        })
+      )
+    } catch (e) {
+      console.error("[v0] Erro ao salvar estado:", e)
+    }
+  }, [winners, champion, isLoaded])
 
   // Dispara o confete em ondas a partir das laterais.
   const fireConfetti = useCallback(() => {
@@ -135,6 +172,19 @@ export function WorldCupBracket() {
   function reset() {
     setWinners({})
     setChampion(null)
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(STORAGE_KEY)
+    }
+  }
+
+  // Verifica se um time perdeu em seu confronto (tem um rival que avançou no mesmo nó).
+  function hasLost(ring: number, index: number, team: Team | null): boolean {
+    if (!team) return false
+    const parentRing = ring + 1
+    const parentIndex = Math.floor(index / 2)
+    const winner = winners[`${parentRing}-${parentIndex}`]
+    // Se há um vencedor neste nó e não é este time, então este perdeu.
+    return !!winner && winner.id !== team.id
   }
 
   // Chave interligada: um arco liga os dois confrontos de cada par e um
@@ -410,6 +460,7 @@ export function WorldCupBracket() {
               const team = teamAt(ring, index)
               const pos = nodePos(ring, index)
               const advanced = hasAdvanced(ring, index, team)
+              const lost = hasLost(ring, index, team)
               return (
                 <Node
                   key={`${ring}-${index}`}
@@ -418,6 +469,7 @@ export function WorldCupBracket() {
                   left={pos.left}
                   top={pos.top}
                   advanced={advanced}
+                  lost={lost}
                   onClick={() => pick(ring, index)}
                 />
               )
@@ -500,6 +552,7 @@ function Node({
   left,
   top,
   advanced,
+  lost,
   onClick,
 }: {
   team: Team | null
@@ -507,6 +560,7 @@ function Node({
   left: number
   top: number
   advanced: boolean
+  lost: boolean
   onClick: () => void
 }) {
   return (
@@ -526,17 +580,21 @@ function Node({
     >
       {team ? (
         <span
-          className={`flex size-full items-center justify-center overflow-hidden rounded-full bg-card shadow-md ring-2 ${
-            advanced
-              ? "ring-gold shadow-[0_0_14px_oklch(0.82_0.13_80/0.6)]"
-              : "ring-border"
+          className={`flex size-full items-center justify-center overflow-hidden rounded-full bg-card shadow-md ring-2 transition-all duration-500 ${
+            lost
+              ? "ring-border opacity-50"
+              : advanced
+                ? "ring-gold shadow-[0_0_14px_oklch(0.82_0.13_80/0.6)]"
+                : "ring-border"
           }`}
         >
           <img
             src={flagUrl(team.slug) || "/placeholder.svg"}
             alt={`Bandeira ${team.name}`}
             loading="lazy"
-            className="size-full scale-[1.45] rounded-full object-cover"
+            className={`size-full scale-[1.45] rounded-full object-cover transition-all duration-500 ${
+              lost ? "grayscale" : ""
+            }`}
           />
         </span>
       ) : null}
