@@ -312,7 +312,7 @@ export function WorldCupBracket() {
   const totalPicks = 16 + 8 + 4 + 2 + 1 // 31 confrontos no total
 
   return (
-    <div className="flex w-full flex-col items-center gap-3">
+    <div className="flex w-full flex-col items-center gap-2 sm:gap-3">
       {/* Barra de controle compacta */}
       <div className="flex w-full max-w-[1000px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-3 sm:px-4">
         <div className="flex items-center gap-2 sm:gap-3">
@@ -366,7 +366,7 @@ export function WorldCupBracket() {
 
       {/* Palco radial */}
       <div className="w-full px-2 [container-type:inline-size]">
-        <div className="relative mx-auto w-full max-w-[1000px]" style={{ aspectRatio: "1 / 1", minHeight: "300px" }}>
+        <div className="relative mx-auto w-full max-w-[90vw]" style={{ aspectRatio: "1 / 1", maxHeight: "90vh", minHeight: "300px" }}>
           {/* Linhas conectoras */}
           <svg
             viewBox="0 0 100 100"
@@ -569,24 +569,28 @@ export function WorldCupBracket() {
               Campeão Mundial 2026
             </p>
 
-            {/* Taça animada + taça oficial + bandeira em destaque */}
-            <div className="relative z-10 flex items-center justify-center gap-6">
+            {/* Taça oficial no topo */}
+            <img
+              src="/images/trophy.png"
+              alt="Taça da Copa do Mundo"
+              className="relative z-10 h-32 w-auto object-contain drop-shadow-[0_0_30px_oklch(0.85_0.15_82/0.9)]"
+            />
+
+            <h2 className="relative z-10 text-balance font-heading text-3xl font-bold tracking-tight text-foreground">
+              {champion.name}
+            </h2>
+
+            {/* GIF + bandeira em destaque na parte inferior */}
+            <div className="relative z-10 flex items-center justify-center gap-8">
               {/* GIF animado */}
               <img
                 src="/images/fifa-world-cup-2026-trophy.gif"
                 alt="Troféu Copa 2026 animado"
-                className="h-32 w-auto object-contain"
-              />
-              
-              {/* Taça oficial */}
-              <img
-                src="/images/trophy.png"
-                alt="Taça da Copa do Mundo"
-                className="h-40 w-auto object-contain drop-shadow-[0_0_30px_oklch(0.85_0.15_82/0.9)]"
+                className="h-28 w-auto object-contain"
               />
               
               {/* Bandeira do campeão */}
-              <span className="flex size-28 items-center justify-center overflow-hidden rounded-full bg-card ring-4 ring-gold shadow-[0_0_30px_oklch(0.82_0.13_80/0.7)]">
+              <span className="flex size-32 items-center justify-center overflow-hidden rounded-full bg-card ring-4 ring-gold shadow-[0_0_30px_oklch(0.82_0.13_80/0.7)]">
                 <img
                   src={flagUrl(champion.slug) || "/placeholder.svg"}
                   alt={`Bandeira ${champion.name}`}
@@ -594,10 +598,6 @@ export function WorldCupBracket() {
                 />
               </span>
             </div>
-
-            <h2 className="relative z-10 text-balance font-heading text-3xl font-bold tracking-tight text-foreground">
-              {champion.name}
-            </h2>
 
             <button
               type="button"
