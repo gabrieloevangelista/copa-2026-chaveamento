@@ -178,9 +178,16 @@ export function WorldCupBracket() {
     <div className="flex w-full flex-col items-center gap-3">
       {/* Barra de controle compacta */}
       <div className="flex w-full max-w-[1000px] items-center justify-between gap-4 px-4">
-        <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-gold-soft sm:text-xs">
-          Copa do Mundo 2026
-        </p>
+        <div className="flex items-center gap-3">
+          <img
+            src="/images/fifa-2026-logo.jpg"
+            alt="Logo FIFA World Cup 2026"
+            className="size-10 rounded-md object-cover sm:size-12"
+          />
+          <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-gold-soft sm:text-xs">
+            Copa do Mundo 2026
+          </p>
+        </div>
 
         <div className="flex items-center gap-3">
           {champion ? (
