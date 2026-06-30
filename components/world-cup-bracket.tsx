@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { RotateCcw, X } from "lucide-react"
+import { RotateCcw, X, Volume2, VolumeX } from "lucide-react"
 import confetti from "canvas-confetti"
 import { TEAMS, type Team, flagUrl } from "@/components/teams"
 
@@ -52,7 +52,9 @@ export function WorldCupBracket() {
   const [champion, setChampion] = useState<Team | null>(null)
   const [showCelebration, setShowCelebration] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
   const lastChampionId = useRef<number | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   // Recupera o estado do localStorage ao montar.
   useEffect(() => {
@@ -122,16 +124,31 @@ export function WorldCupBracket() {
     })
   }, [])
 
-  // Ao coroar um novo campeão: celebração + pop-up.
+  // Ao coroar um novo campeão: celebração + pop-up + música.
   useEffect(() => {
     if (champion && champion.id !== lastChampionId.current) {
       lastChampionId.current = champion.id
       setShowCelebration(true)
       fireConfetti()
+      // Toca a trilha da Copa (com fallback para autoplay restrito)
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0
+        const playPromise = audioRef.current.play()
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            console.log("[v0] Autoplay bloqueado, clique para ativar som")
+          })
+        }
+      }
     }
     if (!champion) {
       lastChampionId.current = null
       setShowCelebration(false)
+      // Para a música
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current.currentTime = 0
+      }
     }
   }, [champion, fireConfetti])
 
@@ -185,6 +202,20 @@ export function WorldCupBracket() {
     const winner = winners[`${parentRing}-${parentIndex}`]
     // Se há um vencedor neste nó e não é este time, então este perdeu.
     return !!winner && winner.id !== team.id
+  }
+
+  // Alterna reprodução de áudio
+  function toggleAudio() {
+    if (!audioRef.current) return
+    if (isAudioPlaying) {
+      audioRef.current.pause()
+      setIsAudioPlaying(false)
+    } else {
+      audioRef.current.play().catch(() => {
+        console.log("[v0] Falha ao reproduzir áudio")
+      })
+      setIsAudioPlaying(true)
+    }
   }
 
   // Chave interligada: um arco liga os dois confrontos de cada par e um
@@ -495,6 +526,25 @@ export function WorldCupBracket() {
         <span>BBM Space</span>
       </a>
 
+      {/* Áudio da trilha da Copa */}
+      <audio
+        ref={audioRef}
+        loop
+        crossOrigin="anonymous"
+        onPlay={() => setIsAudioPlaying(true)}
+        onPause={() => setIsAudioPlaying(false)}
+      >
+        <source
+          src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_45c0e0e20c.mp3"
+          type="audio/mpeg"
+        />
+        {/* Fallback: URL alternativa */}
+        <source
+          src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+          type="audio/mpeg"
+        />
+      </audio>
+
       {/* Pop-up de celebração do campeão */}
       {champion && showCelebration && (
         <div
@@ -544,13 +594,27 @@ export function WorldCupBracket() {
               {champion.name}
             </h2>
 
-            <button
-              type="button"
-              onClick={() => setShowCelebration(false)}
-              className="relative z-10 inline-flex items-center justify-center rounded-full bg-gold px-6 py-2 text-sm font-semibold text-background transition-transform hover:scale-105"
-            >
-              Comemorar
-            </button>
+            <div className="relative z-10 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={toggleAudio}
+                aria-label={isAudioPlaying ? "Desativar som" : "Ativar som"}
+                className="inline-flex items-center justify-center rounded-full border border-gold/40 bg-gold/10 p-2 text-gold transition-colors hover:bg-gold hover:text-background"
+              >
+                {isAudioPlaying ? (
+                  <Volume2 className="size-5" />
+                ) : (
+                  <VolumeX className="size-5" />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowCelebration(false)}
+                className="relative z-10 inline-flex items-center justify-center rounded-full bg-gold px-6 py-2 text-sm font-semibold text-background transition-transform hover:scale-105"
+              >
+                Comemorar
+              </button>
+            </div>
           </div>
         </div>
       )}
