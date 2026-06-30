@@ -526,7 +526,7 @@ export function WorldCupBracket() {
         <span>BBM Space</span>
       </a>
 
-      {/* Áudio da trilha da Copa */}
+      {/* Áudio da trilha oficial da Copa 2026 */}
       <audio
         ref={audioRef}
         loop
@@ -535,12 +535,7 @@ export function WorldCupBracket() {
         onPause={() => setIsAudioPlaying(false)}
       >
         <source
-          src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_45c0e0e20c.mp3"
-          type="audio/mpeg"
-        />
-        {/* Fallback: URL alternativa */}
-        <source
-          src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+          src="/audio/fifa-2026-theme.mp3"
           type="audio/mpeg"
         />
       </audio>
@@ -594,27 +589,18 @@ export function WorldCupBracket() {
               {champion.name}
             </h2>
 
-            <div className="relative z-10 flex items-center gap-3">
-              <button
-                type="button"
-                onClick={toggleAudio}
-                aria-label={isAudioPlaying ? "Desativar som" : "Ativar som"}
-                className="inline-flex items-center justify-center rounded-full border border-gold/40 bg-gold/10 p-2 text-gold transition-colors hover:bg-gold hover:text-background"
-              >
-                {isAudioPlaying ? (
-                  <Volume2 className="size-5" />
-                ) : (
-                  <VolumeX className="size-5" />
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowCelebration(false)}
-                className="relative z-10 inline-flex items-center justify-center rounded-full bg-gold px-6 py-2 text-sm font-semibold text-background transition-transform hover:scale-105"
-              >
-                Comemorar
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={toggleAudio}
+              aria-label={isAudioPlaying ? "Desativar som" : "Ativar som"}
+              className="relative z-10 inline-flex items-center justify-center rounded-full border border-gold/40 bg-gold/10 p-3 text-gold transition-colors hover:bg-gold hover:text-background"
+            >
+              {isAudioPlaying ? (
+                <Volume2 className="size-6" />
+              ) : (
+                <VolumeX className="size-6" />
+              )}
+            </button>
           </div>
         </div>
       )}
