@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { RotateCcw, Trophy } from "lucide-react"
+import { RotateCcw } from "lucide-react"
 import { TEAMS, type Team, flagUrl } from "@/components/teams"
 
 // Anéis do mais externo (32 times) ao mais interno (2 finalistas).
@@ -113,6 +113,24 @@ export function WorldCupBracket() {
     return result
   }, [winners, champion])
 
+  // Pequenos pontos de junção em cada nó interno (oitavas → final).
+  const junctions = useMemo(() => {
+    const result: { x: number; y: number; active: boolean; key: string }[] = []
+    for (let ring = 1; ring <= 4; ring++) {
+      for (let i = 0; i < RINGS[ring].count; i++) {
+        const pos = nodePos(ring, i)
+        const team = winners[`${ring}-${i}`] ?? null
+        let active = false
+        if (team) {
+          if (ring === 4) active = champion?.id === team.id
+          else active = winners[`${ring + 1}-${Math.floor(i / 2)}`]?.id === team.id
+        }
+        result.push({ key: `j-${ring}-${i}`, x: pos.left, y: pos.top, active })
+      }
+    }
+    return result
+  }, [winners, champion])
+
   // Um nó "avançou" se é o vencedor escolhido do seu confronto.
   function hasAdvanced(ring: number, index: number, team: Team | null) {
     if (!team) return false
@@ -125,48 +143,42 @@ export function WorldCupBracket() {
   const totalPicks = 16 + 8 + 4 + 2 + 1 // 31 confrontos no total
 
   return (
-    <div className="flex w-full flex-col items-center gap-6">
-      {/* Cabeçalho / campeão */}
-      <div className="flex w-full max-w-[1000px] flex-col items-center gap-3 px-4 text-center">
-        <p className="text-xs font-medium uppercase tracking-[0.3em] text-gold-soft">
+    <div className="flex w-full flex-col items-center gap-3">
+      {/* Barra de controle compacta */}
+      <div className="flex w-full max-w-[1000px] items-center justify-between gap-4 px-4">
+        <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-gold-soft sm:text-xs">
           Copa do Mundo 2026
         </p>
-        <h1 className="text-balance font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Chaveamento — dos 16-avos à final
-        </h1>
-        <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
-          Clique em uma seleção para avançá-la em cada confronto. Continue até coroar o campeão no centro.
-        </p>
 
-        <div className="mt-1 flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {champion ? (
-            <div className="flex items-center gap-3 rounded-full border border-gold/40 bg-gold/10 py-2 pl-2 pr-5">
-              <span className="flex size-10 items-center justify-center overflow-hidden rounded-full bg-card ring-2 ring-gold">
+            <div className="flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 py-1 pl-1.5 pr-4">
+              <span className="flex size-7 items-center justify-center overflow-hidden rounded-full bg-card ring-2 ring-gold">
                 <img
                   src={flagUrl(champion.slug) || "/placeholder.svg"}
                   alt={`Bandeira ${champion.name}`}
-                  className="size-9 rounded-full object-cover"
+                  className="size-6 rounded-full object-cover"
                 />
               </span>
-              <span className="text-left">
-                <span className="block text-[10px] font-medium uppercase tracking-widest text-gold-soft">
+              <span className="text-left leading-none">
+                <span className="block text-[9px] font-medium uppercase tracking-widest text-gold-soft">
                   Campeão
                 </span>
-                <span className="block font-heading text-lg font-bold leading-none text-foreground">
+                <span className="block font-heading text-sm font-bold text-foreground">
                   {champion.name}
                 </span>
               </span>
             </div>
           ) : (
             <span className="text-xs text-muted-foreground">
-              {filledCount}/{totalPicks} confrontos definidos
+              {filledCount}/{totalPicks} confrontos
             </span>
           )}
 
           <button
             type="button"
             onClick={reset}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
           >
             <RotateCcw className="size-3.5" />
             Reiniciar
@@ -183,6 +195,16 @@ export function WorldCupBracket() {
             className="absolute inset-0 size-full"
             aria-hidden="true"
           >
+            {/* Anel fino ao redor da taça */}
+            <circle
+              cx={50}
+              cy={50}
+              r={10}
+              fill="none"
+              className="stroke-line/50"
+              strokeWidth={0.22}
+            />
+            {/* Segmentos do chaveamento */}
             {lines.map((l) => (
               <line
                 key={l.key}
@@ -190,13 +212,19 @@ export function WorldCupBracket() {
                 y1={l.y1}
                 x2={l.x2}
                 y2={l.y2}
-                className={
-                  l.active
-                    ? "stroke-gold"
-                    : "stroke-line/60"
-                }
+                className={l.active ? "stroke-gold" : "stroke-line/75"}
                 strokeWidth={l.active ? 0.45 : 0.3}
                 strokeLinecap="round"
+              />
+            ))}
+            {/* Pontos de junção em cada nó */}
+            {junctions.map((j) => (
+              <circle
+                key={j.key}
+                cx={j.x}
+                cy={j.y}
+                r={j.active ? 0.55 : 0.42}
+                className={j.active ? "fill-gold" : "fill-line"}
               />
             ))}
           </svg>
@@ -232,6 +260,11 @@ export function WorldCupBracket() {
           )}
         </div>
       </div>
+
+      {/* Assinatura */}
+      <span className="font-heading text-sm font-bold tracking-tight text-muted-foreground/70">
+        es
+      </span>
     </div>
   )
 }
@@ -281,11 +314,7 @@ function Node({
             className="size-full scale-110 rounded-full object-cover"
           />
         </span>
-      ) : (
-        <span className="flex size-full items-center justify-center rounded-full border border-dashed border-border bg-card/40">
-          <Trophy className="size-1/3 text-muted-foreground/40" />
-        </span>
-      )}
+      ) : null}
     </button>
   )
 }
