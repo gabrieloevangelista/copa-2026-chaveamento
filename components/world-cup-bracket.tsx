@@ -237,7 +237,7 @@ export function WorldCupBracket() {
     setIsDragging(false)
   }
 
-  // Estado pré-carregado: Brasil, Marrocos, Suíça, Paraguai, Canadá, Noruega nas oitavas
+  // Estado pré-carregado: Brasil, Marrocos, Suíça, Paraguai, Canadá, Noruega, França nas oitavas
   const DEFAULT_WINNERS: Winners = {
     "1-0": TEAMS[1],   // Canadá (1) vence África do Sul (0)
     "1-1": TEAMS[3],   // Marrocos (3) vence Holanda (2)
@@ -245,6 +245,7 @@ export function WorldCupBracket() {
     "1-8": TEAMS[16],  // Brasil (16) vence Japão (17)
     "1-9": TEAMS[19],  // Noruega (19) vence Costa do Marfim (18)
     "1-14": TEAMS[29], // Suíça (29) vence Argélia (28)
+    "1-15": TEAMS[30], // França (30) vence Suécia (31)
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -260,6 +261,10 @@ export function WorldCupBracket() {
             const fullTeam = TEAMS.find((t) => t.id === (val as any).id)
             if (fullTeam) mappedWinners[key] = fullTeam
           }
+        }
+        // Injeta a França se ela não estiver configurada ainda
+        if (!mappedWinners["1-15"]) {
+          mappedWinners["1-15"] = TEAMS[30]
         }
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
@@ -910,7 +915,7 @@ export function WorldCupBracket() {
         href="https://bbmspace.com"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-20 left-0 right-0 md:bottom-2 z-30 flex items-center justify-center gap-1.5 px-2 py-1 text-[10px] font-medium text-muted-foreground/50 transition-colors hover:text-gold-soft md:text-xs md:relative md:bg-transparent md:py-1.5"
+        className="fixed bottom-20 left-0 right-0 md:bottom-3 z-30 flex items-center justify-center gap-1.5 px-2 py-1 text-[10px] font-medium text-muted-foreground/50 transition-colors hover:text-gold-soft md:text-xs md:bg-transparent md:py-1.5"
         title="BBM Space"
       >
         <span>Powered by</span>
