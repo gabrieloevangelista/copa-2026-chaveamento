@@ -579,6 +579,8 @@ export function WorldCupBracket() {
     const checkMatches = () => {
       const now = Date.now()
       
+
+
       const activeItem = SCHEDULE.find(item => {
         if (winnersRef.current[item.parentWinnerKey]) return false
         // Jogo dura 120 minutos (90 min jogo + 15 min intervalo + acréscimos)
