@@ -211,8 +211,8 @@ function getDeterministicMatchResult(matchId: string) {
       t1ScoreFinal: 2,
       t2ScoreFinal: 0,
       goals: [
-        { minute: 14, team: 1 as const },
-        { minute: 72, team: 1 as const }
+        { minute: 1, team: 1 as const },
+        { minute: 2, team: 1 as const }
       ]
     }
   }
