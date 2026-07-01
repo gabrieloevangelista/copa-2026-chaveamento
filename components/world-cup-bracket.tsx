@@ -494,7 +494,7 @@ export function WorldCupBracket() {
     setScale((prev) => Math.min(3, prev + 0.1))
   }
 
-  // Estado pré-carregado: Brasil, Marrocos, Suíça, Paraguai, Canadá, Noruega, França nas oitavas
+  // Estado pré-carregado: Brasil, Marrocos, Suíça, Paraguai, Canadá, Noruega, França e México nas oitavas
   const DEFAULT_WINNERS: Winners = {
     "1-0": TEAMS[1],   // Canadá (1) vence África do Sul (0)
     "1-1": TEAMS[3],   // Marrocos (3) vence Holanda (2)
@@ -502,6 +502,7 @@ export function WorldCupBracket() {
     "1-3": TEAMS[6],   // França (30) vence Suécia (31) -- at index 6
     "1-8": TEAMS[16],  // Brasil (16) vence Japão (17)
     "1-9": TEAMS[19],  // Noruega (19) vence Costa do Marfim (18)
+    "1-10": TEAMS[20], // México (20) vence Equador (21)
     "1-14": TEAMS[28], // Suíça (29) vence Argélia (28) -- at index 28
   }
 
@@ -588,15 +589,15 @@ export function WorldCupBracket() {
    * }, [isLoaded, liveMatchId])
     */
 
-  // Escuta atualizações de placar do x.com (Twitter) em tempo real via WebSocket
+  // Escuta atualizações de placar via WebSocket (LiveScore/X.com)
   useEffect(() => {
     if (!isLoaded) return
 
-    // Conecta a uma stream simulada do X.com que escuta tweets com hashtags de jogos (#MEXxECU, #Brasil, etc.)
+    // Conecta a uma stream real/simulada de LiveScore
     const ws = new WebSocket("wss://x-stream.copa2026.org/live-scores")
 
     ws.onopen = () => {
-      console.log("[X.com WebSocket] Conectado ao stream de atualizações de placar")
+      console.log("[LiveScore] Conectado ao stream de resultados em tempo real")
     }
 
     ws.onmessage = (event) => {
@@ -605,29 +606,36 @@ export function WorldCupBracket() {
         if (data && data.matchId) {
           const activeItem = SCHEDULE.find(item => item.id === data.matchId)
           if (activeItem) {
-            const t1 = TEAMS[activeItem.t1_idx]
-            const t2 = TEAMS[activeItem.t2_idx]
-            
-            setLiveMatch({
-              matchId: activeItem.id,
-              t1,
-              t2,
-              t1Score: data.homeScore,
-              t2Score: data.awayScore,
-              minute: data.minute || 90,
-              scorer: data.scorer || "",
-              isActive: data.isActive !== false
-            })
-
-            // Se o jogo encerrou no stream do X: avança vencedor na chave
-            if (data.isActive === false) {
-              const winner = data.homeScore > data.awayScore ? t1 : t2
-              setWinners(prev => ({ ...prev, [activeItem.parentWinnerKey]: winner }))
+            // Só exibe se estiver marcado como ativo no stream
+            if (data.isActive) {
+              const t1 = TEAMS[activeItem.t1_idx]
+              const t2 = TEAMS[activeItem.t2_idx]
+              
+              setLiveMatch({
+                matchId: activeItem.id,
+                t1,
+                t2,
+                t1Score: data.homeScore,
+                t2Score: data.awayScore,
+                minute: data.minute || 90,
+                scorer: data.scorer || "",
+                isActive: true
+              })
+            } else {
+              // Se o jogo acabou, remove o placar ao vivo imediatamente
+              setLiveMatch(null)
+              
+              // Avança vencedor na chave se necessário
+              const winner = data.homeScore > data.awayScore ? TEAMS[activeItem.t1_idx] : TEAMS[activeItem.t2_idx]
+              setWinners(prev => {
+                if (prev[activeItem.parentWinnerKey]) return prev
+                return { ...prev, [activeItem.parentWinnerKey]: winner }
+              })
             }
           }
         }
       } catch (e) {
-        console.error("[X.com WebSocket] Erro ao processar mensagem:", e)
+        console.error("[LiveScore] Erro ao processar mensagem:", e)
       }
     }
 
@@ -664,21 +672,26 @@ export function WorldCupBracket() {
                 const t1 = TEAMS[activeItem.t1_idx]
                 const t2 = TEAMS[activeItem.t2_idx]
                 
-                setLiveMatch({
-                  matchId: activeItem.id,
-                  t1,
-                  t2,
-                  t1Score: data.homeScore,
-                  t2Score: data.awayScore,
-                  minute: 90,
-                  scorer: "",
-                  isActive: data.isActive,
-                  status: data.status
-                })
-
-                if (!data.isActive) {
+                if (data.isActive) {
+                  setLiveMatch({
+                    matchId: activeItem.id,
+                    t1,
+                    t2,
+                    t1Score: data.homeScore,
+                    t2Score: data.awayScore,
+                    minute: 90,
+                    scorer: "",
+                    isActive: true,
+                    status: data.status
+                  })
+                } else {
+                  // Se o jogo encerrou: remove placar e avança vencedor
+                  setLiveMatch(null)
                   const winner = data.homeScore > data.awayScore ? t1 : t2
-                  setWinners(prev => ({ ...prev, [activeItem.parentWinnerKey]: winner }))
+                  setWinners(prev => {
+                    if (prev[activeItem.parentWinnerKey]) return prev
+                    return { ...prev, [activeItem.parentWinnerKey]: winner }
+                  })
                 }
               }
             }
@@ -749,16 +762,13 @@ export function WorldCupBracket() {
             const parentRing = 1
             const parentIndex = Math.floor(finishedItem.t1_idx / 2)
             const key = `${parentRing}-${parentIndex}`
-            setWinners(prev => ({ ...prev, [key]: winner }))
-            
-            setLiveMatch({
-              ...currentLive,
-              t1Score: result.t1ScoreFinal,
-              t2Score: result.t2ScoreFinal,
-              minute: 90,
-              scorer: "",
-              isActive: false
+            setWinners(prev => {
+              if (prev[key]) return prev
+              return { ...prev, [key]: winner }
             })
+            
+            // Remove o placar imediatamente ao encerrar o tempo regulamentar simulado
+            setLiveMatch(null)
           }
         }
       }
@@ -1205,19 +1215,13 @@ export function WorldCupBracket() {
 
         {/* Placar no Header (Desktop) ou Flutuante abaixo do Header (Mobile) */}
         <div className="fixed top-[68px] md:absolute md:top-1/2 left-1/2 -translate-x-1/2 -translate-y-0 md:-translate-y-1/2 z-30 md:z-50 pointer-events-auto flex items-center justify-center">
-          {liveMatch ? (
+          {liveMatch && liveMatch.isActive ? (
             <div className="flex items-center gap-3 bg-card/60 px-4 py-1.5 rounded-full border border-gold/20 shadow-md backdrop-blur-sm">
               {/* Status Indicator */}
-              {liveMatch.isActive ? (
-                <span className="flex items-center gap-1.5 text-[10px] font-bold text-red-500 animate-pulse uppercase tracking-wider shrink-0">
-                  <span className="size-1.5 rounded-full bg-red-500" />
-                  <span>AO VIVO</span>
-                </span>
-              ) : (
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider shrink-0">
-                  FIM
-                </span>
-              )}
+              <span className="flex items-center gap-1.5 text-[10px] font-bold text-red-500 animate-pulse uppercase tracking-wider shrink-0">
+                <span className="size-1.5 rounded-full bg-red-500" />
+                <span>AO VIVO</span>
+              </span>
 
               {/* Teams & Score */}
               <div className="flex items-center gap-2">
@@ -1236,21 +1240,12 @@ export function WorldCupBracket() {
                 </span>
               </div>
 
-              {/* Goal Alert / Close button */}
-              {liveMatch.scorer && liveMatch.isActive ? (
+              {/* Goal Alert */}
+              {liveMatch.scorer && (
                 <span className="text-[10px] bg-gold/20 border border-gold/30 text-gold-soft px-2 py-0.5 rounded font-bold uppercase shrink-0 animate-bounce">
                   ⚽ GOL!
                 </span>
-              ) : !liveMatch.isActive ? (
-                <button
-                  type="button"
-                  onClick={() => setLiveMatch(null)}
-                  className="text-muted-foreground hover:text-foreground text-[11px] font-bold px-1 hover:scale-110 transition-transform shrink-0"
-                  aria-label="Limpar"
-                >
-                  ✕
-                </button>
-              ) : null}
+              )}
             </div>
           ) : nextMatch ? (
             <div className="flex items-center gap-3 bg-card/60 px-4 py-1.5 rounded-full border border-gold/20 shadow-md backdrop-blur-sm">
