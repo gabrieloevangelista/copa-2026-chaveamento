@@ -23,6 +23,7 @@ export async function GET() {
         homeScore: 2,
         awayScore: 0,
         isActive: true,
+        status: "halftime",
         warning: `Fails to fetch X.com: ${response.status}. Using fallback.`
       })
     }
@@ -31,7 +32,8 @@ export async function GET() {
     
     let homeScore = 2
     let awayScore = 0
-    let isActive = false
+    let isActive = true
+    let status = "halftime"
 
     try {
       const data = JSON.parse(text)
@@ -40,7 +42,8 @@ export async function GET() {
         if (fixture) {
           homeScore = fixture.scores?.home ?? 2
           awayScore = fixture.scores?.away ?? 0
-          isActive = fixture.status === "live"
+          isActive = fixture.status === "live" || fixture.status === "halftime"
+          status = fixture.status === "halftime" ? "halftime" : (fixture.status === "live" ? "live" : "finished")
         }
       }
     } catch {
@@ -50,13 +53,25 @@ export async function GET() {
         homeScore = parseInt(match[1])
         awayScore = parseInt(match[2])
       }
+
+      if (/intervalo|halftime|HT/i.test(text)) {
+        status = "halftime"
+        isActive = true
+      } else if (/fim|ended|FT|fulltime/i.test(text)) {
+        status = "finished"
+        isActive = false
+      } else {
+        status = "live"
+        isActive = true
+      }
     }
 
     return NextResponse.json({
       matchId: "0-10",
       homeScore,
       awayScore,
-      isActive
+      isActive,
+      status
     })
   } catch (error: any) {
     // Retorna fallback se houver exceções
@@ -65,6 +80,7 @@ export async function GET() {
       homeScore: 2,
       awayScore: 0,
       isActive: true,
+      status: "halftime",
       error: error.message
     })
   }
