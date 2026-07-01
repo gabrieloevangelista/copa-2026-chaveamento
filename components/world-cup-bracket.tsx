@@ -299,6 +299,7 @@ export function WorldCupBracket() {
   }, [winners])
 
   const [currentTime, setCurrentTime] = useState(Date.now())
+  const lastXFetchRef = useRef(0)
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now())
@@ -647,7 +648,38 @@ export function WorldCupBracket() {
     const checkMatches = () => {
       const now = Date.now()
       
+      // Tenta buscar atualizações do X.com via API local (que faz proxy para o link do X, throttle 20s)
+      if (now - lastXFetchRef.current > 20000) {
+        lastXFetchRef.current = now
+        fetch("/api/x-scores")
+          .then(res => res.json())
+          .then(data => {
+            if (data && !data.error) {
+              const activeItem = SCHEDULE.find(item => item.id === data.matchId)
+              if (activeItem) {
+                const t1 = TEAMS[activeItem.t1_idx]
+                const t2 = TEAMS[activeItem.t2_idx]
+                
+                setLiveMatch({
+                  matchId: activeItem.id,
+                  t1,
+                  t2,
+                  t1Score: data.homeScore,
+                  t2Score: data.awayScore,
+                  minute: 90,
+                  scorer: "",
+                  isActive: data.isActive
+                })
 
+                if (!data.isActive) {
+                  const winner = data.homeScore > data.awayScore ? t1 : t2
+                  setWinners(prev => ({ ...prev, [activeItem.parentWinnerKey]: winner }))
+                }
+              }
+            }
+          })
+          .catch(err => console.error("Erro ao buscar score do X:", err))
+      }
 
       const activeItem = SCHEDULE.find(item => {
         if (winnersRef.current[item.parentWinnerKey]) return false
