@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { RotateCcw, X, Volume2, VolumeX, Calendar, Download } from "lucide-react"
 import confetti from "canvas-confetti"
 import { TEAMS, type Team, flagUrl, TEAM_COLORS } from "@/components/teams"
+import { Trophy3D } from "@/components/trophy-3d"
 
 // Anéis do mais externo (32 times) ao mais interno (2 finalistas).
 // radius = distância do centro em % da largura do palco; size = tamanho em % do palco.
@@ -1568,6 +1569,11 @@ export function WorldCupBracket() {
         />
       </audio>
 
+      {/* Carregamento nos bastidores (Ghost Render) para cache de GPU */}
+      <div className="fixed -left-[9999px] -top-[9999px] size-1 opacity-0 pointer-events-none" aria-hidden="true">
+        <Trophy3D />
+      </div>
+
       {/* Pop-up de celebração do campeão */}
       {champion && showCelebration && (
         <div
@@ -1597,12 +1603,10 @@ export function WorldCupBracket() {
               Campeão Mundial 2026
             </p>
 
-            {/* Taça oficial no topo */}
-            <img
-              src="/images/trophy.png"
-              alt="Taça da Copa do Mundo"
-              className="relative z-10 h-32 w-auto object-contain drop-shadow-[0_0_30px_oklch(0.85_0.15_82/0.9)]"
-            />
+            {/* Taça 3D no topo */}
+            <div className="relative z-10 w-full flex justify-center -my-8">
+              <Trophy3D />
+            </div>
 
             <h2 className="relative z-10 text-balance font-heading text-3xl font-bold tracking-tight text-foreground">
               {champion.name}
