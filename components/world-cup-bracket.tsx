@@ -695,6 +695,16 @@ export function WorldCupBracket() {
         
         nextWinners[item.parentWinnerKey] = winner
         updated = true
+        
+        // Pequeno confete com cores da bandeira do vencedor automático!
+        const flagColors = TEAM_COLORS[winner.slug] || ["#e9b949", "#ffffff"]
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          startVelocity: 35,
+          origin: { x: 0.5, y: 0.5 },
+          colors: flagColors,
+        })
       }
     })
 
@@ -704,9 +714,11 @@ export function WorldCupBracket() {
   }, [isLoaded, winners])
 
   // Dispara o confete em ondas a partir das laterais.
-  const fireConfetti = useCallback(() => {
+  const fireConfetti = useCallback((customColors?: string[]) => {
     const end = Date.now() + 1500
-    const colors = ["#e9b949", "#f5d76e", "#ffffff", "#16a34a"]
+    const colors = customColors && customColors.length > 0
+      ? customColors
+      : ["#e9b949", "#f5d76e", "#ffffff", "#16a34a"]
     const frame = () => {
       confetti({
         particleCount: 4,
@@ -742,7 +754,8 @@ export function WorldCupBracket() {
     if (champion && champion.id !== lastChampionId.current) {
       lastChampionId.current = champion.id
       setShowCelebration(true)
-      fireConfetti()
+      const flagColors = TEAM_COLORS[champion.slug] || []
+      fireConfetti(flagColors)
       // Toca a trilha da Copa a partir de 0:34.5 desmutado
       if (audioRef.current) {
         audioRef.current.currentTime = 34.5
@@ -799,6 +812,16 @@ export function WorldCupBracket() {
       return next
     })
     setChampion(null)
+
+    // Pequeno confete com cores da bandeira do vencedor intermediário escolhido!
+    const flagColors = TEAM_COLORS[team.slug] || ["#e9b949", "#ffffff"]
+    confetti({
+      particleCount: 35,
+      spread: 45,
+      startVelocity: 30,
+      origin: { x: 0.5, y: 0.5 },
+      colors: flagColors,
+    })
   }
 
   function reset() {
