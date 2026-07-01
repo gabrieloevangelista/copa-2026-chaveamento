@@ -25,8 +25,8 @@ export const TEAMS: Team[] = [
   { id: 9, name: "Bósnia", slug: "bosnia-and-herzegovina" },
   { id: 10, name: "Bélgica", slug: "belgium" },
   { id: 11, name: "Senegal", slug: "senegal" },
-  { id: 12, name: "Gana", slug: "ghana" },
-  { id: 13, name: "Colômbia", slug: "colombia" },
+  { id: 30, name: "França", slug: "france" },
+  { id: 31, name: "Suécia", slug: "sweden" },
   { id: 14, name: "Paraguai", slug: "paraguay" },
   { id: 15, name: "Alemanha", slug: "germany" },
   { id: 16, name: "Brasil", slug: "brazil" },
@@ -43,8 +43,8 @@ export const TEAMS: Team[] = [
   { id: 27, name: "Egito", slug: "egypt" },
   { id: 28, name: "Argélia", slug: "algeria" },
   { id: 29, name: "Suíça", slug: "switzerland" },
-  { id: 30, name: "França", slug: "france" },
-  { id: 31, name: "Suécia", slug: "sweden" },
+  { id: 12, name: "Gana", slug: "ghana" },
+  { id: 13, name: "Colômbia", slug: "colombia" },
 ]
 
 export const ROUND_LABELS = [

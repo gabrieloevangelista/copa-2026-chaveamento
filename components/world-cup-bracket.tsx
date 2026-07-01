@@ -76,7 +76,7 @@ function getMatchDate(ring: number, index: number): string | null {
 
 type Winners = Record<string, Team>
 
-const STORAGE_KEY = "fifa-2026-bracket"
+const STORAGE_KEY = "fifa-2026-bracket-v2"
 
 export function WorldCupBracket() {
   const [winners, setWinners] = useState<Winners>({})
@@ -241,11 +241,11 @@ export function WorldCupBracket() {
   const DEFAULT_WINNERS: Winners = {
     "1-0": TEAMS[1],   // Canadá (1) vence África do Sul (0)
     "1-1": TEAMS[3],   // Marrocos (3) vence Holanda (2)
-    "1-7": TEAMS[14],  // Paraguai (14) vence Alemanha (15)
+    "1-6": TEAMS[12],  // França (30) vence Suécia (31) -- at index 12/13
+    "1-7": TEAMS[14],  // Paraguai (14) vence Alemanha (15) -- at index 14/15
     "1-8": TEAMS[16],  // Brasil (16) vence Japão (17)
     "1-9": TEAMS[19],  // Noruega (19) vence Costa do Marfim (18)
     "1-14": TEAMS[29], // Suíça (29) vence Argélia (28)
-    "1-15": TEAMS[30], // França (30) vence Suécia (31)
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -263,8 +263,8 @@ export function WorldCupBracket() {
           }
         }
         // Injeta a França se ela não estiver configurada ainda
-        if (!mappedWinners["1-15"]) {
-          mappedWinners["1-15"] = TEAMS[30]
+        if (!mappedWinners["1-6"]) {
+          mappedWinners["1-6"] = TEAMS[12]
         }
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
