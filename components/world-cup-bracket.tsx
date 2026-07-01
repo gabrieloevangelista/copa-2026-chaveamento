@@ -606,8 +606,8 @@ export function WorldCupBracket() {
         if (data && data.matchId) {
           const activeItem = SCHEDULE.find(item => item.id === data.matchId)
           if (activeItem) {
-            // Só exibe se estiver marcado como ativo no stream
-            if (data.isActive) {
+            // Só exibe se estiver marcado como ativo no stream E ainda não tiver vencedor na chave
+            if (data.isActive && !winnersRef.current[activeItem.parentWinnerKey]) {
               const t1 = TEAMS[activeItem.t1_idx]
               const t2 = TEAMS[activeItem.t2_idx]
               
@@ -622,15 +622,14 @@ export function WorldCupBracket() {
                 isActive: true
               })
             } else {
-              // Se o jogo acabou, remove o placar ao vivo imediatamente
+              // Se o jogo acabou ou já temos vencedor, remove o placar ao vivo imediatamente
               setLiveMatch(null)
               
-              // Avança vencedor na chave se necessário
-              const winner = data.homeScore > data.awayScore ? TEAMS[activeItem.t1_idx] : TEAMS[activeItem.t2_idx]
-              setWinners(prev => {
-                if (prev[activeItem.parentWinnerKey]) return prev
-                return { ...prev, [activeItem.parentWinnerKey]: winner }
-              })
+              // Avança vencedor na chave se ainda não existir
+              if (!winnersRef.current[activeItem.parentWinnerKey]) {
+                const winner = data.homeScore > data.awayScore ? TEAMS[activeItem.t1_idx] : TEAMS[activeItem.t2_idx]
+                setWinners(prev => ({ ...prev, [activeItem.parentWinnerKey]: winner }))
+              }
             }
           }
         }
@@ -672,7 +671,8 @@ export function WorldCupBracket() {
                 const t1 = TEAMS[activeItem.t1_idx]
                 const t2 = TEAMS[activeItem.t2_idx]
                 
-                if (data.isActive) {
+                // Só ativa o placar se o jogo estiver realmente em andamento E ainda não houver vencedor definido
+                if (data.isActive && !winnersRef.current[activeItem.parentWinnerKey]) {
                   setLiveMatch({
                     matchId: activeItem.id,
                     t1,
@@ -685,13 +685,12 @@ export function WorldCupBracket() {
                     status: data.status
                   })
                 } else {
-                  // Se o jogo encerrou: remove placar e avança vencedor
+                  // Se o jogo encerrou ou já temos vencedor: limpa placar e avança vencedor se necessário
                   setLiveMatch(null)
-                  const winner = data.homeScore > data.awayScore ? t1 : t2
-                  setWinners(prev => {
-                    if (prev[activeItem.parentWinnerKey]) return prev
-                    return { ...prev, [activeItem.parentWinnerKey]: winner }
-                  })
+                  if (!winnersRef.current[activeItem.parentWinnerKey]) {
+                    const winner = data.homeScore > data.awayScore ? t1 : t2
+                    setWinners(prev => ({ ...prev, [activeItem.parentWinnerKey]: winner }))
+                  }
                 }
               }
             }
@@ -705,6 +704,7 @@ export function WorldCupBracket() {
       }
 
       const activeItem = SCHEDULE.find(item => {
+        // Se já existe um vencedor para este confronto no estado da chave, não é um jogo "AO VIVO"
         if (winnersRef.current[item.parentWinnerKey]) return false
         // Jogo dura 120 minutos (90 min jogo + 15 min intervalo + acréscimos)
         return now >= item.timestamp && now < item.timestamp + 120 * 60 * 1000
