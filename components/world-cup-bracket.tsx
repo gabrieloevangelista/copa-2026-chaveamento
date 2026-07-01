@@ -629,6 +629,15 @@ export function WorldCupBracket() {
               if (!winnersRef.current[activeItem.parentWinnerKey]) {
                 const winner = data.homeScore > data.awayScore ? TEAMS[activeItem.t1_idx] : TEAMS[activeItem.t2_idx]
                 setWinners(prev => ({ ...prev, [activeItem.parentWinnerKey]: winner }))
+                
+                // Celebração visual do vencedor automático
+                const flagColors = TEAM_COLORS[winner.slug] || ["#e9b949", "#ffffff"]
+                confetti({
+                  particleCount: 60,
+                  spread: 70,
+                  origin: { x: 0.5, y: 0.5 },
+                  colors: flagColors,
+                })
               }
             }
           }
@@ -690,6 +699,15 @@ export function WorldCupBracket() {
                   if (!winnersRef.current[activeItem.parentWinnerKey]) {
                     const winner = data.homeScore > data.awayScore ? t1 : t2
                     setWinners(prev => ({ ...prev, [activeItem.parentWinnerKey]: winner }))
+                    
+                    // Celebração visual
+                    const flagColors = TEAM_COLORS[winner.slug] || ["#e9b949", "#ffffff"]
+                    confetti({
+                      particleCount: 60,
+                      spread: 70,
+                      origin: { x: 0.5, y: 0.5 },
+                      colors: flagColors,
+                    })
                   }
                 }
               }
@@ -763,12 +781,21 @@ export function WorldCupBracket() {
             const parentIndex = Math.floor(finishedItem.t1_idx / 2)
             const key = `${parentRing}-${parentIndex}`
             setWinners(prev => {
-              if (prev[key]) return prev
-              return { ...prev, [key]: winner }
-            })
-            
-            // Remove o placar imediatamente ao encerrar o tempo regulamentar simulado
-            setLiveMatch(null)
+                if (prev[key]) return prev
+                return { ...prev, [key]: winner }
+              })
+
+              // Celebração visual
+              const flagColors = TEAM_COLORS[winner.slug] || ["#e9b949", "#ffffff"]
+              confetti({
+                particleCount: 60,
+                spread: 70,
+                origin: { x: 0.5, y: 0.5 },
+                colors: flagColors,
+              })
+              
+              // Remove o placar imediatamente ao encerrar o tempo regulamentar simulado
+              setLiveMatch(null)
           }
         }
       }
@@ -1213,41 +1240,9 @@ export function WorldCupBracket() {
           </div>
         </div>
 
-        {/* Placar no Header (Desktop) ou Flutuante abaixo do Header (Mobile) */}
+        {/* Informação do Próximo Jogo no Header */}
         <div className="fixed top-[68px] md:absolute md:top-1/2 left-1/2 -translate-x-1/2 -translate-y-0 md:-translate-y-1/2 z-30 md:z-50 pointer-events-auto flex items-center justify-center">
-          {liveMatch && liveMatch.isActive ? (
-            <div className="flex items-center gap-3 bg-card/60 px-4 py-1.5 rounded-full border border-gold/20 shadow-md backdrop-blur-sm">
-              {/* Status Indicator */}
-              <span className="flex items-center gap-1.5 text-[10px] font-bold text-red-500 animate-pulse uppercase tracking-wider shrink-0">
-                <span className="size-1.5 rounded-full bg-red-500" />
-                <span>AO VIVO</span>
-              </span>
-
-              {/* Teams & Score */}
-              <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm">
-                  <img src={flagUrl(liveMatch.t1.slug)} alt="" className="size-4 rounded-full object-cover shadow-sm ring-1 ring-border" />
-                  <span className="hidden sm:inline truncate max-w-[80px]">{liveMatch.t1.name}</span>
-                </span>
-                
-                <span className="bg-background px-2.5 py-0.5 rounded-md border border-border text-gold-soft font-mono text-sm sm:text-base font-bold tracking-tight shadow-inner">
-                  {liveMatch.t1Score} - {liveMatch.t2Score}
-                </span>
-
-                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm">
-                  <span className="hidden sm:inline truncate max-w-[80px]">{liveMatch.t2.name}</span>
-                  <img src={flagUrl(liveMatch.t2.slug)} alt="" className="size-4 rounded-full object-cover shadow-sm ring-1 ring-border" />
-                </span>
-              </div>
-
-              {/* Goal Alert */}
-              {liveMatch.scorer && (
-                <span className="text-[10px] bg-gold/20 border border-gold/30 text-gold-soft px-2 py-0.5 rounded font-bold uppercase shrink-0 animate-bounce">
-                  ⚽ GOL!
-                </span>
-              )}
-            </div>
-          ) : nextMatch ? (
+          {nextMatch ? (
             <div className="flex items-center gap-3 bg-card/60 px-4 py-1.5 rounded-full border border-gold/20 shadow-md backdrop-blur-sm">
               <span className="text-[9px] font-extrabold text-gold-soft uppercase tracking-widest shrink-0">
                 PRÓXIMO
@@ -1268,9 +1263,9 @@ export function WorldCupBracket() {
                 </span>
               </div>
 
-              {/* Schedule and Countdown */}
+              {/* Schedule only (No countdown) */}
               <span className="text-[10px] text-muted-foreground font-medium shrink-0">
-                {nextMatch.dateLabel} às {nextMatch.timeLabel} (em {getCountdownLabel(nextMatch.timestamp)})
+                {nextMatch.dateLabel} às {nextMatch.timeLabel}
               </span>
             </div>
           ) : null}
