@@ -628,36 +628,15 @@ export function WorldCupBracket() {
     }
 
     ws.onerror = (error) => {
-      console.warn("[X.com WebSocket] Erro na conexão, caindo para o simulador offline:", error)
-      // Para fins de teste/offline, simulamos a chegada de eventos do X.com de tempos em tempos
-      simulateXMessages()
+      console.warn("[X.com WebSocket] Erro na conexão:", error)
     }
 
     ws.onclose = () => {
       console.log("[X.com WebSocket] Conexão encerrada")
     }
 
-    let mockTimeout: NodeJS.Timeout
-    const simulateXMessages = () => {
-      mockTimeout = setTimeout(() => {
-        // Envia atualização do jogo México vs Equador (2 x 0)
-        const event = {
-          data: JSON.stringify({
-            matchId: "0-10",
-            homeScore: 2,
-            awayScore: 0,
-            minute: 75,
-            scorer: "Santiago Giménez",
-            isActive: true
-          })
-        }
-        if (ws.onmessage) ws.onmessage(event as MessageEvent)
-      }, 8000) // Simula chegada de tweet após 8 segundos
-    }
-
     return () => {
       ws.close()
-      if (mockTimeout) clearTimeout(mockTimeout)
     }
   }, [isLoaded])
 
@@ -696,21 +675,9 @@ export function WorldCupBracket() {
           gameMinute = 90
         }
 
-        const result = getDeterministicMatchResult(activeItem.id)
         let t1Score = 0
         let t2Score = 0
         let currentScorer = ""
-
-        result.goals.forEach(goal => {
-          if (gameMinute >= goal.minute) {
-            if (goal.team === 1) t1Score++
-            else t2Score++
-            
-            if (gameMinute === goal.minute) {
-              currentScorer = goal.team === 1 ? t1.name : t2.name
-            }
-          }
-        })
 
         setLiveMatch({
           matchId: activeItem.id,
