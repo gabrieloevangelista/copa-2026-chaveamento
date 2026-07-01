@@ -93,6 +93,7 @@ export type LiveMatchState = {
   minute: number
   scorer: string
   isActive: boolean
+  status?: "live" | "halftime" | "finished"
 }
 
 function getMatchInfo(
@@ -300,6 +301,7 @@ export function WorldCupBracket() {
 
   const [currentTime, setCurrentTime] = useState(Date.now())
   const lastXFetchRef = useRef(0)
+  const isXActiveRef = useRef(false)
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now())
@@ -657,6 +659,7 @@ export function WorldCupBracket() {
             if (data && !data.error) {
               const activeItem = SCHEDULE.find(item => item.id === data.matchId)
               if (activeItem) {
+                isXActiveRef.current = true
                 const t1 = TEAMS[activeItem.t1_idx]
                 const t2 = TEAMS[activeItem.t2_idx]
                 
@@ -668,7 +671,8 @@ export function WorldCupBracket() {
                   t2Score: data.awayScore,
                   minute: 90,
                   scorer: "",
-                  isActive: data.isActive
+                  isActive: data.isActive,
+                  status: data.status
                 })
 
                 if (!data.isActive) {
@@ -679,6 +683,11 @@ export function WorldCupBracket() {
             }
           })
           .catch(err => console.error("Erro ao buscar score do X:", err))
+      }
+
+      // Se o X.com já está ativamente gerenciando o placar, não rodamos a simulação do relógio do sistema
+      if (isXActiveRef.current) {
+        return
       }
 
       const activeItem = SCHEDULE.find(item => {
