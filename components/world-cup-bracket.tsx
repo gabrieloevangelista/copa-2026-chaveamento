@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { RotateCcw, X, Volume2, VolumeX, Calendar, Download } from "lucide-react"
 import confetti from "canvas-confetti"
-import { TEAMS, type Team, flagUrl } from "@/components/teams"
+import { TEAMS, type Team, flagUrl, TEAM_COLORS } from "@/components/teams"
 
 // Anéis do mais externo (32 times) ao mais interno (2 finalistas).
 // radius = distância do centro em % da largura do palco; size = tamanho em % do palco.
