@@ -1080,8 +1080,8 @@ export function WorldCupBracket() {
           </div>
         </div>
 
-        {/* Placar Centralizado no Header */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto flex items-center justify-center">
+        {/* Placar no Header (Desktop) ou Flutuante abaixo do Header (Mobile) */}
+        <div className="fixed top-[68px] md:absolute md:top-1/2 left-1/2 -translate-x-1/2 -translate-y-0 md:-translate-y-1/2 z-30 md:z-50 pointer-events-auto flex items-center justify-center">
           {liveMatch ? (
             <div className="flex items-center gap-3 bg-card/60 px-4 py-1.5 rounded-full border border-gold/20 shadow-md backdrop-blur-sm">
               {/* Status Indicator */}
@@ -1650,22 +1650,58 @@ function Node({
   matchInfo: MatchInfo
 }) {
   const [isHovered, setIsHovered] = useState(false)
+  const clickTimeout = useRef<any>(null)
+
+  useEffect(() => {
+    return () => {
+      if (clickTimeout.current) clearTimeout(clickTimeout.current)
+    }
+  }, [])
+
+  const handleNodeClick = (e: React.MouseEvent) => {
+    const isMobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768
+
+    if (isMobile) {
+      e.preventDefault()
+      if (clickTimeout.current) {
+        // Clique duplo detectado
+        clearTimeout(clickTimeout.current)
+        clickTimeout.current = null
+        setIsHovered((prev) => !prev)
+      } else {
+        // Primeiro clique: inicia temporizador
+        clickTimeout.current = setTimeout(() => {
+          clickTimeout.current = null
+          onClick()
+        }, 250)
+      }
+    } else {
+      onClick()
+    }
+  }
 
   return (
     <div
-      className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
+      className="absolute -translate-x-1/2 -translate-y-1/2"
       style={{
         left: `${left}%`,
         top: `${top}%`,
         width: `${size}%`,
         aspectRatio: "1 / 1",
+        zIndex: isHovered ? 3000 : 20,
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => {
+        const isMobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768
+        if (!isMobile) setIsHovered(true)
+      }}
+      onMouseLeave={() => {
+        const isMobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768
+        if (!isMobile) setIsHovered(false)
+      }}
     >
       <button
         type="button"
-        onClick={onClick}
+        onClick={handleNodeClick}
         disabled={!team}
         title="" // Desativa o tooltip nativo do navegador
         aria-label={
@@ -1701,7 +1737,10 @@ function Node({
 
       {/* Tooltip Premium */}
       {isHovered && (
-        <div className="absolute bottom-full left-1/2 z-50 mb-3 -translate-x-1/2 pointer-events-none select-none">
+        <div 
+          className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2 pointer-events-none select-none"
+          style={{ zIndex: 3000 }}
+        >
           <div className="flex w-64 flex-col gap-2 rounded-xl border border-gold/30 bg-card/95 p-3 text-left shadow-2xl backdrop-blur-md">
             {/* Header: Phase and Status/Date */}
             <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider text-gold-soft">
