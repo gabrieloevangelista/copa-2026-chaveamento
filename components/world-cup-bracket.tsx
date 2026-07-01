@@ -205,6 +205,18 @@ const SCHEDULE = [
 ]
 
 function getDeterministicMatchResult(matchId: string) {
+  // Sobrescreve o placar do jogo México vs Equador (matchId "0-10") para 2 x 0 para o México
+  if (matchId === "0-10") {
+    return {
+      t1ScoreFinal: 2,
+      t2ScoreFinal: 0,
+      goals: [
+        { minute: 14, team: 1 as const },
+        { minute: 72, team: 1 as const }
+      ]
+    }
+  }
+
   let hash = 0
   for (let i = 0; i < matchId.length; i++) {
     hash = (hash << 5) - hash + matchId.charCodeAt(i)
@@ -570,7 +582,84 @@ export function WorldCupBracket() {
    * 
    *   return () => ws.close()
    * }, [isLoaded, liveMatchId])
-   */
+    */
+
+  // Escuta atualizações de placar do x.com (Twitter) em tempo real via WebSocket
+  useEffect(() => {
+    if (!isLoaded) return
+
+    // Conecta a uma stream simulada do X.com que escuta tweets com hashtags de jogos (#MEXxECU, #Brasil, etc.)
+    const ws = new WebSocket("wss://x-stream.copa2026.org/live-scores")
+
+    ws.onopen = () => {
+      console.log("[X.com WebSocket] Conectado ao stream de atualizações de placar")
+    }
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        if (data && data.matchId) {
+          const activeItem = SCHEDULE.find(item => item.id === data.matchId)
+          if (activeItem) {
+            const t1 = TEAMS[activeItem.t1_idx]
+            const t2 = TEAMS[activeItem.t2_idx]
+            
+            setLiveMatch({
+              matchId: activeItem.id,
+              t1,
+              t2,
+              t1Score: data.homeScore,
+              t2Score: data.awayScore,
+              minute: data.minute || 90,
+              scorer: data.scorer || "",
+              isActive: data.isActive !== false
+            })
+
+            // Se o jogo encerrou no stream do X: avança vencedor na chave
+            if (data.isActive === false) {
+              const winner = data.homeScore > data.awayScore ? t1 : t2
+              setWinners(prev => ({ ...prev, [activeItem.parentWinnerKey]: winner }))
+            }
+          }
+        }
+      } catch (e) {
+        console.error("[X.com WebSocket] Erro ao processar mensagem:", e)
+      }
+    }
+
+    ws.onerror = (error) => {
+      console.warn("[X.com WebSocket] Erro na conexão, caindo para o simulador offline:", error)
+      // Para fins de teste/offline, simulamos a chegada de eventos do X.com de tempos em tempos
+      simulateXMessages()
+    }
+
+    ws.onclose = () => {
+      console.log("[X.com WebSocket] Conexão encerrada")
+    }
+
+    let mockTimeout: NodeJS.Timeout
+    const simulateXMessages = () => {
+      mockTimeout = setTimeout(() => {
+        // Envia atualização do jogo México vs Equador (2 x 0)
+        const event = {
+          data: JSON.stringify({
+            matchId: "0-10",
+            homeScore: 2,
+            awayScore: 0,
+            minute: 75,
+            scorer: "Santiago Giménez",
+            isActive: true
+          })
+        }
+        if (ws.onmessage) ws.onmessage(event as MessageEvent)
+      }, 8000) // Simula chegada de tweet após 8 segundos
+    }
+
+    return () => {
+      ws.close()
+      if (mockTimeout) clearTimeout(mockTimeout)
+    }
+  }, [isLoaded])
 
   // Verifica e atualiza partidas ao vivo em tempo real baseado no relógio do sistema
   useEffect(() => {
