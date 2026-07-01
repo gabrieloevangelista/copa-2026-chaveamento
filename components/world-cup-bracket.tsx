@@ -109,7 +109,7 @@ function getMatchInfo(
     return {
       phase: "16-avos de final",
       date: "AO VIVO",
-      time: `${liveMatch.minute}'`,
+      time: "Em Andamento",
       t1: liveMatch.t1,
       t2: liveMatch.t2,
       score: `${liveMatch.t1Score} x ${liveMatch.t2Score}`,
