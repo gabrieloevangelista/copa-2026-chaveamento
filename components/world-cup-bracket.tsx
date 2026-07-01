@@ -48,9 +48,9 @@ function getMatchDate(ring: number, index: number): string | null {
   if (ring === 1) {
     const matchIdx = Math.floor(index / 2)
     if (matchIdx === 0) return "04 de Julho"
-    if (matchIdx === 1) return "06 de Julho"
+    if (matchIdx === 1) return "04 de Julho"
     if (matchIdx === 2) return "06 de Julho"
-    if (matchIdx === 3) return "04 de Julho"
+    if (matchIdx === 3) return "06 de Julho"
     if (matchIdx === 4) return "05 de Julho"
     if (matchIdx === 5) return "05 de Julho"
     if (matchIdx === 6) return "07 de Julho"
@@ -74,9 +74,169 @@ function getMatchDate(ring: number, index: number): string | null {
   return null
 }
 
+export type MatchInfo = {
+  phase: string
+  date: string
+  time: string
+  t1: Team | null
+  t2: Team | null
+  score: string | null
+  status: string
+}
+
+export type LiveMatchState = {
+  matchId: string
+  t1: Team
+  t2: Team
+  t1Score: number
+  t2Score: number
+  minute: number
+  scorer: string
+  isActive: boolean
+}
+
+function getMatchInfo(
+  ring: number,
+  index: number,
+  winners: Winners,
+  champion: Team | null,
+  liveMatch: LiveMatchState | null
+): MatchInfo {
+  const matchIdx = Math.floor(index / 2)
+
+  // Se for a partida ao vivo no momento, sobrescreve os dados com o placar ao vivo
+  if (liveMatch && ring === 0 && liveMatch.matchId === `0-${matchIdx}`) {
+    return {
+      phase: "16-avos de final",
+      date: "AO VIVO",
+      time: `${liveMatch.minute}'`,
+      t1: liveMatch.t1,
+      t2: liveMatch.t2,
+      score: `${liveMatch.t1Score} x ${liveMatch.t2Score}`,
+      status: "AO VIVO"
+    }
+  }
+
+  const teamAtLocal = (r: number, idx: number): Team | null => {
+    if (r === 0) return TEAMS[idx]
+    return winners[`${r}-${idx}`] ?? null
+  }
+
+  const phases = ["16-avos de final", "Oitavas de final", "Quartas de final", "Semifinal", "Final"]
+  const phase = phases[ring]
+
+  let date = ""
+  let time = ""
+  let score: string | null = null
+  let status = "A definir"
+
+  if (ring === 0) {
+    const dates = [
+      "Dom., 28/06", "Ontem", "Ontem", "Hoje", 
+      "qui., 02/07", "qui., 02/07", "amanhã", "amanhã",
+      "Ontem", "Hoje", "hoje", "amanhã",
+      "sex., 03/07", "sex., 03/07", "sex., 03/07", "sex., 03/07"
+    ]
+    const times = [
+      "FIM", "FIM (P)", "FIM (P)", "FIM",
+      "20:00", "16:00", "21:00", "17:00",
+      "FIM", "FIM", "23:00", "13:00",
+      "19:00", "15:00", "00:00", "22:30"
+    ]
+    const scores = [
+      "0 x 1", "1 (2) x 1 (3)", "1 (3) x 1 (4)", "3 x 0",
+      null, null, null, null,
+      "2 x 1", "1 x 2", null, null,
+      null, null, null, null
+    ]
+    date = dates[matchIdx] ?? ""
+    time = times[matchIdx] ?? ""
+    score = scores[matchIdx] ?? null
+    status = time.startsWith("FIM") ? "FIM" : "Agendado"
+  } else if (ring === 1) {
+    const dates = ["Sáb., 04/07", "Sáb., 04/07", "Seg., 06/07", "Seg., 06/07", "Dom., 05/07", "Dom., 05/07", "Ter., 07/07", "Ter., 07/07"]
+    const times = ["14:00", "18:00", "16:00", "21:00", "17:00", "21:00", "13:00", "17:00"]
+    date = dates[matchIdx] ?? ""
+    time = times[matchIdx] ?? ""
+    status = "Agendado"
+  } else if (ring === 2) {
+    const dates = ["Qui., 09/07", "Sex., 10/07", "Sáb., 11/07", "Sáb., 11/07"]
+    const times = ["17:00", "16:00", "18:00", "22:00"]
+    date = dates[matchIdx] ?? ""
+    time = times[matchIdx] ?? ""
+    status = "Agendado"
+  } else if (ring === 3) {
+    const dates = ["Ter., 14/07", "Qua., 15/07"]
+    const times = ["16:00", "16:00"]
+    date = dates[matchIdx] ?? ""
+    time = times[matchIdx] ?? ""
+    status = "Agendado"
+  } else if (ring === 4) {
+    date = "Dom., 19/07"
+    time = "16:00"
+    status = "Agendado"
+  }
+
+  const t1 = teamAtLocal(ring, matchIdx * 2)
+  const t2 = teamAtLocal(ring, matchIdx * 2 + 1)
+
+  return { phase, date, time, t1, t2, score, status }
+}
+
 type Winners = Record<string, Team>
 
-const STORAGE_KEY = "fifa-2026-bracket-v2"
+const SCHEDULE = [
+  { id: "0-0", dateLabel: "Dom., 28/06", timeLabel: "14:00", t1_idx: 0, t2_idx: 1, timestamp: new Date("2026-06-28T14:00:00-03:00").getTime(), parentWinnerKey: "1-0" },
+  { id: "0-1", dateLabel: "Seg., 29/06", timeLabel: "14:00", t1_idx: 2, t2_idx: 3, timestamp: new Date("2026-06-29T14:00:00-03:00").getTime(), parentWinnerKey: "1-1" },
+  { id: "0-2", dateLabel: "Seg., 29/06", timeLabel: "18:00", t1_idx: 4, t2_idx: 5, timestamp: new Date("2026-06-29T18:00:00-03:00").getTime(), parentWinnerKey: "1-2" },
+  { id: "0-8", dateLabel: "Seg., 29/06", timeLabel: "21:00", t1_idx: 16, t2_idx: 17, timestamp: new Date("2026-06-29T21:00:00-03:00").getTime(), parentWinnerKey: "1-8" },
+  { id: "0-3", dateLabel: "Ter., 30/06", timeLabel: "17:00", t1_idx: 6, t2_idx: 7, timestamp: new Date("2026-06-30T17:00:00-03:00").getTime(), parentWinnerKey: "1-3" },
+  { id: "0-9", dateLabel: "Ter., 30/06", timeLabel: "21:00", t1_idx: 18, t2_idx: 19, timestamp: new Date("2026-06-30T21:00:00-03:00").getTime(), parentWinnerKey: "1-9" },
+  { id: "0-10", dateLabel: "Ter., 30/06", timeLabel: "22:55", t1_idx: 20, t2_idx: 21, timestamp: new Date("2026-06-30T22:55:00-03:00").getTime(), parentWinnerKey: "1-10" },
+  { id: "0-11", dateLabel: "Qua., 01/07", timeLabel: "13:00", t1_idx: 22, t2_idx: 23, timestamp: new Date("2026-07-01T13:00:00-03:00").getTime(), parentWinnerKey: "1-11" },
+  { id: "0-7", dateLabel: "Qua., 01/07", timeLabel: "17:00", t1_idx: 14, t2_idx: 15, timestamp: new Date("2026-07-01T17:00:00-03:00").getTime(), parentWinnerKey: "1-7" },
+  { id: "0-6", dateLabel: "Qua., 01/07", timeLabel: "21:00", t1_idx: 12, t2_idx: 13, timestamp: new Date("2026-07-01T21:00:00-03:00").getTime(), parentWinnerKey: "1-6" },
+  { id: "0-5", dateLabel: "Qui., 02/07", timeLabel: "16:00", t1_idx: 10, t2_idx: 11, timestamp: new Date("2026-07-02T16:00:00-03:00").getTime(), parentWinnerKey: "1-5" },
+  { id: "0-4", dateLabel: "Qui., 02/07", timeLabel: "20:00", t1_idx: 8, t2_idx: 9, timestamp: new Date("2026-07-02T20:00:00-03:00").getTime(), parentWinnerKey: "1-4" },
+  { id: "0-14", dateLabel: "Sex., 03/07", timeLabel: "00:00", t1_idx: 28, t2_idx: 29, timestamp: new Date("2026-07-03T00:00:00-03:00").getTime(), parentWinnerKey: "1-14" },
+  { id: "0-13", dateLabel: "Sex., 03/07", timeLabel: "15:00", t1_idx: 26, t2_idx: 27, timestamp: new Date("2026-07-03T15:00:00-03:00").getTime(), parentWinnerKey: "1-13" },
+  { id: "0-12", dateLabel: "Sex., 03/07", timeLabel: "19:00", t1_idx: 24, t2_idx: 25, timestamp: new Date("2026-07-03T19:00:00-03:00").getTime(), parentWinnerKey: "1-12" },
+  { id: "0-15", dateLabel: "Sex., 03/07", timeLabel: "22:30", t1_idx: 30, t2_idx: 31, timestamp: new Date("2026-07-03T22:30:00-03:00").getTime(), parentWinnerKey: "1-15" }
+]
+
+function getDeterministicMatchResult(matchId: string) {
+  let hash = 0
+  for (let i = 0; i < matchId.length; i++) {
+    hash = (hash << 5) - hash + matchId.charCodeAt(i)
+    hash |= 0
+  }
+  hash = Math.abs(hash)
+  
+  const t1ScoreFinal = hash % 3
+  const t2ScoreFinal = (hash >> 2) % 3
+  
+  const goals: { minute: number; team: 1 | 2 }[] = []
+  
+  for (let i = 0; i < t1ScoreFinal; i++) {
+    goals.push({
+      minute: 5 + ((hash + i * 23) % 80),
+      team: 1
+    })
+  }
+  
+  for (let i = 0; i < t2ScoreFinal; i++) {
+    goals.push({
+      minute: 8 + ((hash + i * 31) % 78),
+      team: 2
+    })
+  }
+  
+  goals.sort((a, b) => a.minute - b.minute)
+  
+  return { t1ScoreFinal, t2ScoreFinal, goals }
+}
+
+const STORAGE_KEY = "fifa-2026-bracket-v3"
 
 export function WorldCupBracket() {
   const [winners, setWinners] = useState<Winners>({})
@@ -96,11 +256,57 @@ export function WorldCupBracket() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const canvasRef = useRef<HTMLDivElement | null>(null)
 
+  // Drag tracking to prevent clicking team nodes when dragging
+  const hasDragged = useRef(false)
+  const dragStartPos = useRef({ x: 0, y: 0 })
+
   // Touch references to track touch state
   const touchStartRef = useRef<{ x: number; y: number } | null>(null)
   const pinchStartDistRef = useRef<number | null>(null)
   const scaleStartRef = useRef<number>(1)
   const dragPosStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+
+  const [liveMatch, setLiveMatchState] = useState<LiveMatchState | null>(null)
+  const liveMatchRef = useRef<LiveMatchState | null>(null)
+  const setLiveMatch = useCallback((val: LiveMatchState | null | ((prev: LiveMatchState | null) => LiveMatchState | null)) => {
+    if (typeof val === "function") {
+      setLiveMatchState(prev => {
+        const next = val(prev)
+        liveMatchRef.current = next
+        return next
+      })
+    } else {
+      liveMatchRef.current = val
+      setLiveMatchState(val)
+    }
+  }, [])
+
+  const winnersRef = useRef<Winners>({})
+  useEffect(() => {
+    winnersRef.current = winners
+  }, [winners])
+
+  const [currentTime, setCurrentTime] = useState(Date.now())
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now())
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const getCountdownLabel = useCallback((targetMs: number) => {
+    const diff = targetMs - currentTime
+    if (diff <= 0) return "Começando..."
+    const hours = Math.floor(diff / 3600000)
+    const minutes = Math.floor((diff % 3600000) / 60000)
+    const seconds = Math.floor((diff % 60000) / 1000)
+    
+    const pad = (n: number) => String(n).padStart(2, "0")
+    if (hours > 0) {
+      return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+    }
+    return `${pad(minutes)}:${pad(seconds)}`
+  }, [currentTime])
 
   // Register Service Worker and listen to Install prompt
   useEffect(() => {
@@ -139,6 +345,21 @@ export function WorldCupBracket() {
     setShowInstallBtn(false)
   }
 
+  // Escuta combinação de teclas Ctrl+0 ou Cmd+0 para redefinir o zoom e posição
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "0") {
+        e.preventDefault()
+        setScale(1)
+        setDragPos({ x: 0, y: 0 })
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [])
+
   // Active event listeners for passive-avoidance wheel and touch moves
   useEffect(() => {
     const canvas = canvasRef.current
@@ -171,6 +392,7 @@ export function WorldCupBracket() {
       touchStartRef.current = { x: touch.clientX, y: touch.clientY }
       dragPosStartRef.current = { ...dragPos }
       pinchStartDistRef.current = null
+      hasDragged.current = false
     } else if (e.touches.length === 2) {
       const touch1 = e.touches[0]
       const touch2 = e.touches[1]
@@ -182,6 +404,7 @@ export function WorldCupBracket() {
       const midY = (touch1.clientY + touch2.clientY) / 2
       touchStartRef.current = { x: midX, y: midY }
       dragPosStartRef.current = { ...dragPos }
+      hasDragged.current = false
     }
   }
 
@@ -190,6 +413,9 @@ export function WorldCupBracket() {
       const touch = e.touches[0]
       const deltaX = touch.clientX - touchStartRef.current.x
       const deltaY = touch.clientY - touchStartRef.current.y
+      if (Math.hypot(deltaX, deltaY) > 5) {
+        hasDragged.current = true
+      }
       setDragPos({
         x: dragPosStartRef.current.x + deltaX,
         y: dragPosStartRef.current.y + deltaY,
@@ -207,6 +433,9 @@ export function WorldCupBracket() {
       const midY = (touch1.clientY + touch2.clientY) / 2
       const deltaX = midX - touchStartRef.current.x
       const deltaY = midY - touchStartRef.current.y
+      if (Math.hypot(deltaX, deltaY) > 5) {
+        hasDragged.current = true
+      }
       setDragPos({
         x: dragPosStartRef.current.x + deltaX,
         y: dragPosStartRef.current.y + deltaY,
@@ -223,10 +452,17 @@ export function WorldCupBracket() {
     if (e.button !== 0) return
     setIsDragging(true)
     setDragStart({ x: e.clientX - dragPos.x, y: e.clientY - dragPos.y })
+    dragStartPos.current = { x: e.clientX, y: e.clientY }
+    hasDragged.current = false
   }
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return
+    const dx = e.clientX - dragStartPos.current.x
+    const dy = e.clientY - dragStartPos.current.y
+    if (Math.hypot(dx, dy) > 5) {
+      hasDragged.current = true
+    }
     setDragPos({
       x: e.clientX - dragStart.x,
       y: e.clientY - dragStart.y,
@@ -237,15 +473,20 @@ export function WorldCupBracket() {
     setIsDragging(false)
   }
 
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setScale((prev) => Math.min(3, prev + 0.1))
+  }
+
   // Estado pré-carregado: Brasil, Marrocos, Suíça, Paraguai, Canadá, Noruega, França nas oitavas
   const DEFAULT_WINNERS: Winners = {
     "1-0": TEAMS[1],   // Canadá (1) vence África do Sul (0)
     "1-1": TEAMS[3],   // Marrocos (3) vence Holanda (2)
-    "1-6": TEAMS[12],  // França (30) vence Suécia (31) -- at index 12/13
-    "1-7": TEAMS[14],  // Paraguai (14) vence Alemanha (15) -- at index 14/15
+    "1-2": TEAMS[5],   // Paraguai (14) vence Alemanha (15) -- at index 5
+    "1-3": TEAMS[6],   // França (30) vence Suécia (31) -- at index 6
     "1-8": TEAMS[16],  // Brasil (16) vence Japão (17)
     "1-9": TEAMS[19],  // Noruega (19) vence Costa do Marfim (18)
-    "1-14": TEAMS[29], // Suíça (29) vence Argélia (28)
+    "1-14": TEAMS[28], // Suíça (29) vence Argélia (28) -- at index 28
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -263,8 +504,8 @@ export function WorldCupBracket() {
           }
         }
         // Injeta a França se ela não estiver configurada ainda
-        if (!mappedWinners["1-6"]) {
-          mappedWinners["1-6"] = TEAMS[12]
+        if (!mappedWinners["1-3"]) {
+          mappedWinners["1-3"] = TEAMS[6]
         }
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
@@ -295,6 +536,172 @@ export function WorldCupBracket() {
       console.error("[v0] Erro ao salvar estado:", e)
     }
   }, [winners, champion, isLoaded])
+
+  /*
+   * NOTA PARA PRODUÇÃO:
+   * Para conectar a uma API de Esportes real (por exemplo, API-Football ou Live-Score API) em tempo real:
+   * 
+   * useEffect(() => {
+   *   if (!isLoaded || !liveMatchId) return
+   * 
+   *   // Exemplo com WebSocket real:
+   *   const ws = new WebSocket(`wss://api.api-football.com/live?fixture=${liveMatchId}&apiKey=SUA_CHAVE_API`)
+   * 
+   *   ws.onmessage = (event) => {
+   *     const data = JSON.parse(event.data)
+   *     // Atualiza placar em tempo real:
+   *     setLiveMatch({
+   *       matchId: data.fixture.id,
+   *       t1: data.teams.home,
+   *       t2: data.teams.away,
+   *       t1Score: data.goals.home,
+   *       t2Score: data.goals.away,
+   *       minute: data.fixture.status.elapsed,
+   *       scorer: data.events.find(e => e.type === "Goal")?.player.name || "",
+   *       isActive: data.fixture.status.short !== "FT"
+   *     })
+   *     
+   *     if (data.fixture.status.short === "FT") {
+   *       // Partida encerrada: define vencedor e avança na chave
+   *       const winner = data.goals.home > data.goals.away ? data.teams.home : data.teams.away
+   *       setWinners(prev => ({ ...prev, [parentWinnerKey]: winner }))
+   *     }
+   *   }
+   * 
+   *   return () => ws.close()
+   * }, [isLoaded, liveMatchId])
+   */
+
+  // Verifica e atualiza partidas ao vivo em tempo real baseado no relógio do sistema
+  useEffect(() => {
+    if (!isLoaded) return
+
+    const checkMatches = () => {
+      const now = Date.now()
+      
+      const activeItem = SCHEDULE.find(item => {
+        if (winnersRef.current[item.parentWinnerKey]) return false
+        // Jogo dura 120 minutos (90 min jogo + 15 min intervalo + acréscimos)
+        return now >= item.timestamp && now < item.timestamp + 120 * 60 * 1000
+      })
+
+      if (activeItem) {
+        const t1 = TEAMS[activeItem.t1_idx]
+        const t2 = TEAMS[activeItem.t2_idx]
+        
+        const elapsedMinutes = Math.floor((now - activeItem.timestamp) / 60000)
+        
+        let gameMinute = 0
+        let isHalftime = false
+        
+        if (elapsedMinutes < 45) {
+          gameMinute = elapsedMinutes
+        } else if (elapsedMinutes >= 45 && elapsedMinutes < 60) {
+          gameMinute = 45
+          isHalftime = true
+        } else if (elapsedMinutes >= 60 && elapsedMinutes < 105) {
+          gameMinute = 45 + (elapsedMinutes - 60)
+        } else {
+          gameMinute = 90
+        }
+
+        const result = getDeterministicMatchResult(activeItem.id)
+        let t1Score = 0
+        let t2Score = 0
+        let currentScorer = ""
+
+        result.goals.forEach(goal => {
+          if (gameMinute >= goal.minute) {
+            if (goal.team === 1) t1Score++
+            else t2Score++
+            
+            if (gameMinute === goal.minute) {
+              currentScorer = goal.team === 1 ? t1.name : t2.name
+            }
+          }
+        })
+
+        setLiveMatch({
+          matchId: activeItem.id,
+          t1,
+          t2,
+          t1Score,
+          t2Score,
+          minute: gameMinute,
+          scorer: currentScorer,
+          isActive: true
+        })
+      } else {
+        const currentLive = liveMatchRef.current
+        if (currentLive && currentLive.isActive) {
+          const finishedItem = SCHEDULE.find(item => item.id === currentLive.matchId)
+          if (finishedItem) {
+            const result = getDeterministicMatchResult(finishedItem.id)
+            let winner = currentLive.t1
+            if (result.t1ScoreFinal === result.t2ScoreFinal) {
+              const t1Pen = 4 + (finishedItem.id.charCodeAt(0) % 2)
+              const t2Pen = t1Pen === 5 ? 4 : 5
+              winner = t1Pen > t2Pen ? currentLive.t1 : currentLive.t2
+            } else {
+              winner = result.t1ScoreFinal > result.t2ScoreFinal ? currentLive.t1 : currentLive.t2
+            }
+            
+            const parentRing = 1
+            const parentIndex = Math.floor(finishedItem.t1_idx / 2)
+            const key = `${parentRing}-${parentIndex}`
+            setWinners(prev => ({ ...prev, [key]: winner }))
+            
+            setLiveMatch({
+              ...currentLive,
+              t1Score: result.t1ScoreFinal,
+              t2Score: result.t2ScoreFinal,
+              minute: 90,
+              scorer: "",
+              isActive: false
+            })
+          }
+        }
+      }
+    }
+
+    const interval = setInterval(checkMatches, 1000)
+    checkMatches()
+
+    return () => clearInterval(interval)
+  }, [isLoaded])
+
+  // Avança automaticamente partidas passadas que ainda não têm vencedor definido
+  useEffect(() => {
+    if (!isLoaded) return
+    
+    let updated = false
+    const nextWinners = { ...winners }
+    const now = Date.now()
+
+    SCHEDULE.forEach(item => {
+      if (now >= item.timestamp + 120 * 60 * 1000 && !winners[item.parentWinnerKey]) {
+        const result = getDeterministicMatchResult(item.id)
+        const t1 = TEAMS[item.t1_idx]
+        const t2 = TEAMS[item.t2_idx]
+        
+        let winner = t1
+        if (result.t1ScoreFinal === result.t2ScoreFinal) {
+          const t1Pen = 4 + (item.id.charCodeAt(0) % 2)
+          const t2Pen = t1Pen === 5 ? 4 : 5
+          winner = t1Pen > t2Pen ? t1 : t2
+        } else {
+          winner = result.t1ScoreFinal > result.t2ScoreFinal ? t1 : t2
+        }
+        
+        nextWinners[item.parentWinnerKey] = winner
+        updated = true
+      }
+    })
+
+    if (updated) {
+      setWinners(nextWinners)
+    }
+  }, [isLoaded, winners])
 
   // Dispara o confete em ondas a partir das laterais.
   const fireConfetti = useCallback(() => {
@@ -365,6 +772,7 @@ export function WorldCupBracket() {
   }
 
   function pick(ring: number, index: number) {
+    if (hasDragged.current) return
     const team = teamAt(ring, index)
     if (!team) return
 
@@ -542,11 +950,11 @@ export function WorldCupBracket() {
     
     return [
       { phase: "Oitavas de final", date: "Sáb., 04/07", time: "14:00", t1: teamAt(1, 0), t2: teamAt(1, 1) },
-      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", t1: teamAt(1, 6), t2: teamAt(1, 7) },
+      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", t1: teamAt(1, 2), t2: teamAt(1, 3) },
       { phase: "Oitavas de final", date: "Dom., 05/07", time: "17:00", t1: teamAt(1, 8), t2: teamAt(1, 9) },
       { phase: "Oitavas de final", date: "Dom., 05/07", time: "21:00", t1: teamAt(1, 10), t2: teamAt(1, 11) },
-      { phase: "Oitavas de final", date: "Seg., 06/07", time: "16:00", t1: teamAt(1, 2), t2: teamAt(1, 3) },
-      { phase: "Oitavas de final", date: "Seg., 06/07", time: "21:00", t1: teamAt(1, 4), t2: teamAt(1, 5) },
+      { phase: "Oitavas de final", date: "Seg., 06/07", time: "16:00", t1: teamAt(1, 4), t2: teamAt(1, 5) },
+      { phase: "Oitavas de final", date: "Seg., 06/07", time: "21:00", t1: teamAt(1, 6), t2: teamAt(1, 7) },
       { phase: "Oitavas de final", date: "Ter., 07/07", time: "13:00", t1: teamAt(1, 12), t2: teamAt(1, 13) },
       { phase: "Oitavas de final", date: "Ter., 07/07", time: "17:00", t1: teamAt(1, 14), t2: teamAt(1, 15) },
       
@@ -563,6 +971,23 @@ export function WorldCupBracket() {
       { phase: "Final", date: "Dom., 19/07", time: "16:00", t1: teamAt(4, 0), t2: teamAt(4, 1) }
     ]
   }
+
+  const nextMatch = useMemo(() => {
+    if (!isLoaded) return null
+    const now = Date.now()
+    const found = SCHEDULE.find(item => {
+      if (winners[item.parentWinnerKey]) return false
+      return item.timestamp > now
+    })
+    if (!found) return null
+    const t1 = TEAMS[found.t1_idx]
+    const t2 = TEAMS[found.t2_idx]
+    return {
+      ...found,
+      t1,
+      t2
+    }
+  }, [isLoaded, winners])
 
   return (
     <div className="relative w-full h-full flex flex-col bg-background overflow-hidden select-none">
@@ -654,6 +1079,84 @@ export function WorldCupBracket() {
             </button>
           </div>
         </div>
+
+        {/* Placar Centralizado no Header */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto flex items-center justify-center">
+          {liveMatch ? (
+            <div className="flex items-center gap-3 bg-card/60 px-4 py-1.5 rounded-full border border-gold/20 shadow-md backdrop-blur-sm">
+              {/* Status Indicator */}
+              {liveMatch.isActive ? (
+                <span className="flex items-center gap-1.5 text-[10px] font-bold text-red-500 animate-pulse uppercase tracking-wider shrink-0">
+                  <span className="size-1.5 rounded-full bg-red-500" />
+                  <span>AO VIVO</span>
+                </span>
+              ) : (
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider shrink-0">
+                  FIM
+                </span>
+              )}
+
+              {/* Teams & Score */}
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm">
+                  <img src={flagUrl(liveMatch.t1.slug)} alt="" className="size-4 rounded-full object-cover shadow-sm ring-1 ring-border" />
+                  <span className="hidden sm:inline truncate max-w-[80px]">{liveMatch.t1.name}</span>
+                </span>
+                
+                <span className="bg-background px-2.5 py-0.5 rounded-md border border-border text-gold-soft font-mono text-sm sm:text-base font-bold tracking-tight shadow-inner">
+                  {liveMatch.t1Score} - {liveMatch.t2Score}
+                </span>
+
+                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm">
+                  <span className="hidden sm:inline truncate max-w-[80px]">{liveMatch.t2.name}</span>
+                  <img src={flagUrl(liveMatch.t2.slug)} alt="" className="size-4 rounded-full object-cover shadow-sm ring-1 ring-border" />
+                </span>
+              </div>
+
+              {/* Goal Alert / Close button */}
+              {liveMatch.scorer && liveMatch.isActive ? (
+                <span className="text-[10px] bg-gold/20 border border-gold/30 text-gold-soft px-2 py-0.5 rounded font-bold uppercase shrink-0 animate-bounce">
+                  ⚽ GOL!
+                </span>
+              ) : !liveMatch.isActive ? (
+                <button
+                  type="button"
+                  onClick={() => setLiveMatch(null)}
+                  className="text-muted-foreground hover:text-foreground text-[11px] font-bold px-1 hover:scale-110 transition-transform shrink-0"
+                  aria-label="Limpar"
+                >
+                  ✕
+                </button>
+              ) : null}
+            </div>
+          ) : nextMatch ? (
+            <div className="flex items-center gap-3 bg-card/60 px-4 py-1.5 rounded-full border border-gold/20 shadow-md backdrop-blur-sm">
+              <span className="text-[9px] font-extrabold text-gold-soft uppercase tracking-widest shrink-0">
+                PRÓXIMO
+              </span>
+
+              {/* Teams & Flags */}
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm">
+                  <img src={flagUrl(nextMatch.t1.slug)} alt="" className="size-4 rounded-full object-cover shadow-sm ring-1 ring-border" />
+                  <span className="hidden sm:inline truncate max-w-[80px]">{nextMatch.t1.name}</span>
+                </span>
+                
+                <span className="text-muted-foreground font-normal text-[10px]">vs</span>
+
+                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm">
+                  <span className="hidden sm:inline truncate max-w-[80px]">{nextMatch.t2.name}</span>
+                  <img src={flagUrl(nextMatch.t2.slug)} alt="" className="size-4 rounded-full object-cover shadow-sm ring-1 ring-border" />
+                </span>
+              </div>
+
+              {/* Schedule and Countdown */}
+              <span className="text-[10px] text-muted-foreground font-medium shrink-0">
+                {nextMatch.dateLabel} às {nextMatch.timeLabel} (em {getCountdownLabel(nextMatch.timestamp)})
+              </span>
+            </div>
+          ) : null}
+        </div>
       </header>
 
       {/* Palco radial com drag/zoom para mobile e desktop */}
@@ -671,6 +1174,7 @@ export function WorldCupBracket() {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onDoubleClick={handleDoubleClick}
       >
         <div 
           className="relative w-full max-w-[900px] aspect-square flex items-center justify-center" 
@@ -830,6 +1334,7 @@ export function WorldCupBracket() {
                   lost={lost}
                   date={getMatchDate(ring, index)}
                   onClick={() => pick(ring, index)}
+                  matchInfo={getMatchInfo(ring, index, winners, champion, liveMatch)}
                 />
               )
             }),
@@ -1132,6 +1637,7 @@ function Node({
   lost,
   date,
   onClick,
+  matchInfo,
 }: {
   team: Team | null
   size: number
@@ -1141,50 +1647,131 @@ function Node({
   lost: boolean
   date: string | null
   onClick: () => void
+  matchInfo: MatchInfo
 }) {
+  const [isHovered, setIsHovered] = useState(false)
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={!team}
-      title={
-        team
-          ? `${team.name}${date ? ` (Jogo: ${date})` : ""}`
-          : `Aguardando confronto${date ? ` (${date})` : ""}`
-      }
-      aria-label={
-        team
-          ? `Avançar ${team.name}${date ? ` - Jogo em ${date}` : ""}`
-          : `Aguardando confronto${date ? ` em ${date}` : ""}`
-      }
-      className="absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold enabled:hover:scale-110"
+    <div
+      className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
       style={{
         left: `${left}%`,
         top: `${top}%`,
         width: `${size}%`,
         aspectRatio: "1 / 1",
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {team ? (
-        <span
-          className={`flex size-full items-center justify-center overflow-hidden rounded-full bg-card shadow-md ring-2 transition-all duration-500 ${
-            lost
-              ? "ring-border opacity-50"
-              : advanced
-                ? "ring-gold shadow-[0_0_14px_oklch(0.82_0.13_80/0.6)]"
-                : "ring-border"
-          }`}
-        >
-          <img
-            src={flagUrl(team.slug) || "/placeholder.svg"}
-            alt={`Bandeira ${team.name}`}
-            loading="lazy"
-            className={`size-full scale-[1.45] rounded-full object-cover transition-all duration-500 ${
-              lost ? "grayscale" : ""
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={!team}
+        title="" // Desativa o tooltip nativo do navegador
+        aria-label={
+          team
+            ? `Avançar ${team.name}${date ? ` - Jogo em ${date}` : ""}`
+            : `Aguardando confronto${date ? ` em ${date}` : ""}`
+        }
+        className="relative flex size-full items-center justify-center rounded-full transition-transform duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold enabled:hover:scale-110"
+      >
+        {team ? (
+          <span
+            title=""
+            className={`flex size-full items-center justify-center overflow-hidden rounded-full bg-card shadow-md ring-2 transition-all duration-500 ${
+              lost
+                ? "ring-border opacity-50"
+                : advanced
+                  ? "ring-gold shadow-[0_0_14px_oklch(0.82_0.13_80/0.6)]"
+                  : "ring-border"
             }`}
-          />
-        </span>
-      ) : null}
-    </button>
+          >
+            <img
+              src={flagUrl(team.slug) || "/placeholder.svg"}
+              alt={`Bandeira ${team.name}`}
+              title=""
+              loading="lazy"
+              className={`size-full scale-[1.45] rounded-full object-cover transition-all duration-500 ${
+                lost ? "grayscale" : ""
+              }`}
+            />
+          </span>
+        ) : null}
+      </button>
+
+      {/* Tooltip Premium */}
+      {isHovered && (
+        <div className="absolute bottom-full left-1/2 z-50 mb-3 -translate-x-1/2 pointer-events-none select-none">
+          <div className="flex w-64 flex-col gap-2 rounded-xl border border-gold/30 bg-card/95 p-3 text-left shadow-2xl backdrop-blur-md">
+            {/* Header: Phase and Status/Date */}
+            <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider text-gold-soft">
+              <span>{matchInfo.phase}</span>
+              <span>{matchInfo.date}</span>
+            </div>
+
+            {/* Teams Matchup */}
+            <div className="flex flex-col gap-1.5 py-1 border-y border-border/40">
+              {/* Team 1 */}
+              <div className="flex items-center justify-between gap-2 text-xs font-semibold text-foreground">
+                <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                  {matchInfo.t1 ? (
+                    <>
+                      <img
+                        src={flagUrl(matchInfo.t1.slug)}
+                        alt=""
+                        className="size-4 rounded-full object-cover ring-1 ring-border shrink-0"
+                      />
+                      <span className="truncate">{matchInfo.t1.name}</span>
+                    </>
+                  ) : (
+                    <span className="text-muted-foreground/60 italic font-normal">A definir</span>
+                  )}
+                </div>
+                {/* Score do Time 1 */}
+                {matchInfo.score && (
+                  <span className="text-xs font-bold text-gold-soft shrink-0">
+                    {matchInfo.score.split("x")[0].trim()}
+                  </span>
+                )}
+              </div>
+
+              {/* Team 2 */}
+              <div className="flex items-center justify-between gap-2 text-xs font-semibold text-foreground">
+                <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                  {matchInfo.t2 ? (
+                    <>
+                      <img
+                        src={flagUrl(matchInfo.t2.slug)}
+                        alt=""
+                        className="size-4 rounded-full object-cover ring-1 ring-border shrink-0"
+                      />
+                      <span className="truncate">{matchInfo.t2.name}</span>
+                    </>
+                  ) : (
+                    <span className="text-muted-foreground/60 italic font-normal">A definir</span>
+                  )}
+                </div>
+                {/* Score do Time 2 */}
+                {matchInfo.score && (
+                  <span className="text-xs font-bold text-gold-soft shrink-0">
+                    {matchInfo.score.split("x")[1].trim()}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Footer: Time/Status info */}
+            <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+              <span>Horário / Status:</span>
+              <span className="font-semibold text-foreground">
+                {matchInfo.time}
+              </span>
+            </div>
+          </div>
+          {/* Tooltip Arrow */}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-0.5 size-2 rotate-45 border-r border-b border-gold/30 bg-card/95" />
+        </div>
+      )}
+    </div>
   )
 }
