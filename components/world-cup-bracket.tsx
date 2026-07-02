@@ -549,10 +549,12 @@ export function WorldCupBracket() {
             if (fullTeam) mappedWinners[key] = fullTeam
           }
         }
-        // Injeta a França se ela não estiver configurada ainda
-        if (!mappedWinners["1-3"]) {
-          mappedWinners["1-3"] = TEAMS[6]
-        }
+        // Injeta resultados oficiais se eles estiverem incorretos no storage
+        mappedWinners["1-3"] = TEAMS[6]   // França
+        mappedWinners["1-6"] = TEAMS[12]  // EUA
+        mappedWinners["1-7"] = TEAMS[14]  // Bélgica
+        mappedWinners["1-10"] = TEAMS[20] // México
+
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
       } else {
