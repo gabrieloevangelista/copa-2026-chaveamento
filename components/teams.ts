@@ -13,38 +13,38 @@ export function flagUrl(slug: string) {
 // se enfrentam nos 16-avos e os vencedores se encontram nas oitavas.
 // Ex.: Brasil×Japão e Costa do Marfim×Noruega -> vencedores se enfrentam nas oitavas.
 export const TEAMS: Team[] = [
-  { id: 0, name: "África do Sul", slug: "south-africa" },
-  { id: 1, name: "Canadá", slug: "canada" },
-  { id: 2, name: "Holanda", slug: "netherlands" },
-  { id: 3, name: "Marrocos", slug: "morocco" },
-  { id: 15, name: "Alemanha", slug: "germany" },
-  { id: 14, name: "Paraguai", slug: "paraguay" },
-  { id: 30, name: "França", slug: "france" },
-  { id: 31, name: "Suécia", slug: "sweden" },
-  { id: 4, name: "Portugal", slug: "portugal" },
-  { id: 5, name: "Croácia", slug: "croatia" },
-  { id: 6, name: "Espanha", slug: "spain" },
-  { id: 7, name: "Áustria", slug: "austria" },
-  { id: 8, name: "EUA", slug: "usa" },
-  { id: 9, name: "Bósnia", slug: "bosnia-and-herzegovina" },
-  { id: 10, name: "Bélgica", slug: "belgium" },
-  { id: 11, name: "Senegal", slug: "senegal" },
-  { id: 16, name: "Brasil", slug: "brazil" },
-  { id: 17, name: "Japão", slug: "japan" },
-  { id: 18, name: "Costa do Marfim", slug: "ivory-coast" },
-  { id: 19, name: "Noruega", slug: "norway" },
-  { id: 20, name: "México", slug: "mexico" },
-  { id: 21, name: "Equador", slug: "ecuador-circular" },
-  { id: 22, name: "Inglaterra", slug: "england" },
-  { id: 23, name: "Rep. Dem. Congo", slug: "congo" },
-  { id: 24, name: "Argentina", slug: "argentina" },
-  { id: 25, name: "Cabo Verde", slug: "cape-verde" },
-  { id: 26, name: "Austrália", slug: "australia-flag" },
-  { id: 27, name: "Egito", slug: "egypt" },
-  { id: 29, name: "Suíça", slug: "switzerland" },
-  { id: 28, name: "Argélia", slug: "algeria" },
-  { id: 13, name: "Colômbia", slug: "colombia" },
-  { id: 12, name: "Gana", slug: "ghana" },
+  { id: 16, name: "Alemanha", slug: "germany" }, // 0
+  { id: 17, name: "Paraguai", slug: "paraguay" }, // 1
+  { id: 18, name: "França", slug: "france" }, // 2
+  { id: 19, name: "Suécia", slug: "sweden" }, // 3
+  { id: 20, name: "México", slug: "mexico" }, // 4
+  { id: 21, name: "Equador", slug: "ecuador-circular" }, // 5
+  { id: 22, name: "Inglaterra", slug: "england" }, // 6
+  { id: 23, name: "RD Congo", slug: "congo" }, // 7
+  { id: 24, name: "Estados Unidos", slug: "usa" }, // 8
+  { id: 25, name: "Bósnia e Herzegovina", slug: "bosnia-and-herzegovina" }, // 9
+  { id: 26, name: "Bélgica", slug: "belgium" }, // 10
+  { id: 27, name: "Senegal", slug: "senegal" }, // 11
+  { id: 28, name: "Argentina", slug: "argentina" }, // 12
+  { id: 29, name: "Cabo Verde", slug: "cape-verde" }, // 13
+  { id: 30, name: "Colômbia", slug: "colombia" }, // 14
+  { id: 31, name: "Gana", slug: "ghana" }, // 15
+  { id: 12, name: "Suíça", slug: "switzerland" }, // 16
+  { id: 13, name: "Argélia", slug: "algeria" }, // 17
+  { id: 14, name: "Austrália", slug: "australia-flag" }, // 18
+  { id: 15, name: "Egito", slug: "egypt" }, // 19
+  { id: 8, name: "Espanha", slug: "spain" }, // 20
+  { id: 9, name: "Áustria", slug: "austria" }, // 21
+  { id: 10, name: "Portugal", slug: "portugal" }, // 22
+  { id: 11, name: "Croácia", slug: "croatia" }, // 23
+  { id: 4, name: "Brasil", slug: "brazil" }, // 24
+  { id: 5, name: "Japão", slug: "japan" }, // 25
+  { id: 6, name: "Costa do Marfim", slug: "ivory-coast" }, // 26
+  { id: 7, name: "Noruega", slug: "norway" }, // 27
+  { id: 0, name: "África do Sul", slug: "south-africa" }, // 28
+  { id: 1, name: "Canadá", slug: "canada" }, // 29
+  { id: 2, name: "Países Baixos", slug: "netherlands" }, // 30
+  { id: 3, name: "Marrocos", slug: "morocco" }, // 31
 ]
 
 export const ROUND_LABELS = [
