@@ -577,41 +577,13 @@ export function WorldCupBracket() {
   }, [winners, champion, isLoaded])
 
   /*
-   * NOTA PARA PRODUÇÃO:
-   * Para conectar a uma API de Esportes real (por exemplo, API-Football ou Live-Score API) em tempo real:
-   * 
-   * useEffect(() => {
-   *   if (!isLoaded || !liveMatchId) return
-   * 
-   *   // Exemplo com WebSocket real:
-   *   const ws = new WebSocket(`wss://api.api-football.com/live?fixture=${liveMatchId}&apiKey=SUA_CHAVE_API`)
-   * 
-   *   ws.onmessage = (event) => {
-   *     const data = JSON.parse(event.data)
-   *     // Atualiza placar em tempo real:
-   *     setLiveMatch({
-   *       matchId: data.fixture.id,
-   *       t1: data.teams.home,
-   *       t2: data.teams.away,
-   *       t1Score: data.goals.home,
-   *       t2Score: data.goals.away,
-   *       minute: data.fixture.status.elapsed,
-   *       scorer: data.events.find(e => e.type === "Goal")?.player.name || "",
-   *       isActive: data.fixture.status.short !== "FT"
-   *     })
-   *     
-   *     if (data.fixture.status.short === "FT") {
-   *       // Partida encerrada: define vencedor e avança na chave
-   *       const winner = data.goals.home > data.goals.away ? data.teams.home : data.teams.away
-   *       setWinners(prev => ({ ...prev, [parentWinnerKey]: winner }))
-   *     }
-   *   }
-   * 
-   *   return () => ws.close()
-   * }, [isLoaded, liveMatchId])
-    */
+   * INTEGRAÇÃO EM PRODUÇÃO:
+   * Os placares ao vivo são obtidos via SportMonks Football API v3 (/api/x-scores).
+   * A rota consulta livescores inplay e fixtures por data, filtrando pela Season ID da Copa 2026.
+   * Configurar SPORTMONKS_API_TOKEN no .env.local para ativar.
+   */
 
-  // Escuta atualizações de placar via WebSocket (LiveScore/X.com)
+  // Escuta atualizações de placar via WebSocket (stream de resultados ao vivo)
   useEffect(() => {
     if (!isLoaded) return
 
@@ -689,7 +661,7 @@ export function WorldCupBracket() {
     const checkMatches = () => {
       const now = getSimulatedNow()
       
-      // Tenta buscar atualizações do X.com via API local (que faz proxy para o link do X, throttle 20s)
+      // Busca atualizações de placar via SportMonks API (throttle 20s)
       if (now - lastXFetchRef.current > 20000) {
         lastXFetchRef.current = now
         fetch("/api/x-scores")
@@ -710,8 +682,8 @@ export function WorldCupBracket() {
                     t2,
                     t1Score: data.homeScore,
                     t2Score: data.awayScore,
-                    minute: 90,
-                    scorer: "",
+                    minute: data.minute ?? 0,
+                    scorer: data.scorer ?? "",
                     isActive: true,
                     status: data.status
                   })
@@ -735,10 +707,10 @@ export function WorldCupBracket() {
               }
             }
           })
-          .catch(err => console.error("Erro ao buscar score do X:", err))
+          .catch(err => console.error("Erro ao buscar score da SportMonks:", err))
       }
 
-      // Se o X.com já está ativamente gerenciando o placar, não rodamos a simulação do relógio do sistema
+      // Se a SportMonks já está ativamente gerenciando o placar, não rodamos a simulação do relógio do sistema
       if (isXActiveRef.current) {
         return
       }
