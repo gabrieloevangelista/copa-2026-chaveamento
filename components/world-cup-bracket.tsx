@@ -583,11 +583,13 @@ export function WorldCupBracket() {
    * Configurar SPORTMONKS_API_TOKEN no .env.local para ativar.
    */
 
-  // Escuta atualizações de placar via WebSocket (stream de resultados ao vivo)
+  // O WebSocket de simulação (wss://x-stream.copa2026.org/live-scores) foi desativado
+  // para evitar poluição de erros no console, pois a integração principal agora é feita
+  // via HTTP Polling com a SportMonks API no endpoint /api/x-scores.
+  /*
   useEffect(() => {
     if (!isLoaded) return
 
-    // Conecta a uma stream real/simulada de LiveScore
     const ws = new WebSocket("wss://x-stream.copa2026.org/live-scores")
 
     ws.onopen = () => {
@@ -600,7 +602,6 @@ export function WorldCupBracket() {
         if (data && data.matchId) {
           const activeItem = SCHEDULE.find(item => item.id === data.matchId)
           if (activeItem) {
-            // Só exibe se estiver marcado como ativo no stream E ainda não tiver vencedor na chave
             if (data.isActive && !winnersRef.current[activeItem.parentWinnerKey]) {
               const t1 = TEAMS[activeItem.t1_idx]
               const t2 = TEAMS[activeItem.t2_idx]
@@ -616,15 +617,11 @@ export function WorldCupBracket() {
                 isActive: true
               })
             } else {
-              // Se o jogo acabou ou já temos vencedor, remove o placar ao vivo imediatamente
               setLiveMatch(null)
-              
-              // Avança vencedor na chave se ainda não existir
               if (!winnersRef.current[activeItem.parentWinnerKey]) {
                 const winner = data.homeScore > data.awayScore ? TEAMS[activeItem.t1_idx] : TEAMS[activeItem.t2_idx]
                 setWinners(prev => ({ ...prev, [activeItem.parentWinnerKey]: winner }))
                 
-                // Celebração visual do vencedor automático
                 const flagColors = TEAM_COLORS[winner.slug] || ["#e9b949", "#ffffff"]
                 confetti({
                   particleCount: 60,
@@ -653,6 +650,7 @@ export function WorldCupBracket() {
       ws.close()
     }
   }, [isLoaded])
+  */
 
   // Verifica e atualiza partidas ao vivo em tempo real baseado no relógio do sistema
   useEffect(() => {
