@@ -134,21 +134,21 @@ function getMatchInfo(
 
   if (ring === 0) {
     const dates = [
-      "Dom., 28/06", "Ontem", "Ontem", "Hoje", 
-      "qui., 02/07", "qui., 02/07", "amanhã", "amanhã",
-      "Ontem", "Hoje", "hoje", "amanhã",
-      "sex., 03/07", "sex., 03/07", "sex., 03/07", "sex., 03/07"
+      "Dom., 28/06", "Seg., 29/06", "Seg., 29/06", "Ter., 30/06", 
+      "Hoje", "Hoje", "Ontem", "Ontem",
+      "Seg., 29/06", "Ter., 30/06", "Ter., 30/06", "Ontem",
+      "Amanhã", "Amanhã", "Amanhã", "Amanhã"
     ]
     const times = [
       "FIM", "FIM (P)", "FIM (P)", "FIM",
-      "20:00", "16:00", "21:00", "17:00",
-      "FIM", "FIM", "23:00", "13:00",
+      "20:00", "16:00", "FIM", "FIM (P)",
+      "FIM", "FIM", "FIM", "FIM",
       "19:00", "15:00", "00:00", "22:30"
     ]
     const scores = [
       "0 x 1", "1 (2) x 1 (3)", "1 (3) x 1 (4)", "3 x 0",
-      null, null, null, null,
-      "2 x 1", "1 x 2", null, null,
+      null, null, "2 x 0", "3 x 2",
+      "2 x 1", "1 x 2", "2 x 0", "2 x 1",
       null, null, null, null
     ]
     date = dates[matchIdx] ?? ""
@@ -207,42 +207,26 @@ const SCHEDULE = [
 ]
 
 function getDeterministicMatchResult(matchId: string) {
-  // Sobrescreve o placar do jogo México vs Equador (matchId "0-10") para 2 x 0 para o México
-  if (matchId === "0-10") {
-    return {
-      t1ScoreFinal: 2,
-      t2ScoreFinal: 0,
-      goals: [
-        { minute: 1, team: 1 as const },
-        { minute: 2, team: 1 as const }
-      ]
-    }
+  // Resultados oficiais da imagem (16-avos)
+  const officialResults: Record<string, { t1: number, t2: number }> = {
+    "0-0": { t1: 0, t2: 1 }, // África do Sul x Canadá
+    "0-1": { t1: 1, t2: 1 }, // Holanda x Marrocos (1-1, Marrocos vence nos penais)
+    "0-2": { t1: 1, t2: 1 }, // Alemanha x Paraguai (1-1, Paraguai vence nos penais)
+    "0-3": { t1: 3, t2: 0 }, // França x Suécia
+    "0-6": { t1: 2, t2: 0 }, // EUA x Bósnia
+    "0-7": { t1: 3, t2: 2 }, // Bélgica x Senegal
+    "0-8": { t1: 2, t2: 1 }, // Brasil x Japão
+    "0-9": { t1: 1, t2: 2 }, // Costa do Marfim x Noruega
+    "0-10": { t1: 2, t2: 0 }, // México x Equador
+    "0-11": { t1: 2, t2: 1 }, // Inglaterra x RD Congo
   }
 
-  // Sobrescreve o placar do jogo Bélgica vs Senegal (matchId "0-7") para 3 x 2 para a Bélgica
-  if (matchId === "0-7") {
+  if (officialResults[matchId]) {
+    const res = officialResults[matchId]
     return {
-      t1ScoreFinal: 3,
-      t2ScoreFinal: 2,
-      goals: [
-        { minute: 15, team: 1 as const },
-        { minute: 30, team: 2 as const },
-        { minute: 55, team: 2 as const },
-        { minute: 75, team: 1 as const },
-        { minute: 88, team: 1 as const }
-      ]
-    }
-  }
-
-  // Sobrescreve o placar do jogo EUA vs Bósnia (matchId "0-6") para 2 x 0 para os EUA
-  if (matchId === "0-6") {
-    return {
-      t1ScoreFinal: 2,
-      t2ScoreFinal: 0,
-      goals: [
-        { minute: 22, team: 1 as const },
-        { minute: 68, team: 1 as const }
-      ]
+      t1ScoreFinal: res.t1,
+      t2ScoreFinal: res.t2,
+      goals: [] // Gols não especificados na imagem, deixamos vazio
     }
   }
 
