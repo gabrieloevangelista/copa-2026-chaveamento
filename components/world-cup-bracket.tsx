@@ -234,6 +234,18 @@ function getDeterministicMatchResult(matchId: string) {
     }
   }
 
+  // Sobrescreve o placar do jogo EUA vs Bósnia (matchId "0-6") para 2 x 0 para os EUA
+  if (matchId === "0-6") {
+    return {
+      t1ScoreFinal: 2,
+      t2ScoreFinal: 0,
+      goals: [
+        { minute: 22, team: 1 as const },
+        { minute: 68, team: 1 as const }
+      ]
+    }
+  }
+
   let hash = 0
   for (let i = 0; i < matchId.length; i++) {
     hash = (hash << 5) - hash + matchId.charCodeAt(i)
@@ -509,12 +521,13 @@ export function WorldCupBracket() {
     setScale((prev) => Math.min(3, prev + 0.1))
   }
 
-  // Estado pré-carregado: Brasil, Marrocos, Suíça, Paraguai, Canadá, Noruega, França, México e Bélgica nas oitavas
+  // Estado pré-carregado: Brasil, Marrocos, Suíça, Paraguai, Canadá, Noruega, França, México, Bélgica e EUA nas oitavas
   const DEFAULT_WINNERS: Winners = {
     "1-0": TEAMS[1],   // Canadá (1) vence África do Sul (0)
     "1-1": TEAMS[3],   // Marrocos (3) vence Holanda (2)
     "1-2": TEAMS[5],   // Paraguai (14) vence Alemanha (15) -- at index 5
     "1-3": TEAMS[6],   // França (30) vence Suécia (31) -- at index 6
+    "1-6": TEAMS[12],  // EUA (8) vence Bósnia (9) -- index 12 no array TEAMS
     "1-7": TEAMS[14],  // Bélgica (10) vence Senegal (11) -- index 14 no array TEAMS
     "1-8": TEAMS[16],  // Brasil (16) vence Japão (17)
     "1-9": TEAMS[19],  // Noruega (19) vence Costa do Marfim (18)
