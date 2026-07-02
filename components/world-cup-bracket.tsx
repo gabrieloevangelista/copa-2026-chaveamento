@@ -219,6 +219,21 @@ function getDeterministicMatchResult(matchId: string) {
     }
   }
 
+  // Sobrescreve o placar do jogo Bélgica vs Senegal (matchId "0-5") para 3 x 2 para a Bélgica
+  if (matchId === "0-5") {
+    return {
+      t1ScoreFinal: 3,
+      t2ScoreFinal: 2,
+      goals: [
+        { minute: 15, team: 1 as const },
+        { minute: 30, team: 2 as const },
+        { minute: 55, team: 2 as const },
+        { minute: 75, team: 1 as const },
+        { minute: 88, team: 1 as const }
+      ]
+    }
+  }
+
   let hash = 0
   for (let i = 0; i < matchId.length; i++) {
     hash = (hash << 5) - hash + matchId.charCodeAt(i)
@@ -494,12 +509,13 @@ export function WorldCupBracket() {
     setScale((prev) => Math.min(3, prev + 0.1))
   }
 
-  // Estado pré-carregado: Brasil, Marrocos, Suíça, Paraguai, Canadá, Noruega, França e México nas oitavas
+  // Estado pré-carregado: Brasil, Marrocos, Suíça, Paraguai, Canadá, Noruega, França, México e Bélgica nas oitavas
   const DEFAULT_WINNERS: Winners = {
     "1-0": TEAMS[1],   // Canadá (1) vence África do Sul (0)
     "1-1": TEAMS[3],   // Marrocos (3) vence Holanda (2)
     "1-2": TEAMS[5],   // Paraguai (14) vence Alemanha (15) -- at index 5
     "1-3": TEAMS[6],   // França (30) vence Suécia (31) -- at index 6
+    "1-5": TEAMS[14],  // Bélgica (10) vence Senegal (11) -- index 14 no array TEAMS
     "1-8": TEAMS[16],  // Brasil (16) vence Japão (17)
     "1-9": TEAMS[19],  // Noruega (19) vence Costa do Marfim (18)
     "1-10": TEAMS[20], // México (20) vence Equador (21)
