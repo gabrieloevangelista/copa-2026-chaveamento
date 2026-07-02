@@ -48,26 +48,26 @@ function getMatchDate(ring: number, index: number): string | null {
   if (ring === 0) return null
   if (ring === 1) {
     const matchIdx = Math.floor(index / 2)
-    if (matchIdx === 0) return "04 de Julho"
+    if (matchIdx === 0) return "05 de Julho"
     if (matchIdx === 1) return "05 de Julho"
-    if (matchIdx === 2) return "06 de Julho"
+    if (matchIdx === 2) return "07 de Julho"
     if (matchIdx === 3) return "07 de Julho"
-    if (matchIdx === 4) return "07 de Julho"
-    if (matchIdx === 5) return "06 de Julho"
-    if (matchIdx === 6) return "05 de Julho"
-    if (matchIdx === 7) return "04 de Julho"
+    if (matchIdx === 4) return "04 de Julho"
+    if (matchIdx === 5) return "04 de Julho"
+    if (matchIdx === 6) return "06 de Julho"
+    if (matchIdx === 7) return "06 de Julho"
   }
   if (ring === 2) {
     const matchIdx = Math.floor(index / 2)
-    if (matchIdx === 0) return "09 de Julho"
-    if (matchIdx === 1) return "10 de Julho"
-    if (matchIdx === 2) return "10 de Julho"
-    if (matchIdx === 3) return "11 de Julho"
+    if (matchIdx === 0) return "11 de Julho"
+    if (matchIdx === 1) return "11 de Julho"
+    if (matchIdx === 2) return "09 de Julho"
+    if (matchIdx === 3) return "10 de Julho"
   }
   if (ring === 3) {
     const matchIdx = Math.floor(index / 2)
-    if (matchIdx === 0) return "14 de Julho"
-    if (matchIdx === 1) return "15 de Julho"
+    if (matchIdx === 0) return "15 de Julho"
+    if (matchIdx === 1) return "14 de Julho"
   }
   if (ring === 4) {
     return "19 de Julho"
@@ -105,9 +105,10 @@ function getMatchInfo(
   liveMatch: LiveMatchState | null
 ): MatchInfo {
   const matchIdx = Math.floor(index / 2)
+  const activeItem = ring === 0 ? SCHEDULE[matchIdx] : null
 
   // Se for a partida ao vivo no momento, sobrescreve os dados com o placar ao vivo
-  if (liveMatch && ring === 0 && liveMatch.matchId === `0-${matchIdx}`) {
+  if (liveMatch && ring === 0 && activeItem && liveMatch.matchId === activeItem.id) {
     return {
       phase: "16-avos de final",
       date: "AO VIVO",
@@ -132,36 +133,33 @@ function getMatchInfo(
   let score: string | null = null
   let status = "A definir"
 
-  if (ring === 0) {
-    const activeItem = SCHEDULE.find(item => item.id === `0-${matchIdx}`)
-    if (activeItem) {
-      date = activeItem.dateLabel
-      time = activeItem.timeLabel
-      
-      const isFinished = !!winners[`1-${matchIdx}`]
-      
-      if (isFinished) {
-         const res = getDeterministicMatchResult(activeItem.id)
-         score = (res as any).str ? (res as any).str : `${res.t1ScoreFinal} x ${res.t2ScoreFinal}`
-         status = "FIM"
-      } else {
-         status = "Agendado"
-      }
+  if (ring === 0 && activeItem) {
+    date = activeItem.dateLabel
+    time = activeItem.timeLabel
+    
+    const isFinished = !!winners[`1-${matchIdx}`]
+    
+    if (isFinished) {
+       const res = getDeterministicMatchResult(activeItem.id)
+       score = (res as any).str ? (res as any).str : `${res.t1ScoreFinal} x ${res.t2ScoreFinal}`
+       status = "FIM"
+    } else {
+       status = "Agendado"
     }
   } else if (ring === 1) {
-    const dates = ["Sáb., 04/07", "Dom., 05/07", "Seg., 06/07", "Ter., 07/07", "Ter., 07/07", "Seg., 06/07", "Dom., 05/07", "Sáb., 04/07"]
-    const times = ["18:00", "21:00", "21:00", "17:00", "13:00", "16:00", "17:00", "14:00"]
+    const dates = ["Dom., 05/07", "Dom., 05/07", "Ter., 07/07", "Ter., 07/07", "Sáb., 04/07", "Sáb., 04/07", "Seg., 06/07", "Seg., 06/07"]
+    const times = ["17:00", "21:00", "13:00", "17:00", "18:00", "14:00", "16:00", "21:00"]
     date = dates[matchIdx] ?? ""
     time = times[matchIdx] ?? ""
     status = "Agendado"
   } else if (ring === 2) {
-    const dates = ["Qui., 09/07", "Sex., 10/07", "Sáb., 11/07", "Sáb., 11/07"]
-    const times = ["17:00", "16:00", "18:00", "22:00"]
+    const dates = ["Sáb., 11/07", "Sáb., 11/07", "Qui., 09/07", "Sex., 10/07"]
+    const times = ["18:00", "22:00", "17:00", "16:00"]
     date = dates[matchIdx] ?? ""
     time = times[matchIdx] ?? ""
     status = "Agendado"
   } else if (ring === 3) {
-    const dates = ["Ter., 14/07", "Qua., 15/07"]
+    const dates = ["Qua., 15/07", "Ter., 14/07"]
     const times = ["16:00", "16:00"]
     date = dates[matchIdx] ?? ""
     time = times[matchIdx] ?? ""
@@ -181,38 +179,38 @@ function getMatchInfo(
 type Winners = Record<string, Team>
 
 const SCHEDULE = [
-  { id: "0-0", dateLabel: "Seg., 29/06", timeLabel: "18:00", t1_idx: 0, t2_idx: 1, timestamp: new Date("2026-06-29T18:00:00-03:00").getTime(), parentWinnerKey: "1-0" }, // Alemanha x Paraguai
-  { id: "0-1", dateLabel: "Ter., 30/06", timeLabel: "17:00", t1_idx: 2, t2_idx: 3, timestamp: new Date("2026-06-30T17:00:00-03:00").getTime(), parentWinnerKey: "1-1" }, // França x Suécia
-  { id: "0-2", dateLabel: "Ter., 30/06", timeLabel: "22:55", t1_idx: 4, t2_idx: 5, timestamp: new Date("2026-06-30T22:55:00-03:00").getTime(), parentWinnerKey: "1-2" }, // México x Equador
-  { id: "0-3", dateLabel: "Ontem", timeLabel: "13:00", t1_idx: 6, t2_idx: 7, timestamp: new Date("2026-07-01T13:00:00-03:00").getTime(), parentWinnerKey: "1-3" }, // Inglaterra x RD Congo
-  { id: "0-4", dateLabel: "Ontem", timeLabel: "21:00", t1_idx: 8, t2_idx: 9, timestamp: new Date("2026-07-01T21:00:00-03:00").getTime(), parentWinnerKey: "1-4" }, // EUA x Bósnia
-  { id: "0-5", dateLabel: "Ontem", timeLabel: "17:00", t1_idx: 10, t2_idx: 11, timestamp: new Date("2026-07-01T17:00:00-03:00").getTime(), parentWinnerKey: "1-5" }, // Bélgica x Senegal
-  { id: "0-6", dateLabel: "Amanhã", timeLabel: "19:00", t1_idx: 12, t2_idx: 13, timestamp: new Date("2026-07-03T19:00:00-03:00").getTime(), parentWinnerKey: "1-6" }, // Argentina x Cabo Verde
-  { id: "0-7", dateLabel: "Amanhã", timeLabel: "22:30", t1_idx: 14, t2_idx: 15, timestamp: new Date("2026-07-03T22:30:00-03:00").getTime(), parentWinnerKey: "1-7" }, // Colômbia x Gana
+  { id: "J76", dateLabel: "Seg., 29/06", timeLabel: "21:00", t1_idx: 0, t2_idx: 1, timestamp: new Date("2026-06-29T21:00:00-03:00").getTime(), parentWinnerKey: "1-0" }, // Brasil x Japão
+  { id: "J78", dateLabel: "Ter., 30/06", timeLabel: "21:00", t1_idx: 2, t2_idx: 3, timestamp: new Date("2026-06-30T21:00:00-03:00").getTime(), parentWinnerKey: "1-1" }, // Costa do Marfim x Noruega
+  { id: "J79", dateLabel: "Ter., 30/06", timeLabel: "22:55", t1_idx: 4, t2_idx: 5, timestamp: new Date("2026-06-30T22:55:00-03:00").getTime(), parentWinnerKey: "1-2" }, // México x Equador
+  { id: "J80", dateLabel: "Ontem", timeLabel: "13:00", t1_idx: 6, t2_idx: 7, timestamp: new Date("2026-07-01T13:00:00-03:00").getTime(), parentWinnerKey: "1-3" }, // Inglaterra x RD Congo
+  { id: "J86", dateLabel: "Amanhã", timeLabel: "19:00", t1_idx: 8, t2_idx: 9, timestamp: new Date("2026-07-03T19:00:00-03:00").getTime(), parentWinnerKey: "1-4" }, // Argentina x Cabo Verde
+  { id: "J88", dateLabel: "Amanhã", timeLabel: "15:00", t1_idx: 10, t2_idx: 11, timestamp: new Date("2026-07-03T15:00:00-03:00").getTime(), parentWinnerKey: "1-5" }, // Austrália x Egito
+  { id: "J85", dateLabel: "Amanhã", timeLabel: "00:00", t1_idx: 12, t2_idx: 13, timestamp: new Date("2026-07-03T00:00:00-03:00").getTime(), parentWinnerKey: "1-6" }, // Suíça x Argélia
+  { id: "J87", dateLabel: "Amanhã", timeLabel: "22:30", t1_idx: 14, t2_idx: 15, timestamp: new Date("2026-07-03T22:30:00-03:00").getTime(), parentWinnerKey: "1-7" }, // Colômbia x Gana
   
-  { id: "0-8", dateLabel: "Amanhã", timeLabel: "00:00", t1_idx: 16, t2_idx: 17, timestamp: new Date("2026-07-03T00:00:00-03:00").getTime(), parentWinnerKey: "1-8" }, // Suíça x Argélia
-  { id: "0-9", dateLabel: "Amanhã", timeLabel: "15:00", t1_idx: 18, t2_idx: 19, timestamp: new Date("2026-07-03T15:00:00-03:00").getTime(), parentWinnerKey: "1-9" }, // Austrália x Egito
-  { id: "0-10", dateLabel: "Hoje", timeLabel: "16:00", t1_idx: 20, t2_idx: 21, timestamp: new Date("2026-07-02T16:00:00-03:00").getTime(), parentWinnerKey: "1-10" }, // Espanha x Áustria
-  { id: "0-11", dateLabel: "Hoje", timeLabel: "20:00", t1_idx: 22, t2_idx: 23, timestamp: new Date("2026-07-02T20:00:00-03:00").getTime(), parentWinnerKey: "1-11" }, // Portugal x Croácia
-  { id: "0-12", dateLabel: "Seg., 29/06", timeLabel: "21:00", t1_idx: 24, t2_idx: 25, timestamp: new Date("2026-06-29T21:00:00-03:00").getTime(), parentWinnerKey: "1-12" }, // Brasil x Japão
-  { id: "0-13", dateLabel: "Ter., 30/06", timeLabel: "21:00", t1_idx: 26, t2_idx: 27, timestamp: new Date("2026-06-30T21:00:00-03:00").getTime(), parentWinnerKey: "1-13" }, // Costa do Marfim x Noruega
-  { id: "0-14", dateLabel: "Dom., 28/06", timeLabel: "14:00", t1_idx: 28, t2_idx: 29, timestamp: new Date("2026-06-28T14:00:00-03:00").getTime(), parentWinnerKey: "1-14" }, // África do Sul x Canadá
-  { id: "0-15", dateLabel: "Seg., 29/06", timeLabel: "14:00", t1_idx: 30, t2_idx: 31, timestamp: new Date("2026-06-29T14:00:00-03:00").getTime(), parentWinnerKey: "1-15" } // Holanda x Marrocos
+  { id: "J74", dateLabel: "Seg., 29/06", timeLabel: "18:00", t1_idx: 16, t2_idx: 17, timestamp: new Date("2026-06-29T18:00:00-03:00").getTime(), parentWinnerKey: "1-8" }, // Alemanha x Paraguai
+  { id: "J77", dateLabel: "Ter., 30/06", timeLabel: "17:00", t1_idx: 18, t2_idx: 19, timestamp: new Date("2026-06-30T17:00:00-03:00").getTime(), parentWinnerKey: "1-9" }, // França x Suécia
+  { id: "J73", dateLabel: "Dom., 28/06", timeLabel: "14:00", t1_idx: 20, t2_idx: 21, timestamp: new Date("2026-06-28T14:00:00-03:00").getTime(), parentWinnerKey: "1-10" }, // África do Sul x Canadá
+  { id: "J75", dateLabel: "Seg., 29/06", timeLabel: "14:00", t1_idx: 22, t2_idx: 23, timestamp: new Date("2026-06-29T14:00:00-03:00").getTime(), parentWinnerKey: "1-11" }, // Holanda x Marrocos
+  { id: "J83", dateLabel: "Hoje", timeLabel: "20:00", t1_idx: 24, t2_idx: 25, timestamp: new Date("2026-07-02T20:00:00-03:00").getTime(), parentWinnerKey: "1-12" }, // Portugal x Croácia
+  { id: "J84", dateLabel: "Hoje", timeLabel: "16:00", t1_idx: 26, t2_idx: 27, timestamp: new Date("2026-07-02T16:00:00-03:00").getTime(), parentWinnerKey: "1-13" }, // Espanha x Áustria
+  { id: "J81", dateLabel: "Ontem", timeLabel: "21:00", t1_idx: 28, t2_idx: 29, timestamp: new Date("2026-07-01T21:00:00-03:00").getTime(), parentWinnerKey: "1-14" }, // EUA x Bósnia
+  { id: "J82", dateLabel: "Ontem", timeLabel: "17:00", t1_idx: 30, t2_idx: 31, timestamp: new Date("2026-07-01T17:00:00-03:00").getTime(), parentWinnerKey: "1-15" } // Bélgica x Senegal
 ]
 
 function getDeterministicMatchResult(matchId: string) {
   // Resultados oficiais da imagem (16-avos)
   const officialResults: Record<string, { t1: number, t2: number, str?: string }> = {
-    "0-0": { t1: 1, t2: 1, str: "1 (3) x 1 (4)" }, // Alemanha x Paraguai
-    "0-1": { t1: 3, t2: 0 }, // França x Suécia
-    "0-2": { t1: 2, t2: 0 }, // México x Equador
-    "0-3": { t1: 2, t2: 1 }, // Inglaterra x RD Congo
-    "0-4": { t1: 2, t2: 0 }, // EUA x Bósnia
-    "0-5": { t1: 3, t2: 2 }, // Bélgica x Senegal
-    "0-12": { t1: 2, t2: 1 }, // Brasil x Japão
-    "0-13": { t1: 1, t2: 2 }, // Costa do Marfim x Noruega
-    "0-14": { t1: 0, t2: 1 }, // África do Sul x Canadá
-    "0-15": { t1: 1, t2: 1, str: "1 (2) x 1 (3)" }, // Holanda x Marrocos
+    "J76": { t1: 2, t2: 1 }, // Brasil x Japão
+    "J78": { t1: 1, t2: 2 }, // Costa do Marfim x Noruega
+    "J79": { t1: 2, t2: 0 }, // México x Equador
+    "J80": { t1: 2, t2: 1 }, // Inglaterra x RD Congo
+    "J74": { t1: 1, t2: 1, str: "1 (3) x 1 (4)" }, // Alemanha x Paraguai
+    "J77": { t1: 3, t2: 0 }, // França x Suécia
+    "J73": { t1: 0, t2: 1 }, // África do Sul x Canadá
+    "J75": { t1: 1, t2: 1, str: "1 (2) x 1 (3)" }, // Holanda x Marrocos
+    "J81": { t1: 2, t2: 0 }, // EUA x Bósnia
+    "J82": { t1: 3, t2: 2 }, // Bélgica x Senegal
   }
 
   if (officialResults[matchId]) {
@@ -306,15 +304,23 @@ export function WorldCupBracket() {
     winnersRef.current = winners
   }, [winners])
 
-  const [currentTime, setCurrentTime] = useState(Date.now())
+  const realStartRef = useRef(typeof window !== "undefined" ? Date.now() : new Date("2026-07-02T08:40:24-03:00").getTime())
+  const SIMULATED_START = useMemo(() => new Date("2026-07-02T08:40:24-03:00").getTime(), [])
+  
+  const getSimulatedNow = useCallback(() => {
+    if (typeof window === "undefined") return SIMULATED_START
+    return SIMULATED_START + (Date.now() - realStartRef.current)
+  }, [SIMULATED_START])
+
+  const [currentTime, setCurrentTime] = useState(getSimulatedNow())
   const lastXFetchRef = useRef(0)
   const isXActiveRef = useRef(false)
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTime(Date.now())
+      setCurrentTime(getSimulatedNow())
     }, 1000)
     return () => clearInterval(interval)
-  }, [])
+  }, [getSimulatedNow])
 
   const getCountdownLabel = useCallback((targetMs: number) => {
     const diff = targetMs - currentTime
@@ -502,16 +508,16 @@ export function WorldCupBracket() {
 
   // Estado pré-carregado: Todos os vencedores confirmados no JSON (16-avos)
   const DEFAULT_WINNERS: Winners = {
-    "1-0": TEAMS[1],   // Paraguai
-    "1-1": TEAMS[2],   // França
+    "1-0": TEAMS[0],   // Brasil
+    "1-1": TEAMS[3],   // Noruega
     "1-2": TEAMS[4],   // México
     "1-3": TEAMS[6],   // Inglaterra
-    "1-4": TEAMS[8],   // EUA
-    "1-5": TEAMS[10],  // Bélgica
-    "1-12": TEAMS[24], // Brasil
-    "1-13": TEAMS[27], // Noruega
-    "1-14": TEAMS[29], // Canadá
-    "1-15": TEAMS[31], // Marrocos
+    "1-8": TEAMS[17],  // Paraguai
+    "1-9": TEAMS[18],  // França
+    "1-10": TEAMS[21], // Canadá
+    "1-11": TEAMS[23], // Marrocos
+    "1-14": TEAMS[28], // EUA
+    "1-15": TEAMS[30], // Bélgica
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -529,16 +535,16 @@ export function WorldCupBracket() {
           }
         }
         // Injeta resultados oficiais do JSON se eles estiverem incorretos no storage
-        mappedWinners["1-0"] = TEAMS[1]   // Paraguai
-        mappedWinners["1-1"] = TEAMS[2]   // França
+        mappedWinners["1-0"] = TEAMS[0]   // Brasil
+        mappedWinners["1-1"] = TEAMS[3]   // Noruega
         mappedWinners["1-2"] = TEAMS[4]   // México
         mappedWinners["1-3"] = TEAMS[6]   // Inglaterra
-        mappedWinners["1-4"] = TEAMS[8]   // EUA
-        mappedWinners["1-5"] = TEAMS[10]  // Bélgica
-        mappedWinners["1-12"] = TEAMS[24] // Brasil
-        mappedWinners["1-13"] = TEAMS[27] // Noruega
-        mappedWinners["1-14"] = TEAMS[29] // Canadá
-        mappedWinners["1-15"] = TEAMS[31] // Marrocos
+        mappedWinners["1-8"] = TEAMS[17]  // Paraguai
+        mappedWinners["1-9"] = TEAMS[18]  // França
+        mappedWinners["1-10"] = TEAMS[21] // Canadá
+        mappedWinners["1-11"] = TEAMS[23] // Marrocos
+        mappedWinners["1-14"] = TEAMS[28] // EUA
+        mappedWinners["1-15"] = TEAMS[30] // Bélgica
 
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
@@ -681,7 +687,7 @@ export function WorldCupBracket() {
     if (!isLoaded) return
 
     const checkMatches = () => {
-      const now = Date.now()
+      const now = getSimulatedNow()
       
       // Tenta buscar atualizações do X.com via API local (que faz proxy para o link do X, throttle 20s)
       if (now - lastXFetchRef.current > 20000) {
@@ -829,7 +835,7 @@ export function WorldCupBracket() {
     
     let updated = false
     const nextWinners = { ...winners }
-    const now = Date.now()
+    const now = getSimulatedNow()
 
     SCHEDULE.forEach(item => {
       if (now >= item.timestamp + 120 * 60 * 1000 && !winners[item.parentWinnerKey]) {
@@ -1125,22 +1131,22 @@ export function WorldCupBracket() {
     const thirdPlace = getThirdPlaceTeams()
     
     return [
-      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "14:00", t1: teamAt(1, 14), t2: teamAt(1, 15) }, // Canadá x Marrocos
-      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", t1: teamAt(1, 0), t2: teamAt(1, 1) }, // Paraguai x França
-      { phase: "Oitavas de final", date: "Dom., 05/07", time: "17:00", t1: teamAt(1, 12), t2: teamAt(1, 13) }, // Brasil x Noruega
+      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "14:00", t1: teamAt(1, 10), t2: teamAt(1, 11) }, // Canadá x Marrocos
+      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", t1: teamAt(1, 8), t2: teamAt(1, 9) }, // Paraguai x França
+      { phase: "Oitavas de final", date: "Dom., 05/07", time: "17:00", t1: teamAt(1, 0), t2: teamAt(1, 1) }, // Brasil x Noruega
       { phase: "Oitavas de final", date: "Dom., 05/07", time: "21:00", t1: teamAt(1, 2), t2: teamAt(1, 3) }, // México x Inglaterra
-      { phase: "Oitavas de final", date: "Seg., 06/07", time: "16:00", t1: teamAt(1, 10), t2: teamAt(1, 11) },
-      { phase: "Oitavas de final", date: "Seg., 06/07", time: "21:00", t1: teamAt(1, 4), t2: teamAt(1, 5) }, // EUA x Bélgica
-      { phase: "Oitavas de final", date: "Ter., 07/07", time: "13:00", t1: teamAt(1, 8), t2: teamAt(1, 9) },
-      { phase: "Oitavas de final", date: "Ter., 07/07", time: "17:00", t1: teamAt(1, 6), t2: teamAt(1, 7) },
+      { phase: "Oitavas de final", date: "Seg., 06/07", time: "16:00", t1: teamAt(1, 12), t2: teamAt(1, 13) }, // Portugal/Croácia vs Espanha/Áustria
+      { phase: "Oitavas de final", date: "Seg., 06/07", time: "21:00", t1: teamAt(1, 14), t2: teamAt(1, 15) }, // EUA x Bélgica
+      { phase: "Oitavas de final", date: "Ter., 07/07", time: "13:00", t1: teamAt(1, 4), t2: teamAt(1, 5) }, // Argentina/CPV vs Austrália/Egito
+      { phase: "Oitavas de final", date: "Ter., 07/07", time: "17:00", t1: teamAt(1, 6), t2: teamAt(1, 7) }, // Suíça/Argélia vs Colômbia/Gana
       
-      { phase: "Quartas de final", date: "Qui., 09/07", time: "17:00", t1: teamAt(2, 0), t2: teamAt(2, 1) },
-      { phase: "Quartas de final", date: "Sex., 10/07", time: "16:00", t1: teamAt(2, 2), t2: teamAt(2, 3) },
-      { phase: "Quartas de final", date: "Sáb., 11/07", time: "18:00", t1: teamAt(2, 4), t2: teamAt(2, 5) },
-      { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", t1: teamAt(2, 6), t2: teamAt(2, 7) },
+      { phase: "Quartas de final", date: "Qui., 09/07", time: "17:00", t1: teamAt(2, 4), t2: teamAt(2, 5) },
+      { phase: "Quartas de final", date: "Sex., 10/07", time: "16:00", t1: teamAt(2, 6), t2: teamAt(2, 7) },
+      { phase: "Quartas de final", date: "Sáb., 11/07", time: "18:00", t1: teamAt(2, 0), t2: teamAt(2, 1) },
+      { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", t1: teamAt(2, 2), t2: teamAt(2, 3) },
       
-      { phase: "Semifinal", date: "Ter., 14/07", time: "16:00", t1: teamAt(3, 0), t2: teamAt(3, 1) },
-      { phase: "Semifinal", date: "Qua., 15/07", time: "16:00", t1: teamAt(3, 2), t2: teamAt(3, 3) },
+      { phase: "Semifinal", date: "Ter., 14/07", time: "16:00", t1: teamAt(3, 2), t2: teamAt(3, 3) },
+      { phase: "Semifinal", date: "Qua., 15/07", time: "16:00", t1: teamAt(3, 0), t2: teamAt(3, 1) },
       
       { phase: "Disputa 3º Lugar", date: "Sáb., 18/07", time: "18:00", t1: thirdPlace.teamA, t2: thirdPlace.teamB },
       
@@ -1150,8 +1156,9 @@ export function WorldCupBracket() {
 
   const nextMatch = useMemo(() => {
     if (!isLoaded) return null
-    const now = Date.now()
-    const found = SCHEDULE.find(item => {
+    const now = getSimulatedNow()
+    const sortedSchedule = [...SCHEDULE].sort((a, b) => a.timestamp - b.timestamp)
+    const found = sortedSchedule.find(item => {
       if (winners[item.parentWinnerKey]) return false
       return item.timestamp > now
     })
@@ -1163,7 +1170,7 @@ export function WorldCupBracket() {
       t1,
       t2
     }
-  }, [isLoaded, winners])
+  }, [isLoaded, winners, currentTime, getSimulatedNow])
 
   return (
     <div className="relative w-full h-full flex flex-col bg-background overflow-hidden select-none">

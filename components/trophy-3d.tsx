@@ -33,7 +33,7 @@ export function Trophy3D() {
         camera={{ position: [0, 0, 5], fov: 40 }}
       >
         <Suspense fallback={<Html center><div className="text-gold-soft animate-pulse whitespace-nowrap text-[10px] uppercase tracking-[0.2em]">Sincronizando Taça...</div></Html>}>
-          <Stage environment="city" intensity={0.6} contactShadow={{ opacity: 0.8, blur: 2 }} adjustCamera={false}>
+          <Stage environment="city" intensity={0.6} shadows={{ type: "contact", opacity: 0.8, blur: 2 }} adjustCamera={false}>
             <Model />
           </Stage>
         </Suspense>

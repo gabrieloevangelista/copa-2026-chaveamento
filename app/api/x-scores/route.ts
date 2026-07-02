@@ -19,7 +19,7 @@ export async function GET() {
     if (!response.ok) {
       // Retorna fallback 2 x 0 para México vs Equador se a requisição falhar (como por exemplo se estiver sem login)
       return NextResponse.json({
-        matchId: "0-10",
+        matchId: "J79",
         homeScore: 2,
         awayScore: 0,
         isActive: true,
@@ -67,7 +67,7 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      matchId: "0-10",
+      matchId: "J79",
       homeScore,
       awayScore,
       isActive,
@@ -76,7 +76,7 @@ export async function GET() {
   } catch (error: any) {
     // Retorna fallback se houver exceções
     return NextResponse.json({
-      matchId: "0-10",
+      matchId: "J79",
       homeScore: 2,
       awayScore: 0,
       isActive: true,
