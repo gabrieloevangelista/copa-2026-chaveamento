@@ -1171,11 +1171,11 @@ export function WorldCupBracket() {
         <div className="flex items-center gap-3">
           {champion ? (
             <div className="flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 py-1 pl-1.5 pr-3">
-              <span className="flex size-7 items-center justify-center overflow-hidden rounded-full bg-card ring-2 ring-gold">
+              <span className="flex size-7 items-center justify-center overflow-hidden rounded-full bg-card ring-2 ring-gold shrink-0">
                 <img
                   src={flagUrl(champion.slug) || "/placeholder.svg"}
                   alt={`Bandeira ${champion.name}`}
-                  className="size-6 rounded-full object-cover"
+                  className="size-6 shrink-0 rounded-full object-cover"
                 />
               </span>
               <span className="text-left leading-none">
@@ -1248,17 +1248,17 @@ export function WorldCupBracket() {
               </span>
 
               {/* Teams & Flags */}
-              <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm">
-                  <img src={flagUrl(nextMatch.t1.slug)} alt="" className="size-4 rounded-full object-cover shadow-sm ring-1 ring-border" />
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm shrink-0">
+                  <img src={flagUrl(nextMatch.t1.slug)} alt="" className="size-4 shrink-0 rounded-full object-cover shadow-sm ring-1 ring-border" />
                   <span className="hidden sm:inline truncate max-w-[80px]">{nextMatch.t1.name}</span>
                 </span>
                 
-                <span className="text-muted-foreground font-normal text-[10px]">vs</span>
+                <span className="text-muted-foreground font-normal text-[10px] shrink-0">vs</span>
 
-                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm">
+                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm shrink-0">
                   <span className="hidden sm:inline truncate max-w-[80px]">{nextMatch.t2.name}</span>
-                  <img src={flagUrl(nextMatch.t2.slug)} alt="" className="size-4 rounded-full object-cover shadow-sm ring-1 ring-border" />
+                  <img src={flagUrl(nextMatch.t2.slug)} alt="" className="size-4 shrink-0 rounded-full object-cover shadow-sm ring-1 ring-border" />
                 </span>
               </div>
 
@@ -1672,13 +1672,13 @@ export function WorldCupBracket() {
                   
                   <div className="flex items-center justify-between gap-2 text-xs font-semibold text-foreground">
                     {/* Time 1 */}
-                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-1 min-w-0 shrink-0">
                       {match.t1 ? (
                         <>
                           <img
                             src={flagUrl(match.t1.slug)}
                             alt=""
-                            className="size-4 rounded-full object-cover ring-1 ring-border"
+                            className="size-4 shrink-0 rounded-full object-cover ring-1 ring-border"
                           />
                           <span className="truncate">{match.t1.name}</span>
                         </>
@@ -1687,17 +1687,17 @@ export function WorldCupBracket() {
                       )}
                     </div>
                     
-                    <span className="text-[10px] text-muted-foreground font-bold px-1.5">×</span>
+                    <span className="text-[10px] text-muted-foreground font-bold px-1.5 shrink-0">×</span>
                     
                     {/* Time 2 */}
-                    <div className="flex items-center gap-1.5 flex-1 justify-end min-w-0 text-right">
+                    <div className="flex items-center gap-1.5 flex-1 justify-end min-w-0 text-right shrink-0">
                       {match.t2 ? (
                         <>
                           <span className="truncate">{match.t2.name}</span>
                           <img
                             src={flagUrl(match.t2.slug)}
                             alt=""
-                            className="size-4 rounded-full object-cover ring-1 ring-border"
+                            className="size-4 shrink-0 rounded-full object-cover ring-1 ring-border"
                           />
                         </>
                       ) : (
