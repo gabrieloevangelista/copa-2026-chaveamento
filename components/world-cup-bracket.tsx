@@ -211,6 +211,8 @@ function getDeterministicMatchResult(matchId: string) {
     "J75": { t1: 1, t2: 1, str: "1 (2) x 1 (3)" }, // Holanda x Marrocos
     "J81": { t1: 2, t2: 0 }, // EUA x Bósnia
     "J82": { t1: 3, t2: 2 }, // Bélgica x Senegal
+    "J83": { t1: 2, t2: 1 }, // Portugal x Croácia
+    "J84": { t1: 3, t2: 1 }, // Espanha x Áustria
   }
 
   if (officialResults[matchId]) {
@@ -516,6 +518,8 @@ export function WorldCupBracket() {
     "1-9": TEAMS[18],  // França
     "1-10": TEAMS[21], // Canadá
     "1-11": TEAMS[23], // Marrocos
+    "1-12": TEAMS[24], // Portugal
+    "1-13": TEAMS[26], // Espanha
     "1-14": TEAMS[28], // EUA
     "1-15": TEAMS[30], // Bélgica
   }
@@ -543,6 +547,8 @@ export function WorldCupBracket() {
         mappedWinners["1-9"] = TEAMS[18]  // França
         mappedWinners["1-10"] = TEAMS[21] // Canadá
         mappedWinners["1-11"] = TEAMS[23] // Marrocos
+        mappedWinners["1-12"] = TEAMS[24] // Portugal
+        mappedWinners["1-13"] = TEAMS[26] // Espanha
         mappedWinners["1-14"] = TEAMS[28] // EUA
         mappedWinners["1-15"] = TEAMS[30] // Bélgica
 
