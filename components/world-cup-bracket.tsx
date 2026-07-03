@@ -201,7 +201,9 @@ const SCHEDULE = [
 function getDeterministicMatchResult(matchId: string) {
   // Resultados oficiais da imagem (16-avos)
   const officialResults: Record<string, { t1: number, t2: number, str?: string }> = {
-    "J76": { t1: 2, t2: 1 }, // Brasil x Japão
+    "0-8": { t1: 0, t2: 0, str: "1 x 0" }, // Suíça x Argélia (se já aconteceu)
+    "0-9": { t1: 0, t2: 1, str: "0 x 1" }, // Austrália x Egito
+    "0-12": { t1: 2, t2: 1 }, // Brasil x Japão
     "J78": { t1: 1, t2: 2 }, // Costa do Marfim x Noruega
     "J79": { t1: 2, t2: 0 }, // México x Equador
     "J80": { t1: 2, t2: 1 }, // Inglaterra x RD Congo
@@ -522,6 +524,7 @@ export function WorldCupBracket() {
     "1-13": TEAMS[26], // Espanha
     "1-14": TEAMS[28], // EUA
     "1-15": TEAMS[30], // Bélgica
+    "1-5": TEAMS[19],  // Egito
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -551,6 +554,7 @@ export function WorldCupBracket() {
         mappedWinners["1-13"] = TEAMS[26] // Espanha
         mappedWinners["1-14"] = TEAMS[28] // EUA
         mappedWinners["1-15"] = TEAMS[30] // Bélgica
+        mappedWinners["1-5"] = TEAMS[19]  // Egito
 
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
