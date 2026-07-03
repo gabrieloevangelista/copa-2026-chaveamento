@@ -1240,30 +1240,30 @@ export function WorldCupBracket() {
         </div>
 
         {/* Informação do Próximo Jogo no Header */}
-        <div className="fixed top-[68px] md:absolute md:top-1/2 left-1/2 -translate-x-1/2 -translate-y-0 md:-translate-y-1/2 z-30 md:z-50 pointer-events-auto flex items-center justify-center">
+        <div className="fixed top-[74px] md:absolute md:top-1/2 left-1/2 -translate-x-1/2 -translate-y-0 md:-translate-y-1/2 z-30 md:z-50 pointer-events-auto flex items-center justify-center">
           {nextMatch ? (
-            <div className="flex items-center gap-3 bg-card/60 px-4 py-1.5 rounded-full border border-gold/20 shadow-md backdrop-blur-sm">
-              <span className="text-[9px] font-extrabold text-gold-soft uppercase tracking-widest shrink-0">
+            <div className="flex items-center gap-2.5 sm:gap-3 bg-card/75 px-5 py-2 rounded-full border border-gold/30 shadow-lg backdrop-blur-md max-w-[95vw] sm:max-w-none whitespace-nowrap">
+              <span className="text-[9px] sm:text-[10px] font-extrabold text-gold-soft uppercase tracking-widest shrink-0 whitespace-nowrap">
                 PRÓXIMO
               </span>
 
               {/* Teams & Flags */}
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm shrink-0">
-                  <img src={flagUrl(nextMatch.t1.slug)} alt="" className="size-4 shrink-0 rounded-full object-cover shadow-sm ring-1 ring-border" />
+              <div className="flex items-center gap-2 shrink-0 whitespace-nowrap">
+                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm shrink-0 whitespace-nowrap">
+                  <img src={flagUrl(nextMatch.t1.slug)} alt="" className="size-5 shrink-0 rounded-full object-cover shadow-sm ring-1 ring-border" />
                   <span className="hidden sm:inline truncate max-w-[80px]">{nextMatch.t1.name}</span>
                 </span>
                 
-                <span className="text-muted-foreground font-normal text-[10px] shrink-0">vs</span>
+                <span className="text-muted-foreground font-normal text-[10px] shrink-0 whitespace-nowrap">vs</span>
 
-                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm shrink-0">
+                <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm shrink-0 whitespace-nowrap">
                   <span className="hidden sm:inline truncate max-w-[80px]">{nextMatch.t2.name}</span>
-                  <img src={flagUrl(nextMatch.t2.slug)} alt="" className="size-4 shrink-0 rounded-full object-cover shadow-sm ring-1 ring-border" />
+                  <img src={flagUrl(nextMatch.t2.slug)} alt="" className="size-5 shrink-0 rounded-full object-cover shadow-sm ring-1 ring-border" />
                 </span>
               </div>
 
               {/* Schedule only (No countdown) */}
-              <span className="text-[10px] text-muted-foreground font-medium shrink-0">
+              <span className="text-[10px] sm:text-xs text-muted-foreground font-semibold shrink-0 whitespace-nowrap">
                 {nextMatch.dateLabel} às {nextMatch.timeLabel}
               </span>
             </div>
