@@ -1138,26 +1138,26 @@ export function WorldCupBracket() {
     const thirdPlace = getThirdPlaceTeams()
     
     return [
-      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "14:00", t1: teamAt(1, 4), t2: teamAt(1, 6) }, // Canadá x Marrocos
-      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", t1: teamAt(1, 0), t2: teamAt(1, 2) }, // Paraguai x França
-      { phase: "Oitavas de final", date: "Dom., 05/07", time: "17:00", t1: teamAt(1, 16), t2: teamAt(1, 18) }, // Brasil x Noruega
-      { phase: "Oitavas de final", date: "Dom., 05/07", time: "21:00", t1: teamAt(1, 20), t2: teamAt(1, 22) }, // México x Inglaterra
-      { phase: "Oitavas de final", date: "Seg., 06/07", time: "16:00", t1: teamAt(1, 8), t2: teamAt(1, 10) }, // Portugal x Espanha
-      { phase: "Oitavas de final", date: "Seg., 06/07", time: "21:00", t1: teamAt(1, 12), t2: teamAt(1, 14) }, // EUA x Bélgica
-      { phase: "Oitavas de final", date: "Ter., 07/07", time: "13:00", t1: teamAt(1, 24), t2: teamAt(1, 26) }, // Argentina x Egito
-      { phase: "Oitavas de final", date: "Ter., 07/07", time: "17:00", t1: teamAt(1, 28), t2: teamAt(1, 30) }, // Suíça x Colômbia/Gana
+      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "14:00", stadium: "Estádio de Houston (TX)", t1: teamAt(1, 4), t2: teamAt(1, 6) }, // Canadá x Marrocos
+      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", stadium: "Estádio de Filadélfia (PA)", t1: teamAt(1, 0), t2: teamAt(1, 2) }, // Paraguai x França
+      { phase: "Oitavas de final", date: "Dom., 05/07", time: "17:00", stadium: "Estádio de Nova York / Nova Jersey (NJ)", t1: teamAt(1, 16), t2: teamAt(1, 18) }, // Brasil x Noruega
+      { phase: "Oitavas de final", date: "Dom., 05/07", time: "21:00", stadium: "Estádio da Cidade do México", t1: teamAt(1, 20), t2: teamAt(1, 22) }, // México x Inglaterra
+      { phase: "Oitavas de final", date: "Seg., 06/07", time: "16:00", stadium: "Estádio de Dallas (TX)", t1: teamAt(1, 8), t2: teamAt(1, 10) }, // Portugal x Espanha
+      { phase: "Oitavas de final", date: "Seg., 06/07", time: "21:00", stadium: "Estádio de Seattle (WA)", t1: teamAt(1, 12), t2: teamAt(1, 14) }, // EUA x Bélgica
+      { phase: "Oitavas de final", date: "Ter., 07/07", time: "13:00", stadium: "Estádio de Atlanta (GA)", t1: teamAt(1, 24), t2: teamAt(1, 26) }, // Argentina x Egito
+      { phase: "Oitavas de final", date: "Ter., 07/07", time: "17:00", stadium: "BC Place, Vancouver", t1: teamAt(1, 28), t2: teamAt(1, 30) }, // Suíça x Colômbia/Gana
       
-      { phase: "Quartas de final", date: "Qui., 09/07", time: "17:00", t1: teamAt(2, 0), t2: teamAt(2, 2) }, // QF-1: Paraguai/França x Canadá/Marrocos
-      { phase: "Quartas de final", date: "Sex., 10/07", time: "16:00", t1: teamAt(2, 8), t2: teamAt(2, 12) }, // QF-2: Portugal/Espanha x EUA/Bélgica
-      { phase: "Quartas de final", date: "Sáb., 11/07", time: "18:00", t1: teamAt(2, 16), t2: teamAt(2, 20) }, // QF-3: Brasil/Noruega x México/Inglaterra
-      { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", t1: teamAt(2, 24), t2: teamAt(2, 28) }, // QF-4: Argentina/Egito x Suíça/A definir
+      { phase: "Quartas de final", date: "Qui., 09/07", time: "17:00", stadium: "", t1: teamAt(2, 0), t2: teamAt(2, 2) }, // QF-1
+      { phase: "Quartas de final", date: "Sex., 10/07", time: "16:00", stadium: "", t1: teamAt(2, 8), t2: teamAt(2, 12) }, // QF-2
+      { phase: "Quartas de final", date: "Sáb., 11/07", time: "18:00", stadium: "", t1: teamAt(2, 16), t2: teamAt(2, 20) }, // QF-3
+      { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", stadium: "", t1: teamAt(2, 24), t2: teamAt(2, 28) }, // QF-4
       
-      { phase: "Semifinal", date: "Ter., 14/07", time: "16:00", t1: teamAt(3, 0), t2: teamAt(3, 8) }, // SF-1: Vencedor QF-1 x Vencedor QF-2
-      { phase: "Semifinal", date: "Qua., 15/07", time: "16:00", t1: teamAt(3, 16), t2: teamAt(3, 24) }, // SF-2: Vencedor QF-3 x Vencedor QF-4
+      { phase: "Semifinal", date: "Ter., 14/07", time: "16:00", stadium: "", t1: teamAt(3, 0), t2: teamAt(3, 8) }, // SF-1
+      { phase: "Semifinal", date: "Qua., 15/07", time: "16:00", stadium: "", t1: teamAt(3, 16), t2: teamAt(3, 24) }, // SF-2
       
-      { phase: "Disputa 3º Lugar", date: "Sáb., 18/07", time: "18:00", t1: thirdPlace.teamA, t2: thirdPlace.teamB },
+      { phase: "Disputa 3º Lugar", date: "Sáb., 18/07", time: "18:00", stadium: "", t1: thirdPlace.teamA, t2: thirdPlace.teamB },
       
-      { phase: "Final", date: "Dom., 19/07", time: "16:00", t1: teamAt(4, 0), t2: teamAt(4, 16) }
+      { phase: "Final", date: "Dom., 19/07", time: "16:00", stadium: "", t1: teamAt(4, 0), t2: teamAt(4, 16) }
     ]
   }
 
@@ -1700,6 +1700,12 @@ export function WorldCupBracket() {
                     <span className={match.phase === "Final" ? "text-gold-soft" : ""}>{match.phase}</span>
                     <span>{match.date} às {match.time}</span>
                   </div>
+
+                  {(match as any).stadium && (
+                    <div className="text-[10px] text-muted-foreground/80 font-medium">
+                      {(match as any).stadium}
+                    </div>
+                  )}
                   
                   <div className="flex items-center justify-between gap-2 text-xs font-semibold text-foreground">
                     {/* Time 1 */}
