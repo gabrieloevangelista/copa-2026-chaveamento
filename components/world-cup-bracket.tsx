@@ -1637,7 +1637,7 @@ export function WorldCupBracket() {
               <img
                 src={flagUrl(champion) || "/placeholder.svg"}
                 alt={`Bandeira ${champion.name}`}
-                className="size-full scale-[1.45] rounded-full object-cover"
+                className="size-full rounded-full object-cover"
               />
             </span>
 
@@ -1879,7 +1879,7 @@ function Node({
               alt={`Bandeira ${team.name}`}
               title=""
               loading="lazy"
-              className={`size-full scale-[1.45] rounded-full object-cover transition-all duration-500 ${
+              className={`size-full rounded-full object-cover transition-all duration-500 ${
                 lost ? "grayscale" : ""
               }`}
             />
