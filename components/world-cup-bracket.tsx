@@ -516,22 +516,26 @@ export function WorldCupBracket() {
 
   // Estado pré-carregado: Todos os vencedores confirmados no JSON (16-avos)
   const DEFAULT_WINNERS: Winners = {
-    "1-0": TEAMS[1],   // Paraguai (Venceu Alemanha)
-    "1-1": TEAMS[2],   // França (Venceu Suécia)
-    "1-2": TEAMS[4],   // México
-    "1-3": TEAMS[6],   // Inglaterra
-    "1-4": TEAMS[8],   // EUA
-    "1-5": TEAMS[10],  // Bélgica
-    "1-6": TEAMS[12],  // Argentina
-    "1-7": TEAMS[14],  // Colômbia (Ao vivo/Aguardando)
-    "1-8": TEAMS[16],  // Suíça
-    "1-9": TEAMS[19],  // Egito
-    "1-10": TEAMS[20], // Espanha
-    "1-11": TEAMS[22], // Portugal
-    "1-12": TEAMS[24], // Brasil
-    "1-13": TEAMS[27], // Noruega
-    "1-14": TEAMS[29], // Canadá
-    "1-15": TEAMS[31], // Marrocos
+    // QF-1
+    "1-0": TEAMS[0],   // Paraguai
+    "1-1": TEAMS[2],   // França
+    "1-2": TEAMS[4],   // Canadá
+    "1-3": TEAMS[6],   // Marrocos
+    // QF-2
+    "1-4": TEAMS[8],   // Portugal
+    "1-5": TEAMS[10],  // Espanha
+    "1-6": TEAMS[12],  // Estados Unidos
+    "1-7": TEAMS[14],  // Bélgica
+    // QF-3
+    "1-8": TEAMS[16],  // Brasil
+    "1-9": TEAMS[18],  // Noruega
+    "1-10": TEAMS[20], // México
+    "1-11": TEAMS[22], // Inglaterra
+    // QF-4
+    "1-12": TEAMS[24], // Argentina
+    "1-13": TEAMS[26], // Egito
+    "1-14": TEAMS[28], // Suíça
+    // 1-15: Colômbia/Gana (pendente)
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -549,22 +553,21 @@ export function WorldCupBracket() {
           }
         }
         // Injeta resultados oficiais do JSON se eles estiverem incorretos no storage
-        mappedWinners["1-0"] = TEAMS[1]   // Paraguai
+        mappedWinners["1-0"] = TEAMS[0]   // Paraguai
         mappedWinners["1-1"] = TEAMS[2]   // França
-        mappedWinners["1-2"] = TEAMS[4]   // México
-        mappedWinners["1-3"] = TEAMS[6]   // Inglaterra
-        mappedWinners["1-4"] = TEAMS[8]   // EUA
-        mappedWinners["1-5"] = TEAMS[10]  // Bélgica
-        mappedWinners["1-6"] = TEAMS[12]  // Argentina
-        // 1-7 Colômbia vs Gana pendente
-        mappedWinners["1-8"] = TEAMS[16]  // Suíça
-        mappedWinners["1-9"] = TEAMS[19]  // Egito
-        mappedWinners["1-10"] = TEAMS[20] // Espanha
-        mappedWinners["1-11"] = TEAMS[22] // Portugal
-        mappedWinners["1-12"] = TEAMS[24] // Brasil
-        mappedWinners["1-13"] = TEAMS[27] // Noruega
-        mappedWinners["1-14"] = TEAMS[29] // Canadá
-        mappedWinners["1-15"] = TEAMS[31] // Marrocos
+        mappedWinners["1-2"] = TEAMS[4]   // Canadá
+        mappedWinners["1-3"] = TEAMS[6]   // Marrocos
+        mappedWinners["1-4"] = TEAMS[8]   // Portugal
+        mappedWinners["1-5"] = TEAMS[10]  // Espanha
+        mappedWinners["1-6"] = TEAMS[12]  // EUA
+        mappedWinners["1-7"] = TEAMS[14]  // Bélgica
+        mappedWinners["1-8"] = TEAMS[16]  // Brasil
+        mappedWinners["1-9"] = TEAMS[18]  // Noruega
+        mappedWinners["1-10"] = TEAMS[20] // México
+        mappedWinners["1-11"] = TEAMS[22] // Inglaterra
+        mappedWinners["1-12"] = TEAMS[24] // Argentina
+        mappedWinners["1-13"] = TEAMS[26] // Egito
+        mappedWinners["1-14"] = TEAMS[28] // Suíça
 
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
@@ -1121,26 +1124,26 @@ export function WorldCupBracket() {
     const thirdPlace = getThirdPlaceTeams()
     
     return [
-      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "14:00", t1: teamAt(1, 10), t2: teamAt(1, 11) }, // Canadá x Marrocos
-      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", t1: teamAt(1, 8), t2: teamAt(1, 9) }, // Paraguai x França
-      { phase: "Oitavas de final", date: "Dom., 05/07", time: "17:00", t1: teamAt(1, 0), t2: teamAt(1, 1) }, // Brasil x Noruega
-      { phase: "Oitavas de final", date: "Dom., 05/07", time: "21:00", t1: teamAt(1, 2), t2: teamAt(1, 3) }, // México x Inglaterra
-      { phase: "Oitavas de final", date: "Seg., 06/07", time: "16:00", t1: teamAt(1, 12), t2: teamAt(1, 13) }, // Portugal/Croácia vs Espanha/Áustria
-      { phase: "Oitavas de final", date: "Seg., 06/07", time: "21:00", t1: teamAt(1, 14), t2: teamAt(1, 15) }, // EUA x Bélgica
-      { phase: "Oitavas de final", date: "Ter., 07/07", time: "13:00", t1: teamAt(1, 4), t2: teamAt(1, 5) }, // Argentina/CPV vs Austrália/Egito
-      { phase: "Oitavas de final", date: "Ter., 07/07", time: "17:00", t1: teamAt(1, 6), t2: teamAt(1, 7) }, // Suíça/Argélia vs Colômbia/Gana
+      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "14:00", t1: teamAt(1, 4), t2: teamAt(1, 6) }, // Canadá x Marrocos
+      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", t1: teamAt(1, 0), t2: teamAt(1, 2) }, // Paraguai x França
+      { phase: "Oitavas de final", date: "Dom., 05/07", time: "17:00", t1: teamAt(1, 16), t2: teamAt(1, 18) }, // Brasil x Noruega
+      { phase: "Oitavas de final", date: "Dom., 05/07", time: "21:00", t1: teamAt(1, 20), t2: teamAt(1, 22) }, // México x Inglaterra
+      { phase: "Oitavas de final", date: "Seg., 06/07", time: "16:00", t1: teamAt(1, 8), t2: teamAt(1, 10) }, // Portugal x Espanha
+      { phase: "Oitavas de final", date: "Seg., 06/07", time: "21:00", t1: teamAt(1, 12), t2: teamAt(1, 14) }, // EUA x Bélgica
+      { phase: "Oitavas de final", date: "Ter., 07/07", time: "13:00", t1: teamAt(1, 24), t2: teamAt(1, 26) }, // Argentina x Egito
+      { phase: "Oitavas de final", date: "Ter., 07/07", time: "17:00", t1: teamAt(1, 28), t2: teamAt(1, 30) }, // Suíça x Colômbia/Gana
       
-      { phase: "Quartas de final", date: "Qui., 09/07", time: "17:00", t1: teamAt(2, 4), t2: teamAt(2, 5) },
-      { phase: "Quartas de final", date: "Sex., 10/07", time: "16:00", t1: teamAt(2, 6), t2: teamAt(2, 7) },
-      { phase: "Quartas de final", date: "Sáb., 11/07", time: "18:00", t1: teamAt(2, 0), t2: teamAt(2, 1) },
-      { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", t1: teamAt(2, 2), t2: teamAt(2, 3) },
+      { phase: "Quartas de final", date: "Qui., 09/07", time: "17:00", t1: teamAt(2, 0), t2: teamAt(2, 2) }, // QF-1: Paraguai/França x Canadá/Marrocos
+      { phase: "Quartas de final", date: "Sex., 10/07", time: "16:00", t1: teamAt(2, 8), t2: teamAt(2, 12) }, // QF-2: Portugal/Espanha x EUA/Bélgica
+      { phase: "Quartas de final", date: "Sáb., 11/07", time: "18:00", t1: teamAt(2, 16), t2: teamAt(2, 20) }, // QF-3: Brasil/Noruega x México/Inglaterra
+      { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", t1: teamAt(2, 24), t2: teamAt(2, 28) }, // QF-4: Argentina/Egito x Suíça/A definir
       
-      { phase: "Semifinal", date: "Ter., 14/07", time: "16:00", t1: teamAt(3, 2), t2: teamAt(3, 3) },
-      { phase: "Semifinal", date: "Qua., 15/07", time: "16:00", t1: teamAt(3, 0), t2: teamAt(3, 1) },
+      { phase: "Semifinal", date: "Ter., 14/07", time: "16:00", t1: teamAt(3, 0), t2: teamAt(3, 8) }, // SF-1: Vencedor QF-1 x Vencedor QF-2
+      { phase: "Semifinal", date: "Qua., 15/07", time: "16:00", t1: teamAt(3, 16), t2: teamAt(3, 24) }, // SF-2: Vencedor QF-3 x Vencedor QF-4
       
       { phase: "Disputa 3º Lugar", date: "Sáb., 18/07", time: "18:00", t1: thirdPlace.teamA, t2: thirdPlace.teamB },
       
-      { phase: "Final", date: "Dom., 19/07", time: "16:00", t1: teamAt(4, 0), t2: teamAt(4, 1) }
+      { phase: "Final", date: "Dom., 19/07", time: "16:00", t1: teamAt(4, 0), t2: teamAt(4, 16) }
     ]
   }
 

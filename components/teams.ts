@@ -13,38 +13,61 @@ export function flagUrl(slug: string) {
 // se enfrentam nos 16-avos e os vencedores se encontram nas oitavas.
 // Ex.: Brasil×Japão e Costa do Marfim×Noruega -> vencedores se enfrentam nas oitavas.
 export const TEAMS: Team[] = [
-  { id: 4, name: "Brasil", slug: "brazil" }, // 0
-  { id: 5, name: "Japão", slug: "japan" }, // 1
-  { id: 6, name: "Costa do Marfim", slug: "ivory-coast" }, // 2
-  { id: 7, name: "Noruega", slug: "norway" }, // 3
-  { id: 20, name: "México", slug: "mexico" }, // 4
-  { id: 21, name: "Equador", slug: "ecuador-circular" }, // 5
-  { id: 22, name: "Inglaterra", slug: "england" }, // 6
-  { id: 23, name: "RD Congo", slug: "congo" }, // 7
-  { id: 28, name: "Argentina", slug: "argentina" }, // 8
-  { id: 29, name: "Cabo Verde", slug: "cape-verde" }, // 9
-  { id: 14, name: "Austrália", slug: "australia-flag" }, // 10
-  { id: 15, name: "Egito", slug: "egypt" }, // 11
-  { id: 12, name: "Suíça", slug: "switzerland" }, // 12
-  { id: 13, name: "Argélia", slug: "algeria" }, // 13
-  { id: 30, name: "Colômbia", slug: "colombia" }, // 14
-  { id: 31, name: "Gana", slug: "ghana" }, // 15
-  { id: 16, name: "Alemanha", slug: "germany" }, // 16
-  { id: 17, name: "Paraguai", slug: "paraguay" }, // 17
-  { id: 18, name: "França", slug: "france" }, // 18
-  { id: 19, name: "Suécia", slug: "sweden" }, // 19
-  { id: 0, name: "África do Sul", slug: "south-africa" }, // 20
-  { id: 1, name: "Canadá", slug: "canada" }, // 21
-  { id: 2, name: "Países Baixos", slug: "netherlands" }, // 22
-  { id: 3, name: "Marrocos", slug: "morocco" }, // 23
-  { id: 10, name: "Portugal", slug: "portugal" }, // 24
-  { id: 11, name: "Croácia", slug: "croatia" }, // 25
-  { id: 8, name: "Espanha", slug: "spain" }, // 26
-  { id: 9, name: "Áustria", slug: "austria" }, // 27
-  { id: 24, name: "Estados Unidos", slug: "usa" }, // 28
-  { id: 25, name: "Bósnia e Herzegovina", slug: "bosnia-and-herzegovina" }, // 29
-  { id: 26, name: "Bélgica", slug: "belgium" }, // 30
-  { id: 27, name: "Senegal", slug: "senegal" }, // 31
+  // Ramo Superior (SF-1): QF-1 e QF-2
+  
+  // QF-1 (R16-1 vs R16-2)
+  // R16-1: Paraguai x França (R32-2 vs R32-5)
+  { id: 17, name: "Paraguai", slug: "paraguay" }, // 0
+  { id: 16, name: "Alemanha", slug: "germany" }, // 1 (Adversário eliminado)
+  { id: 18, name: "França", slug: "france" }, // 2
+  { id: 19, name: "Suécia", slug: "sweden" }, // 3 (Adversário eliminado)
+  
+  // R16-2: Canadá x Marrocos (R32-1 vs R32-3)
+  { id: 1, name: "Canadá", slug: "canada" }, // 4
+  { id: 0, name: "África do Sul", slug: "south-africa" }, // 5 (Adversário eliminado)
+  { id: 3, name: "Marrocos", slug: "morocco" }, // 6
+  { id: 2, name: "Países Baixos", slug: "netherlands" }, // 7 (Adversário eliminado)
+
+  // QF-2 (R16-5 vs R16-6)
+  // R16-5: Portugal x Espanha (R32-11 vs R32-12)
+  { id: 10, name: "Portugal", slug: "portugal" }, // 8
+  { id: 11, name: "Croácia", slug: "croatia" }, // 9 (Adversário eliminado)
+  { id: 8, name: "Espanha", slug: "spain" }, // 10
+  { id: 9, name: "Áustria", slug: "austria" }, // 11 (Adversário eliminado)
+  
+  // R16-6: EUA x Bélgica (R32-9 vs R32-10)
+  { id: 24, name: "Estados Unidos", slug: "usa" }, // 12
+  { id: 25, name: "Bósnia", slug: "bosnia-and-herzegovina" }, // 13 (Adversário eliminado)
+  { id: 26, name: "Bélgica", slug: "belgium" }, // 14
+  { id: 27, name: "Senegal", slug: "senegal" }, // 15 (Adversário eliminado)
+
+  // Ramo Inferior (SF-2): QF-3 e QF-4
+  
+  // QF-3 (R16-3 vs R16-4)
+  // R16-3: Brasil x Noruega (R32-4 vs R32-6)
+  { id: 4, name: "Brasil", slug: "brazil" }, // 16
+  { id: 5, name: "Japão", slug: "japan" }, // 17 (Adversário eliminado)
+  { id: 7, name: "Noruega", slug: "norway" }, // 18
+  { id: 6, name: "Costa do Marfim", slug: "ivory-coast" }, // 19 (Adversário eliminado)
+  
+  // R16-4: México x Inglaterra (R32-7 vs R32-8)
+  { id: 20, name: "México", slug: "mexico" }, // 20
+  { id: 21, name: "Equador", slug: "ecuador-circular" }, // 21 (Adversário eliminado)
+  { id: 22, name: "Inglaterra", slug: "england" }, // 22
+  { id: 23, name: "RD Congo", slug: "congo" }, // 23 (Adversário eliminado)
+
+  // QF-4 (R16-7 vs R16-8)
+  // R16-7: Argentina x Egito (R32-14 vs R32-16)
+  { id: 28, name: "Argentina", slug: "argentina" }, // 24
+  { id: 29, name: "Cabo Verde", slug: "cape-verde" }, // 25 (Adversário eliminado)
+  { id: 15, name: "Egito", slug: "egypt" }, // 26
+  { id: 14, name: "Austrália", slug: "australia-flag" }, // 27 (Adversário eliminado)
+  
+  // R16-8: Suíça x Colômbia/Gana (R32-13 vs R32-15)
+  { id: 12, name: "Suíça", slug: "switzerland" }, // 28
+  { id: 13, name: "Argélia", slug: "algeria" }, // 29 (Adversário eliminado)
+  { id: 30, name: "Colômbia", slug: "colombia" }, // 30 (Ainda pode ser Gana)
+  { id: 31, name: "Gana", slug: "ghana" }, // 31
 ]
 
 export const ROUND_LABELS = [
