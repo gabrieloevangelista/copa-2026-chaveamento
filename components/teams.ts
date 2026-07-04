@@ -2,10 +2,19 @@ export type Team = {
   id: number
   name: string
   slug: string
+  code: string // ISO 3166-1 alpha-2 code for flagcdn
 }
 
-export function flagUrl(slug: string) {
-  return `https://img.icons8.com/color/96/${slug}.png`
+export function flagUrl(team: Team | string) {
+  // Backwards compatibility for when slug is passed as string (e.g. champion.slug)
+  if (typeof team === 'string') {
+    const foundTeam = TEAMS.find(t => t.slug === team)
+    if (foundTeam && foundTeam.code) {
+      return `https://flagcdn.com/w160/${foundTeam.code}.png`
+    }
+    return `https://img.icons8.com/color/96/${team}.png`
+  }
+  return `https://flagcdn.com/w160/${team.code}.png`
 }
 
 // Ordem dos 32 times no anel externo (16-avos de final).
@@ -17,57 +26,57 @@ export const TEAMS: Team[] = [
   
   // QF-1 (R16-1 vs R16-2)
   // R16-1: Paraguai x França (R32-2 vs R32-5)
-  { id: 17, name: "Paraguai", slug: "paraguay" }, // 0
-  { id: 16, name: "Alemanha", slug: "germany" }, // 1 (Adversário eliminado)
-  { id: 18, name: "França", slug: "france" }, // 2
-  { id: 19, name: "Suécia", slug: "sweden" }, // 3 (Adversário eliminado)
+  { id: 17, name: "Paraguai", slug: "paraguay", code: "py" }, // 0
+  { id: 16, name: "Alemanha", slug: "germany", code: "de" }, // 1 (Adversário eliminado)
+  { id: 18, name: "França", slug: "france", code: "fr" }, // 2
+  { id: 19, name: "Suécia", slug: "sweden", code: "se" }, // 3 (Adversário eliminado)
   
   // R16-2: Canadá x Marrocos (R32-1 vs R32-3)
-  { id: 1, name: "Canadá", slug: "canada" }, // 4
-  { id: 0, name: "África do Sul", slug: "south-africa" }, // 5 (Adversário eliminado)
-  { id: 3, name: "Marrocos", slug: "morocco" }, // 6
-  { id: 2, name: "Países Baixos", slug: "netherlands" }, // 7 (Adversário eliminado)
+  { id: 1, name: "Canadá", slug: "canada", code: "ca" }, // 4
+  { id: 0, name: "África do Sul", slug: "south-africa", code: "za" }, // 5 (Adversário eliminado)
+  { id: 3, name: "Marrocos", slug: "morocco", code: "ma" }, // 6
+  { id: 2, name: "Países Baixos", slug: "netherlands", code: "nl" }, // 7 (Adversário eliminado)
 
   // QF-2 (R16-5 vs R16-6)
   // R16-5: Portugal x Espanha (R32-11 vs R32-12)
-  { id: 10, name: "Portugal", slug: "portugal" }, // 8
-  { id: 11, name: "Croácia", slug: "croatia" }, // 9 (Adversário eliminado)
-  { id: 8, name: "Espanha", slug: "spain" }, // 10
-  { id: 9, name: "Áustria", slug: "austria" }, // 11 (Adversário eliminado)
+  { id: 10, name: "Portugal", slug: "portugal", code: "pt" }, // 8
+  { id: 11, name: "Croácia", slug: "croatia", code: "hr" }, // 9 (Adversário eliminado)
+  { id: 8, name: "Espanha", slug: "spain", code: "es" }, // 10
+  { id: 9, name: "Áustria", slug: "austria", code: "at" }, // 11 (Adversário eliminado)
   
   // R16-6: EUA x Bélgica (R32-9 vs R32-10)
-  { id: 24, name: "Estados Unidos", slug: "usa" }, // 12
-  { id: 25, name: "Bósnia", slug: "bosnia-and-herzegovina" }, // 13 (Adversário eliminado)
-  { id: 26, name: "Bélgica", slug: "belgium" }, // 14
-  { id: 27, name: "Senegal", slug: "senegal" }, // 15 (Adversário eliminado)
+  { id: 24, name: "Estados Unidos", slug: "usa", code: "us" }, // 12
+  { id: 25, name: "Bósnia", slug: "bosnia-and-herzegovina", code: "ba" }, // 13 (Adversário eliminado)
+  { id: 26, name: "Bélgica", slug: "belgium", code: "be" }, // 14
+  { id: 27, name: "Senegal", slug: "senegal", code: "sn" }, // 15 (Adversário eliminado)
 
   // Ramo Inferior (SF-2): QF-3 e QF-4
   
   // QF-3 (R16-3 vs R16-4)
   // R16-3: Brasil x Noruega (R32-4 vs R32-6)
-  { id: 4, name: "Brasil", slug: "brazil" }, // 16
-  { id: 5, name: "Japão", slug: "japan" }, // 17 (Adversário eliminado)
-  { id: 7, name: "Noruega", slug: "norway" }, // 18
-  { id: 6, name: "Costa do Marfim", slug: "ivory-coast" }, // 19 (Adversário eliminado)
+  { id: 4, name: "Brasil", slug: "brazil", code: "br" }, // 16
+  { id: 5, name: "Japão", slug: "japan", code: "jp" }, // 17 (Adversário eliminado)
+  { id: 7, name: "Noruega", slug: "norway", code: "no" }, // 18
+  { id: 6, name: "Costa do Marfim", slug: "ivory-coast", code: "ci" }, // 19 (Adversário eliminado)
   
   // R16-4: México x Inglaterra (R32-7 vs R32-8)
-  { id: 20, name: "México", slug: "mexico" }, // 20
-  { id: 21, name: "Equador", slug: "ecuador-circular" }, // 21 (Adversário eliminado)
-  { id: 22, name: "Inglaterra", slug: "england" }, // 22
-  { id: 23, name: "RD Congo", slug: "congo" }, // 23 (Adversário eliminado)
+  { id: 20, name: "México", slug: "mexico", code: "mx" }, // 20
+  { id: 21, name: "Equador", slug: "ecuador-circular", code: "ec" }, // 21 (Adversário eliminado)
+  { id: 22, name: "Inglaterra", slug: "england", code: "gb-eng" }, // 22
+  { id: 23, name: "RD Congo", slug: "congo", code: "cd" }, // 23 (Adversário eliminado)
 
   // QF-4 (R16-7 vs R16-8)
   // R16-7: Argentina x Egito (R32-14 vs R32-16)
-  { id: 28, name: "Argentina", slug: "argentina" }, // 24
-  { id: 29, name: "Cabo Verde", slug: "cape-verde" }, // 25 (Adversário eliminado)
-  { id: 15, name: "Egito", slug: "egypt" }, // 26
-  { id: 14, name: "Austrália", slug: "australia-flag" }, // 27 (Adversário eliminado)
+  { id: 28, name: "Argentina", slug: "argentina", code: "ar" }, // 24
+  { id: 29, name: "Cabo Verde", slug: "cape-verde", code: "cv" }, // 25 (Adversário eliminado)
+  { id: 15, name: "Egito", slug: "egypt", code: "eg" }, // 26
+  { id: 14, name: "Austrália", slug: "australia-flag", code: "au" }, // 27 (Adversário eliminado)
   
   // R16-8: Suíça x Colômbia/Gana (R32-13 vs R32-15)
-  { id: 12, name: "Suíça", slug: "switzerland" }, // 28
-  { id: 13, name: "Argélia", slug: "algeria" }, // 29 (Adversário eliminado)
-  { id: 30, name: "Colômbia", slug: "colombia" }, // 30 (Ainda pode ser Gana)
-  { id: 31, name: "Gana", slug: "ghana" }, // 31
+  { id: 12, name: "Suíça", slug: "switzerland", code: "ch" }, // 28
+  { id: 13, name: "Argélia", slug: "algeria", code: "dz" }, // 29 (Adversário eliminado)
+  { id: 30, name: "Colômbia", slug: "colombia", code: "co" }, // 30 (Ainda pode ser Gana)
+  { id: 31, name: "Gana", slug: "ghana", code: "gh" }, // 31
 ]
 
 export const ROUND_LABELS = [

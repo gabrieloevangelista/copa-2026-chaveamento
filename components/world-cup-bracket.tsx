@@ -1204,7 +1204,7 @@ export function WorldCupBracket() {
             <div className="flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 py-1 pl-1.5 pr-3">
               <span className="flex size-7 items-center justify-center overflow-hidden rounded-full bg-card ring-2 ring-gold shrink-0">
                 <img
-                  src={flagUrl(champion.slug) || "/placeholder.svg"}
+                  src={flagUrl(champion) || "/placeholder.svg"}
                   alt={`Bandeira ${champion.name}`}
                   className="size-6 shrink-0 rounded-full object-cover"
                 />
@@ -1281,7 +1281,7 @@ export function WorldCupBracket() {
               {/* Teams & Flags */}
               <div className="flex items-center gap-2 shrink-0 whitespace-nowrap">
                 <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm shrink-0 whitespace-nowrap">
-                  <img src={flagUrl(nextMatch.t1.slug)} alt="" className="size-5 shrink-0 rounded-full object-cover shadow-sm ring-1 ring-border" />
+                  <img src={flagUrl(nextMatch.t1)} alt="" className="size-5 shrink-0 rounded-full object-cover shadow-sm ring-1 ring-border" />
                   <span className="hidden sm:inline truncate max-w-[80px]">{nextMatch.t1.name}</span>
                 </span>
                 
@@ -1289,7 +1289,7 @@ export function WorldCupBracket() {
 
                 <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm shrink-0 whitespace-nowrap">
                   <span className="hidden sm:inline truncate max-w-[80px]">{nextMatch.t2.name}</span>
-                  <img src={flagUrl(nextMatch.t2.slug)} alt="" className="size-5 shrink-0 rounded-full object-cover shadow-sm ring-1 ring-border" />
+                  <img src={flagUrl(nextMatch.t2)} alt="" className="size-5 shrink-0 rounded-full object-cover shadow-sm ring-1 ring-border" />
                 </span>
               </div>
 
@@ -1635,7 +1635,7 @@ export function WorldCupBracket() {
             {/* Bandeira do campeão em destaque */}
             <span className="relative z-10 flex size-36 items-center justify-center overflow-hidden rounded-full bg-card ring-4 ring-gold shadow-[0_0_30px_oklch(0.82_0.13_80/0.7)]">
               <img
-                src={flagUrl(champion.slug) || "/placeholder.svg"}
+                src={flagUrl(champion) || "/placeholder.svg"}
                 alt={`Bandeira ${champion.name}`}
                 className="size-full scale-[1.45] rounded-full object-cover"
               />
@@ -1713,7 +1713,7 @@ export function WorldCupBracket() {
                       {match.t1 ? (
                         <>
                           <img
-                            src={flagUrl(match.t1.slug)}
+                            src={flagUrl(match.t1)}
                             alt=""
                             className="size-4 shrink-0 rounded-full object-cover ring-1 ring-border"
                           />
@@ -1732,7 +1732,7 @@ export function WorldCupBracket() {
                         <>
                           <span className="truncate">{match.t2.name}</span>
                           <img
-                            src={flagUrl(match.t2.slug)}
+                            src={flagUrl(match.t2)}
                             alt=""
                             className="size-4 shrink-0 rounded-full object-cover ring-1 ring-border"
                           />
@@ -1875,7 +1875,7 @@ function Node({
             }`}
           >
             <img
-              src={flagUrl(team.slug) || "/placeholder.svg"}
+              src={flagUrl(team) || "/placeholder.svg"}
               alt={`Bandeira ${team.name}`}
               title=""
               loading="lazy"
@@ -1908,7 +1908,7 @@ function Node({
                   {matchInfo.t1 ? (
                     <>
                       <img
-                        src={flagUrl(matchInfo.t1.slug)}
+                        src={flagUrl(matchInfo.t1)}
                         alt=""
                         className="size-4 rounded-full object-cover ring-1 ring-border shrink-0"
                       />
@@ -1932,7 +1932,7 @@ function Node({
                   {matchInfo.t2 ? (
                     <>
                       <img
-                        src={flagUrl(matchInfo.t2.slug)}
+                        src={flagUrl(matchInfo.t2)}
                         alt=""
                         className="size-4 rounded-full object-cover ring-1 ring-border shrink-0"
                       />
