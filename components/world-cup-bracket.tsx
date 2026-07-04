@@ -179,23 +179,37 @@ function getMatchInfo(
 type Winners = Record<string, Team>
 
 const SCHEDULE = [
-  { id: "J76", dateLabel: "Seg., 29/06", timeLabel: "21:00", t1_idx: 0, t2_idx: 1, timestamp: new Date("2026-06-29T21:00:00-03:00").getTime(), parentWinnerKey: "1-0" }, // Brasil x Japão
-  { id: "J78", dateLabel: "Ter., 30/06", timeLabel: "21:00", t1_idx: 2, t2_idx: 3, timestamp: new Date("2026-06-30T21:00:00-03:00").getTime(), parentWinnerKey: "1-1" }, // Costa do Marfim x Noruega
-  { id: "J79", dateLabel: "Ter., 30/06", timeLabel: "22:55", t1_idx: 4, t2_idx: 5, timestamp: new Date("2026-06-30T22:55:00-03:00").getTime(), parentWinnerKey: "1-2" }, // México x Equador
-  { id: "J80", dateLabel: "Ontem", timeLabel: "13:00", t1_idx: 6, t2_idx: 7, timestamp: new Date("2026-07-01T13:00:00-03:00").getTime(), parentWinnerKey: "1-3" }, // Inglaterra x RD Congo
-  { id: "J86", dateLabel: "Ontem", timeLabel: "19:00", t1_idx: 8, t2_idx: 9, timestamp: new Date("2026-07-02T19:00:00-03:00").getTime(), parentWinnerKey: "1-4" }, // Argentina x Cabo Verde
-  { id: "J88", dateLabel: "Ontem", timeLabel: "15:00", t1_idx: 10, t2_idx: 11, timestamp: new Date("2026-07-02T15:00:00-03:00").getTime(), parentWinnerKey: "1-5" }, // Austrália x Egito
-  { id: "J85", dateLabel: "Ontem", timeLabel: "FIM", t1_idx: 12, t2_idx: 13, timestamp: new Date("2026-07-03T00:00:00-03:00").getTime(), parentWinnerKey: "1-6" }, // Suíça x Argélia
-  { id: "J87", dateLabel: "Hoje", timeLabel: "AO VIVO", t1_idx: 14, t2_idx: 15, timestamp: new Date("2026-07-03T22:30:00-03:00").getTime(), parentWinnerKey: "1-7" }, // Colômbia x Gana
+  // R16-1: Paraguai x França
+  { id: "J74", dateLabel: "Seg., 29/06", timeLabel: "18:00", t1_idx: 0, t2_idx: 1, timestamp: new Date("2026-06-29T18:00:00-03:00").getTime(), parentWinnerKey: "1-0" }, 
+  { id: "J77", dateLabel: "Ter., 30/06", timeLabel: "17:00", t1_idx: 2, t2_idx: 3, timestamp: new Date("2026-06-30T17:00:00-03:00").getTime(), parentWinnerKey: "1-1" },
   
-  { id: "J74", dateLabel: "Seg., 29/06", timeLabel: "18:00", t1_idx: 16, t2_idx: 17, timestamp: new Date("2026-06-29T18:00:00-03:00").getTime(), parentWinnerKey: "1-8" }, // Alemanha x Paraguai
-  { id: "J77", dateLabel: "Ter., 30/06", timeLabel: "17:00", t1_idx: 18, t2_idx: 19, timestamp: new Date("2026-06-30T17:00:00-03:00").getTime(), parentWinnerKey: "1-9" }, // França x Suécia
-  { id: "J73", dateLabel: "Dom., 28/06", timeLabel: "14:00", t1_idx: 20, t2_idx: 21, timestamp: new Date("2026-06-28T14:00:00-03:00").getTime(), parentWinnerKey: "1-10" }, // África do Sul x Canadá
-  { id: "J75", dateLabel: "Seg., 29/06", timeLabel: "14:00", t1_idx: 22, t2_idx: 23, timestamp: new Date("2026-06-29T14:00:00-03:00").getTime(), parentWinnerKey: "1-11" }, // Holanda x Marrocos
-  { id: "J83", dateLabel: "Hoje", timeLabel: "20:00", t1_idx: 24, t2_idx: 25, timestamp: new Date("2026-07-02T20:00:00-03:00").getTime(), parentWinnerKey: "1-12" }, // Portugal x Croácia
-  { id: "J84", dateLabel: "Hoje", timeLabel: "16:00", t1_idx: 26, t2_idx: 27, timestamp: new Date("2026-07-02T16:00:00-03:00").getTime(), parentWinnerKey: "1-13" }, // Espanha x Áustria
-  { id: "J81", dateLabel: "Ontem", timeLabel: "21:00", t1_idx: 28, t2_idx: 29, timestamp: new Date("2026-07-01T21:00:00-03:00").getTime(), parentWinnerKey: "1-14" }, // EUA x Bósnia
-  { id: "J82", dateLabel: "Ontem", timeLabel: "17:00", t1_idx: 30, t2_idx: 31, timestamp: new Date("2026-07-01T17:00:00-03:00").getTime(), parentWinnerKey: "1-15" } // Bélgica x Senegal
+  // R16-2: Canadá x Marrocos
+  { id: "J73", dateLabel: "Dom., 28/06", timeLabel: "14:00", t1_idx: 4, t2_idx: 5, timestamp: new Date("2026-06-28T14:00:00-03:00").getTime(), parentWinnerKey: "1-2" }, 
+  { id: "J75", dateLabel: "Seg., 29/06", timeLabel: "14:00", t1_idx: 6, t2_idx: 7, timestamp: new Date("2026-06-29T14:00:00-03:00").getTime(), parentWinnerKey: "1-3" }, 
+  
+  // R16-5: Portugal x Espanha
+  { id: "J83", dateLabel: "Hoje", timeLabel: "20:00", t1_idx: 8, t2_idx: 9, timestamp: new Date("2026-07-02T20:00:00-03:00").getTime(), parentWinnerKey: "1-4" }, 
+  { id: "J84", dateLabel: "Hoje", timeLabel: "16:00", t1_idx: 10, t2_idx: 11, timestamp: new Date("2026-07-02T16:00:00-03:00").getTime(), parentWinnerKey: "1-5" }, 
+  
+  // R16-6: EUA x Bélgica
+  { id: "J81", dateLabel: "Ontem", timeLabel: "21:00", t1_idx: 12, t2_idx: 13, timestamp: new Date("2026-07-01T21:00:00-03:00").getTime(), parentWinnerKey: "1-6" }, 
+  { id: "J82", dateLabel: "Ontem", timeLabel: "17:00", t1_idx: 14, t2_idx: 15, timestamp: new Date("2026-07-01T17:00:00-03:00").getTime(), parentWinnerKey: "1-7" }, 
+
+  // R16-3: Brasil x Noruega
+  { id: "J76", dateLabel: "Seg., 29/06", timeLabel: "21:00", t1_idx: 16, t2_idx: 17, timestamp: new Date("2026-06-29T21:00:00-03:00").getTime(), parentWinnerKey: "1-8" }, 
+  { id: "J78", dateLabel: "Ter., 30/06", timeLabel: "21:00", t1_idx: 18, t2_idx: 19, timestamp: new Date("2026-06-30T21:00:00-03:00").getTime(), parentWinnerKey: "1-9" }, 
+  
+  // R16-4: México x Inglaterra
+  { id: "J79", dateLabel: "Ter., 30/06", timeLabel: "22:55", t1_idx: 20, t2_idx: 21, timestamp: new Date("2026-06-30T22:55:00-03:00").getTime(), parentWinnerKey: "1-10" }, 
+  { id: "J80", dateLabel: "Ontem", timeLabel: "13:00", t1_idx: 22, t2_idx: 23, timestamp: new Date("2026-07-01T13:00:00-03:00").getTime(), parentWinnerKey: "1-11" }, 
+  
+  // R16-7: Argentina x Egito
+  { id: "J86", dateLabel: "Ontem", timeLabel: "19:00", t1_idx: 24, t2_idx: 25, timestamp: new Date("2026-07-02T19:00:00-03:00").getTime(), parentWinnerKey: "1-12" }, 
+  { id: "J88", dateLabel: "Ontem", timeLabel: "15:00", t1_idx: 26, t2_idx: 27, timestamp: new Date("2026-07-02T15:00:00-03:00").getTime(), parentWinnerKey: "1-13" }, 
+  
+  // R16-8: Suíça x Colômbia/Gana
+  { id: "J85", dateLabel: "Ontem", timeLabel: "FIM", t1_idx: 28, t2_idx: 29, timestamp: new Date("2026-07-03T00:00:00-03:00").getTime(), parentWinnerKey: "1-14" }, 
+  { id: "J87", dateLabel: "Hoje", timeLabel: "AO VIVO", t1_idx: 30, t2_idx: 31, timestamp: new Date("2026-07-03T22:30:00-03:00").getTime(), parentWinnerKey: "1-15" }, 
 ]
 
 function getDeterministicMatchResult(matchId: string) {
