@@ -183,10 +183,10 @@ const SCHEDULE = [
   { id: "J78", dateLabel: "Ter., 30/06", timeLabel: "21:00", t1_idx: 2, t2_idx: 3, timestamp: new Date("2026-06-30T21:00:00-03:00").getTime(), parentWinnerKey: "1-1" }, // Costa do Marfim x Noruega
   { id: "J79", dateLabel: "Ter., 30/06", timeLabel: "22:55", t1_idx: 4, t2_idx: 5, timestamp: new Date("2026-06-30T22:55:00-03:00").getTime(), parentWinnerKey: "1-2" }, // México x Equador
   { id: "J80", dateLabel: "Ontem", timeLabel: "13:00", t1_idx: 6, t2_idx: 7, timestamp: new Date("2026-07-01T13:00:00-03:00").getTime(), parentWinnerKey: "1-3" }, // Inglaterra x RD Congo
-  { id: "J86", dateLabel: "Amanhã", timeLabel: "19:00", t1_idx: 8, t2_idx: 9, timestamp: new Date("2026-07-03T19:00:00-03:00").getTime(), parentWinnerKey: "1-4" }, // Argentina x Cabo Verde
-  { id: "J88", dateLabel: "Amanhã", timeLabel: "15:00", t1_idx: 10, t2_idx: 11, timestamp: new Date("2026-07-03T15:00:00-03:00").getTime(), parentWinnerKey: "1-5" }, // Austrália x Egito
-  { id: "J85", dateLabel: "Amanhã", timeLabel: "00:00", t1_idx: 12, t2_idx: 13, timestamp: new Date("2026-07-03T00:00:00-03:00").getTime(), parentWinnerKey: "1-6" }, // Suíça x Argélia
-  { id: "J87", dateLabel: "Amanhã", timeLabel: "22:30", t1_idx: 14, t2_idx: 15, timestamp: new Date("2026-07-03T22:30:00-03:00").getTime(), parentWinnerKey: "1-7" }, // Colômbia x Gana
+  { id: "J86", dateLabel: "Ontem", timeLabel: "19:00", t1_idx: 8, t2_idx: 9, timestamp: new Date("2026-07-02T19:00:00-03:00").getTime(), parentWinnerKey: "1-4" }, // Argentina x Cabo Verde
+  { id: "J88", dateLabel: "Ontem", timeLabel: "15:00", t1_idx: 10, t2_idx: 11, timestamp: new Date("2026-07-02T15:00:00-03:00").getTime(), parentWinnerKey: "1-5" }, // Austrália x Egito
+  { id: "J85", dateLabel: "Ontem", timeLabel: "FIM", t1_idx: 12, t2_idx: 13, timestamp: new Date("2026-07-03T00:00:00-03:00").getTime(), parentWinnerKey: "1-6" }, // Suíça x Argélia
+  { id: "J87", dateLabel: "Hoje", timeLabel: "AO VIVO", t1_idx: 14, t2_idx: 15, timestamp: new Date("2026-07-03T22:30:00-03:00").getTime(), parentWinnerKey: "1-7" }, // Colômbia x Gana
   
   { id: "J74", dateLabel: "Seg., 29/06", timeLabel: "18:00", t1_idx: 16, t2_idx: 17, timestamp: new Date("2026-06-29T18:00:00-03:00").getTime(), parentWinnerKey: "1-8" }, // Alemanha x Paraguai
   { id: "J77", dateLabel: "Ter., 30/06", timeLabel: "17:00", t1_idx: 18, t2_idx: 19, timestamp: new Date("2026-06-30T17:00:00-03:00").getTime(), parentWinnerKey: "1-9" }, // França x Suécia
@@ -201,12 +201,14 @@ const SCHEDULE = [
 function getDeterministicMatchResult(matchId: string) {
   // Resultados oficiais da imagem (16-avos)
   const officialResults: Record<string, { t1: number, t2: number, str?: string }> = {
-    "0-8": { t1: 0, t2: 0, str: "1 x 0" }, // Suíça x Argélia (se já aconteceu)
-    "0-9": { t1: 0, t2: 1, str: "0 x 1" }, // Austrália x Egito
+    "0-8": { t1: 2, t2: 0 }, // Suíça x Argélia
+    "0-9": { t1: 1, t2: 1, str: "1 (2) x 1 (4)" }, // Austrália x Egito
     "0-12": { t1: 2, t2: 1 }, // Brasil x Japão
+    "J88": { t1: 1, t2: 1, str: "1 (2) x 1 (4)" }, // Austrália x Egito
     "J78": { t1: 1, t2: 2 }, // Costa do Marfim x Noruega
     "J79": { t1: 2, t2: 0 }, // México x Equador
     "J80": { t1: 2, t2: 1 }, // Inglaterra x RD Congo
+    "J86": { t1: 3, t2: 2 }, // Argentina x Cabo Verde
     "J74": { t1: 1, t2: 1, str: "1 (3) x 1 (4)" }, // Alemanha x Paraguai
     "J77": { t1: 3, t2: 0 }, // França x Suécia
     "J73": { t1: 0, t2: 1 }, // África do Sul x Canadá
@@ -214,7 +216,9 @@ function getDeterministicMatchResult(matchId: string) {
     "J81": { t1: 2, t2: 0 }, // EUA x Bósnia
     "J82": { t1: 3, t2: 2 }, // Bélgica x Senegal
     "J83": { t1: 2, t2: 1 }, // Portugal x Croácia
-    "J84": { t1: 3, t2: 1 }, // Espanha x Áustria
+    "J84": { t1: 3, t2: 0 }, // Espanha x Áustria
+    "J85": { t1: 2, t2: 0 }, // Suíça x Argélia
+    "J87": { t1: 1, t2: 0 }, // Colômbia x Gana (Ao vivo)
   }
 
   if (officialResults[matchId]) {
@@ -258,7 +262,7 @@ function getDeterministicMatchResult(matchId: string) {
   return { t1ScoreFinal, t2ScoreFinal, goals }
 }
 
-const STORAGE_KEY = "fifa-2026-bracket-v3"
+const STORAGE_KEY = "fifa-2026-bracket-v4"
 
 export function WorldCupBracket() {
   const [winners, setWinners] = useState<Winners>({})
@@ -512,19 +516,22 @@ export function WorldCupBracket() {
 
   // Estado pré-carregado: Todos os vencedores confirmados no JSON (16-avos)
   const DEFAULT_WINNERS: Winners = {
-    "1-0": TEAMS[0],   // Brasil
-    "1-1": TEAMS[3],   // Noruega
+    "1-0": TEAMS[1],   // Paraguai (Venceu Alemanha)
+    "1-1": TEAMS[2],   // França (Venceu Suécia)
     "1-2": TEAMS[4],   // México
     "1-3": TEAMS[6],   // Inglaterra
-    "1-8": TEAMS[17],  // Paraguai
-    "1-9": TEAMS[18],  // França
-    "1-10": TEAMS[21], // Canadá
-    "1-11": TEAMS[23], // Marrocos
-    "1-12": TEAMS[24], // Portugal
-    "1-13": TEAMS[26], // Espanha
-    "1-14": TEAMS[28], // EUA
-    "1-15": TEAMS[30], // Bélgica
-    "1-5": TEAMS[19],  // Egito
+    "1-4": TEAMS[8],   // EUA
+    "1-5": TEAMS[10],  // Bélgica
+    "1-6": TEAMS[12],  // Argentina
+    "1-7": TEAMS[14],  // Colômbia (Ao vivo/Aguardando)
+    "1-8": TEAMS[16],  // Suíça
+    "1-9": TEAMS[19],  // Egito
+    "1-10": TEAMS[20], // Espanha
+    "1-11": TEAMS[22], // Portugal
+    "1-12": TEAMS[24], // Brasil
+    "1-13": TEAMS[27], // Noruega
+    "1-14": TEAMS[29], // Canadá
+    "1-15": TEAMS[31], // Marrocos
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -542,19 +549,22 @@ export function WorldCupBracket() {
           }
         }
         // Injeta resultados oficiais do JSON se eles estiverem incorretos no storage
-        mappedWinners["1-0"] = TEAMS[0]   // Brasil
-        mappedWinners["1-1"] = TEAMS[3]   // Noruega
+        mappedWinners["1-0"] = TEAMS[1]   // Paraguai
+        mappedWinners["1-1"] = TEAMS[2]   // França
         mappedWinners["1-2"] = TEAMS[4]   // México
         mappedWinners["1-3"] = TEAMS[6]   // Inglaterra
-        mappedWinners["1-8"] = TEAMS[17]  // Paraguai
-        mappedWinners["1-9"] = TEAMS[18]  // França
-        mappedWinners["1-10"] = TEAMS[21] // Canadá
-        mappedWinners["1-11"] = TEAMS[23] // Marrocos
-        mappedWinners["1-12"] = TEAMS[24] // Portugal
-        mappedWinners["1-13"] = TEAMS[26] // Espanha
-        mappedWinners["1-14"] = TEAMS[28] // EUA
-        mappedWinners["1-15"] = TEAMS[30] // Bélgica
-        mappedWinners["1-5"] = TEAMS[19]  // Egito
+        mappedWinners["1-4"] = TEAMS[8]   // EUA
+        mappedWinners["1-5"] = TEAMS[10]  // Bélgica
+        mappedWinners["1-6"] = TEAMS[12]  // Argentina
+        // 1-7 Colômbia vs Gana pendente
+        mappedWinners["1-8"] = TEAMS[16]  // Suíça
+        mappedWinners["1-9"] = TEAMS[19]  // Egito
+        mappedWinners["1-10"] = TEAMS[20] // Espanha
+        mappedWinners["1-11"] = TEAMS[22] // Portugal
+        mappedWinners["1-12"] = TEAMS[24] // Brasil
+        mappedWinners["1-13"] = TEAMS[27] // Noruega
+        mappedWinners["1-14"] = TEAMS[29] // Canadá
+        mappedWinners["1-15"] = TEAMS[31] // Marrocos
 
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
