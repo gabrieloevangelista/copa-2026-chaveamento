@@ -107,26 +107,31 @@ function getMatchInfo(
   const matchIdx = Math.floor(index / 2)
   const activeItem = ring === 0 ? SCHEDULE[matchIdx] : null
 
-  // Se for a partida ao vivo no momento, sobrescreve os dados com o placar ao vivo
-  if (liveMatch && ring === 0 && activeItem && liveMatch.matchId === activeItem.id) {
-    return {
-      phase: "16-avos de final",
-      date: "AO VIVO",
-      time: "Em Andamento",
-      t1: liveMatch.t1,
-      t2: liveMatch.t2,
-      score: `${liveMatch.t1Score} x ${liveMatch.t2Score}`,
-      status: "AO VIVO"
-    }
-  }
-
   const teamAtLocal = (r: number, idx: number): Team | null => {
     if (r === 0) return TEAMS[idx]
     return winners[`${r}-${idx}`] ?? null
   }
 
+  const t1 = teamAtLocal(ring, matchIdx * 2)
+  const t2 = teamAtLocal(ring, matchIdx * 2 + 1)
+
   const phases = ["16-avos de final", "Oitavas de final", "Quartas de final", "Semifinal", "Final"]
   const phase = phases[ring]
+
+  // Se for a partida ao vivo no momento, sobrescreve os dados com o placar ao vivo
+  if (liveMatch && t1 && t2 && ((t1.id === liveMatch.t1.id && t2.id === liveMatch.t2.id) || (t1.id === liveMatch.t2.id && t2.id === liveMatch.t1.id))) {
+    return {
+      phase,
+      date: "AO VIVO",
+      time: liveMatch.status === "halftime" ? "Intervalo" : `${liveMatch.minute}'`,
+      t1,
+      t2,
+      score: t1.id === liveMatch.t1.id 
+        ? `${liveMatch.t1Score} x ${liveMatch.t2Score}` 
+        : `${liveMatch.t2Score} x ${liveMatch.t1Score}`,
+      status: "AO VIVO"
+    }
+  }
 
   let date = ""
   let time = ""
@@ -180,10 +185,6 @@ function getMatchInfo(
     time = "16:00"
     status = "Agendado"
   }
-
-  const t1 = teamAtLocal(ring, matchIdx * 2)
-  const t2 = teamAtLocal(ring, matchIdx * 2 + 1)
-
   return { phase, date, time, t1, t2, score, status }
 }
 
@@ -721,46 +722,60 @@ export function WorldCupBracket() {
           .then(res => res.json())
           .then(data => {
             if (data && !data.error) {
-              const activeItem = SCHEDULE.find(item => item.id === data.matchId)
-              if (activeItem) {
-                isXActiveRef.current = true
-                const t1 = TEAMS[activeItem.t1_idx]
-                const t2 = TEAMS[activeItem.t2_idx]
-                
-                // Só ativa o placar se o jogo estiver realmente em andamento E ainda não houver vencedor definido
-                if (data.isActive && !winnersRef.current[activeItem.parentWinnerKey]) {
+              isXActiveRef.current = true
+              const t1 = TEAMS.find(t => t.id === data.t1.id)
+              const t2 = TEAMS.find(t => t.id === data.t2.id)
+              
+              if (t1 && t2) {
+                // Só ativa o placar se o jogo estiver realmente em andamento
+                if (data.isActive) {
                   setLiveMatch({
-                    matchId: activeItem.id,
+                    matchId: `espn-${t1.id}-${t2.id}`,
                     t1,
                     t2,
-                    t1Score: data.homeScore,
-                    t2Score: data.awayScore,
+                    t1Score: data.t1Score,
+                    t2Score: data.t2Score,
                     minute: data.minute ?? 0,
                     scorer: data.scorer ?? "",
                     isActive: true,
                     status: data.status
                   })
                 } else {
-                  // Se o jogo encerrou ou já temos vencedor: limpa placar e avança vencedor se necessário
                   setLiveMatch(null)
-                  if (!winnersRef.current[activeItem.parentWinnerKey]) {
-                    const winner = data.homeScore > data.awayScore ? t1 : t2
-                    setWinners(prev => ({ ...prev, [activeItem.parentWinnerKey]: winner }))
-                    
-                    // Celebração visual
-                    const flagColors = TEAM_COLORS[winner.slug] || ["#e9b949", "#ffffff"]
-                    confetti({
-                      particleCount: 60,
-                      spread: 70,
-                      origin: { x: 0.5, y: 0.5 },
-                      colors: flagColors,
-                    })
+                  // Se o jogo encerrou, avança o vencedor automaticamente na chave
+                  if (data.status === "finished") {
+                    for (let ring = 0; ring < 4; ring++) {
+                      const count = RINGS[ring].count
+                      for (let i = 0; i < count; i += 2) {
+                        const pt1 = teamAt(ring, i)
+                        const pt2 = teamAt(ring, i + 1)
+                        if (pt1 && pt2 && ((pt1.id === t1.id && pt2.id === t2.id) || (pt1.id === t2.id && pt2.id === t1.id))) {
+                          const parentRing = ring + 1
+                          const parentIndex = Math.floor(i / 2)
+                          const key = `${parentRing}-${parentIndex}`
+                          
+                          if (!winnersRef.current[key]) {
+                            const winner = data.t1Score > data.t2Score ? t1 : t2
+                            setWinners(prev => ({ ...prev, [key]: winner }))
+                            
+                            const flagColors = TEAM_COLORS[winner.slug] || ["#e9b949", "#ffffff"]
+                            confetti({
+                              particleCount: 60,
+                              spread: 70,
+                              origin: { x: 0.5, y: 0.5 },
+                              colors: flagColors,
+                            })
+                          }
+                          break
+                        }
+                      }
+                    }
                   }
                 }
               }
             }
           })
-          .catch(err => console.error("Erro ao buscar score da SportMonks:", err))
+          .catch(err => console.error("Erro ao buscar score da ESPN:", err))
       }
 
       // Se a SportMonks já está ativamente gerenciando o placar, não rodamos a simulação do relógio do sistema
