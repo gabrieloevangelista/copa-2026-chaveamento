@@ -48,12 +48,12 @@ function getMatchDate(ring: number, index: number): string | null {
   if (ring === 0) return null
   if (ring === 1) {
     const matchIdx = Math.floor(index / 2)
-    if (matchIdx === 0) return "05 de Julho"
-    if (matchIdx === 1) return "05 de Julho"
+    if (matchIdx === 0) return "04 de Julho"
+    if (matchIdx === 1) return "04 de Julho"
     if (matchIdx === 2) return "07 de Julho"
     if (matchIdx === 3) return "07 de Julho"
-    if (matchIdx === 4) return "04 de Julho"
-    if (matchIdx === 5) return "04 de Julho"
+    if (matchIdx === 4) return "05 de Julho"
+    if (matchIdx === 5) return "05 de Julho"
     if (matchIdx === 6) return "06 de Julho"
     if (matchIdx === 7) return "06 de Julho"
   }
@@ -147,11 +147,22 @@ function getMatchInfo(
        status = "Agendado"
     }
   } else if (ring === 1) {
-    const dates = ["Dom., 05/07", "Dom., 05/07", "Ter., 07/07", "Ter., 07/07", "Sáb., 04/07", "Sáb., 04/07", "Seg., 06/07", "Seg., 06/07"]
-    const times = ["17:00", "21:00", "13:00", "17:00", "18:00", "14:00", "16:00", "21:00"]
+    const dates = ["Sáb., 04/07", "Sáb., 04/07", "Ter., 07/07", "Ter., 07/07", "Dom., 05/07", "Dom., 05/07", "Seg., 06/07", "Seg., 06/07"]
+    const times = ["18:00", "14:00", "13:00", "17:00", "17:00", "21:00", "16:00", "21:00"]
     date = dates[matchIdx] ?? ""
     time = times[matchIdx] ?? ""
-    status = "Agendado"
+    
+    const isFinished = !!winners[`2-${matchIdx}`]
+    if (isFinished) {
+      status = "FIM"
+      if (matchIdx === 0) {
+        score = "0 x 1" // Paraguai x França
+      } else if (matchIdx === 1) {
+        score = "0 x 3" // Canadá x Marrocos
+      }
+    } else {
+      status = "Agendado"
+    }
   } else if (ring === 2) {
     const dates = ["Sáb., 11/07", "Sáb., 11/07", "Qui., 09/07", "Sex., 10/07"]
     const times = ["18:00", "22:00", "17:00", "16:00"]
@@ -549,7 +560,11 @@ export function WorldCupBracket() {
     "1-12": TEAMS[24], // Argentina
     "1-13": TEAMS[26], // Egito
     "1-14": TEAMS[28], // Suíça
-    // 1-15: Colômbia/Gana (pendente)
+    "1-15": TEAMS[30], // Colômbia
+
+    // Oitavas -> Quartas (Jogos de Ontem)
+    "2-0": TEAMS[2],   // França avançou (venceu Paraguai)
+    "2-1": TEAMS[6],   // Marrocos avançou (venceu Canadá)
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -582,6 +597,9 @@ export function WorldCupBracket() {
         mappedWinners["1-12"] = TEAMS[24] // Argentina
         mappedWinners["1-13"] = TEAMS[26] // Egito
         mappedWinners["1-14"] = TEAMS[28] // Suíça
+        mappedWinners["1-15"] = TEAMS[30] // Colômbia
+        mappedWinners["2-0"] = TEAMS[2]   // França (avançou ontem)
+        mappedWinners["2-1"] = TEAMS[6]   // Marrocos (avançou ontem)
 
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
@@ -1138,8 +1156,8 @@ export function WorldCupBracket() {
     const thirdPlace = getThirdPlaceTeams()
     
     return [
-      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "14:00", stadium: "Estádio de Houston (TX)", t1: teamAt(1, 2), t2: teamAt(1, 3) }, // Canadá x Marrocos
-      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", stadium: "Estádio de Filadélfia (PA)", t1: teamAt(1, 0), t2: teamAt(1, 1) }, // Paraguai x França
+      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "14:00", stadium: "Estádio de Houston (TX)", t1: teamAt(1, 2), t2: teamAt(1, 3), score: winners["2-1"] ? "0 x 3" : null }, // Canadá x Marrocos
+      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", stadium: "Estádio de Filadélfia (PA)", t1: teamAt(1, 0), t2: teamAt(1, 1), score: winners["2-0"] ? "0 x 1" : null }, // Paraguai x França
       { phase: "Oitavas de final", date: "Dom., 05/07", time: "17:00", stadium: "Estádio de Nova York / Nova Jersey (NJ)", t1: teamAt(1, 8), t2: teamAt(1, 9) }, // Brasil x Noruega
       { phase: "Oitavas de final", date: "Dom., 05/07", time: "21:00", stadium: "Estádio da Cidade do México", t1: teamAt(1, 10), t2: teamAt(1, 11) }, // México x Inglaterra
       { phase: "Oitavas de final", date: "Seg., 06/07", time: "16:00", stadium: "Estádio de Dallas (TX)", t1: teamAt(1, 4), t2: teamAt(1, 5) }, // Portugal x Espanha
@@ -1724,7 +1742,9 @@ export function WorldCupBracket() {
                       )}
                     </div>
                     
-                    <span className="text-[10px] text-muted-foreground font-bold px-1.5 shrink-0">×</span>
+                    <span className="text-[10px] text-muted-foreground font-bold px-1.5 shrink-0">
+                      {match.score ? match.score : "×"}
+                    </span>
                     
                     {/* Time 2 */}
                     <div className="flex items-center gap-1.5 flex-1 justify-end min-w-0 text-right shrink-0">
