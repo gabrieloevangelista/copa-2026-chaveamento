@@ -566,6 +566,7 @@ export function WorldCupBracket() {
     // Oitavas -> Quartas (Jogos de Ontem)
     "2-0": TEAMS[2],   // França avançou (venceu Paraguai)
     "2-1": TEAMS[6],   // Marrocos avançou (venceu Canadá)
+    "2-4": TEAMS[18],  // Noruega avançou (venceu Brasil)
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -601,6 +602,7 @@ export function WorldCupBracket() {
         mappedWinners["1-15"] = TEAMS[30] // Colômbia
         mappedWinners["2-0"] = TEAMS[2]   // França (avançou ontem)
         mappedWinners["2-1"] = TEAMS[6]   // Marrocos (avançou ontem)
+        mappedWinners["2-4"] = TEAMS[18]  // Noruega (avançou)
 
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
@@ -1173,7 +1175,7 @@ export function WorldCupBracket() {
     return [
       { phase: "Oitavas de final", date: "Sáb., 04/07", time: "14:00", stadium: "Estádio de Houston (TX)", t1: teamAt(1, 2), t2: teamAt(1, 3), score: winners["2-1"] ? "0 x 3" : null }, // Canadá x Marrocos
       { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", stadium: "Estádio de Filadélfia (PA)", t1: teamAt(1, 0), t2: teamAt(1, 1), score: winners["2-0"] ? "0 x 1" : null }, // Paraguai x França
-      { phase: "Oitavas de final", date: "Dom., 05/07", time: "17:00", stadium: "Estádio de Nova York / Nova Jersey (NJ)", t1: teamAt(1, 8), t2: teamAt(1, 9) }, // Brasil x Noruega
+      { phase: "Oitavas de final", date: "Dom., 05/07", time: "17:00", stadium: "Estádio de Nova York / Nova Jersey (NJ)", t1: teamAt(1, 8), t2: teamAt(1, 9), score: winners["2-4"] ? "1 x 2" : null }, // Brasil x Noruega
       { phase: "Oitavas de final", date: "Dom., 05/07", time: "21:00", stadium: "Estádio da Cidade do México", t1: teamAt(1, 10), t2: teamAt(1, 11) }, // México x Inglaterra
       { phase: "Oitavas de final", date: "Seg., 06/07", time: "16:00", stadium: "Estádio de Dallas (TX)", t1: teamAt(1, 4), t2: teamAt(1, 5) }, // Portugal x Espanha
       { phase: "Oitavas de final", date: "Seg., 06/07", time: "21:00", stadium: "Estádio de Seattle (WA)", t1: teamAt(1, 6), t2: teamAt(1, 7) }, // EUA x Bélgica
