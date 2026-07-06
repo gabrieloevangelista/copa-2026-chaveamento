@@ -152,8 +152,8 @@ function getMatchInfo(
       status = "Agendado"
     }
   } else if (ring === 1) {
-    const dates = ["Sáb., 04/07", "Sáb., 04/07", "Ter., 07/07", "Ter., 07/07", "Dom., 05/07", "Dom., 05/07", "Seg., 06/07", "Seg., 06/07"]
-    const times = ["18:00", "14:00", "13:00", "17:00", "17:00", "21:00", "16:00", "21:00"]
+    const dates = ["Sáb., 04/07", "Sáb., 04/07", "Seg., 06/07", "Seg., 06/07", "Dom., 05/07", "Dom., 05/07", "Ter., 07/07", "Ter., 07/07"]
+    const times = ["18:00", "14:00", "16:00", "21:00", "17:00", "21:00", "13:00", "17:00"]
     date = dates[matchIdx] ?? ""
     time = times[matchIdx] ?? ""
 
@@ -164,6 +164,12 @@ function getMatchInfo(
         score = "0 x 1" // Paraguai x França
       } else if (matchIdx === 1) {
         score = "0 x 3" // Canadá x Marrocos
+      } else if (matchIdx === 2) {
+        score = "0 x 1" // Portugal x Espanha
+      } else if (matchIdx === 4) {
+        score = "1 x 2" // Brasil x Noruega
+      } else if (matchIdx === 5) {
+        score = "0 x 2" // México x Inglaterra
       }
     } else {
       status = "Agendado"
