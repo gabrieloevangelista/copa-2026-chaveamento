@@ -126,8 +126,8 @@ function getMatchInfo(
       time: liveMatch.status === "halftime" ? "Intervalo" : `${liveMatch.minute}'`,
       t1,
       t2,
-      score: t1.id === liveMatch.t1.id 
-        ? `${liveMatch.t1Score} x ${liveMatch.t2Score}` 
+      score: t1.id === liveMatch.t1.id
+        ? `${liveMatch.t1Score} x ${liveMatch.t2Score}`
         : `${liveMatch.t2Score} x ${liveMatch.t1Score}`,
       status: "AO VIVO"
     }
@@ -141,22 +141,22 @@ function getMatchInfo(
   if (ring === 0 && activeItem) {
     date = activeItem.dateLabel
     time = activeItem.timeLabel
-    
+
     const isFinished = !!winners[`1-${matchIdx}`]
-    
+
     if (isFinished) {
-       const res = getDeterministicMatchResult(activeItem.id)
-       score = (res as any).str ? (res as any).str : `${res.t1ScoreFinal} x ${res.t2ScoreFinal}`
-       status = "FIM"
+      const res = getDeterministicMatchResult(activeItem.id)
+      score = (res as any).str ? (res as any).str : `${res.t1ScoreFinal} x ${res.t2ScoreFinal}`
+      status = "FIM"
     } else {
-       status = "Agendado"
+      status = "Agendado"
     }
   } else if (ring === 1) {
     const dates = ["Sáb., 04/07", "Sáb., 04/07", "Ter., 07/07", "Ter., 07/07", "Dom., 05/07", "Dom., 05/07", "Seg., 06/07", "Seg., 06/07"]
     const times = ["18:00", "14:00", "13:00", "17:00", "17:00", "21:00", "16:00", "21:00"]
     date = dates[matchIdx] ?? ""
     time = times[matchIdx] ?? ""
-    
+
     const isFinished = !!winners[`2-${matchIdx}`]
     if (isFinished) {
       status = "FIM"
@@ -192,36 +192,36 @@ type Winners = Record<string, Team>
 
 const SCHEDULE = [
   // R16-1: Paraguai x França
-  { id: "J74", dateLabel: "Seg., 29/06", timeLabel: "18:00", t1_idx: 0, t2_idx: 1, timestamp: new Date("2026-06-29T18:00:00-03:00").getTime(), parentWinnerKey: "1-0" }, 
+  { id: "J74", dateLabel: "Seg., 29/06", timeLabel: "18:00", t1_idx: 0, t2_idx: 1, timestamp: new Date("2026-06-29T18:00:00-03:00").getTime(), parentWinnerKey: "1-0" },
   { id: "J77", dateLabel: "Ter., 30/06", timeLabel: "17:00", t1_idx: 2, t2_idx: 3, timestamp: new Date("2026-06-30T17:00:00-03:00").getTime(), parentWinnerKey: "1-1" },
-  
+
   // R16-2: Canadá x Marrocos
-  { id: "J73", dateLabel: "Dom., 28/06", timeLabel: "14:00", t1_idx: 4, t2_idx: 5, timestamp: new Date("2026-06-28T14:00:00-03:00").getTime(), parentWinnerKey: "1-2" }, 
-  { id: "J75", dateLabel: "Seg., 29/06", timeLabel: "14:00", t1_idx: 6, t2_idx: 7, timestamp: new Date("2026-06-29T14:00:00-03:00").getTime(), parentWinnerKey: "1-3" }, 
-  
+  { id: "J73", dateLabel: "Dom., 28/06", timeLabel: "14:00", t1_idx: 4, t2_idx: 5, timestamp: new Date("2026-06-28T14:00:00-03:00").getTime(), parentWinnerKey: "1-2" },
+  { id: "J75", dateLabel: "Seg., 29/06", timeLabel: "14:00", t1_idx: 6, t2_idx: 7, timestamp: new Date("2026-06-29T14:00:00-03:00").getTime(), parentWinnerKey: "1-3" },
+
   // R16-5: Portugal x Espanha
-  { id: "J83", dateLabel: "Hoje", timeLabel: "20:00", t1_idx: 8, t2_idx: 9, timestamp: new Date("2026-07-02T20:00:00-03:00").getTime(), parentWinnerKey: "1-4" }, 
-  { id: "J84", dateLabel: "Hoje", timeLabel: "16:00", t1_idx: 10, t2_idx: 11, timestamp: new Date("2026-07-02T16:00:00-03:00").getTime(), parentWinnerKey: "1-5" }, 
-  
+  { id: "J83", dateLabel: "Hoje", timeLabel: "20:00", t1_idx: 8, t2_idx: 9, timestamp: new Date("2026-07-02T20:00:00-03:00").getTime(), parentWinnerKey: "1-4" },
+  { id: "J84", dateLabel: "Hoje", timeLabel: "16:00", t1_idx: 10, t2_idx: 11, timestamp: new Date("2026-07-02T16:00:00-03:00").getTime(), parentWinnerKey: "1-5" },
+
   // R16-6: EUA x Bélgica
-  { id: "J81", dateLabel: "Ontem", timeLabel: "21:00", t1_idx: 12, t2_idx: 13, timestamp: new Date("2026-07-01T21:00:00-03:00").getTime(), parentWinnerKey: "1-6" }, 
-  { id: "J82", dateLabel: "Ontem", timeLabel: "17:00", t1_idx: 14, t2_idx: 15, timestamp: new Date("2026-07-01T17:00:00-03:00").getTime(), parentWinnerKey: "1-7" }, 
+  { id: "J81", dateLabel: "Ontem", timeLabel: "21:00", t1_idx: 12, t2_idx: 13, timestamp: new Date("2026-07-01T21:00:00-03:00").getTime(), parentWinnerKey: "1-6" },
+  { id: "J82", dateLabel: "Ontem", timeLabel: "17:00", t1_idx: 14, t2_idx: 15, timestamp: new Date("2026-07-01T17:00:00-03:00").getTime(), parentWinnerKey: "1-7" },
 
   // R16-3: Brasil x Noruega
-  { id: "J76", dateLabel: "Seg., 29/06", timeLabel: "21:00", t1_idx: 16, t2_idx: 17, timestamp: new Date("2026-06-29T21:00:00-03:00").getTime(), parentWinnerKey: "1-8" }, 
-  { id: "J78", dateLabel: "Ter., 30/06", timeLabel: "21:00", t1_idx: 18, t2_idx: 19, timestamp: new Date("2026-06-30T21:00:00-03:00").getTime(), parentWinnerKey: "1-9" }, 
-  
+  { id: "J76", dateLabel: "Seg., 29/06", timeLabel: "21:00", t1_idx: 16, t2_idx: 17, timestamp: new Date("2026-06-29T21:00:00-03:00").getTime(), parentWinnerKey: "1-8" },
+  { id: "J78", dateLabel: "Ter., 30/06", timeLabel: "21:00", t1_idx: 18, t2_idx: 19, timestamp: new Date("2026-06-30T21:00:00-03:00").getTime(), parentWinnerKey: "1-9" },
+
   // R16-4: México x Inglaterra
-  { id: "J79", dateLabel: "Ter., 30/06", timeLabel: "22:55", t1_idx: 20, t2_idx: 21, timestamp: new Date("2026-06-30T22:55:00-03:00").getTime(), parentWinnerKey: "1-10" }, 
-  { id: "J80", dateLabel: "Ontem", timeLabel: "13:00", t1_idx: 22, t2_idx: 23, timestamp: new Date("2026-07-01T13:00:00-03:00").getTime(), parentWinnerKey: "1-11" }, 
-  
+  { id: "J79", dateLabel: "Ter., 30/06", timeLabel: "22:55", t1_idx: 20, t2_idx: 21, timestamp: new Date("2026-06-30T22:55:00-03:00").getTime(), parentWinnerKey: "1-10" },
+  { id: "J80", dateLabel: "Ontem", timeLabel: "13:00", t1_idx: 22, t2_idx: 23, timestamp: new Date("2026-07-01T13:00:00-03:00").getTime(), parentWinnerKey: "1-11" },
+
   // R16-7: Argentina x Egito
-  { id: "J86", dateLabel: "Ontem", timeLabel: "19:00", t1_idx: 24, t2_idx: 25, timestamp: new Date("2026-07-02T19:00:00-03:00").getTime(), parentWinnerKey: "1-12" }, 
-  { id: "J88", dateLabel: "Ontem", timeLabel: "15:00", t1_idx: 26, t2_idx: 27, timestamp: new Date("2026-07-02T15:00:00-03:00").getTime(), parentWinnerKey: "1-13" }, 
-  
+  { id: "J86", dateLabel: "Ontem", timeLabel: "19:00", t1_idx: 24, t2_idx: 25, timestamp: new Date("2026-07-02T19:00:00-03:00").getTime(), parentWinnerKey: "1-12" },
+  { id: "J88", dateLabel: "Ontem", timeLabel: "15:00", t1_idx: 26, t2_idx: 27, timestamp: new Date("2026-07-02T15:00:00-03:00").getTime(), parentWinnerKey: "1-13" },
+
   // R16-8: Suíça x Colômbia/Gana
-  { id: "J85", dateLabel: "Ontem", timeLabel: "FIM", t1_idx: 28, t2_idx: 29, timestamp: new Date("2026-07-03T00:00:00-03:00").getTime(), parentWinnerKey: "1-14" }, 
-  { id: "J87", dateLabel: "Hoje", timeLabel: "AO VIVO", t1_idx: 30, t2_idx: 31, timestamp: new Date("2026-07-03T22:30:00-03:00").getTime(), parentWinnerKey: "1-15" }, 
+  { id: "J85", dateLabel: "Ontem", timeLabel: "FIM", t1_idx: 28, t2_idx: 29, timestamp: new Date("2026-07-03T00:00:00-03:00").getTime(), parentWinnerKey: "1-14" },
+  { id: "J87", dateLabel: "Hoje", timeLabel: "AO VIVO", t1_idx: 30, t2_idx: 31, timestamp: new Date("2026-07-03T22:30:00-03:00").getTime(), parentWinnerKey: "1-15" },
 ]
 
 function getDeterministicMatchResult(matchId: string) {
@@ -263,28 +263,28 @@ function getDeterministicMatchResult(matchId: string) {
     hash |= 0
   }
   hash = Math.abs(hash)
-  
+
   const t1ScoreFinal = hash % 3
   const t2ScoreFinal = (hash >> 2) % 3
-  
+
   const goals: { minute: number; team: 1 | 2 }[] = []
-  
+
   for (let i = 0; i < t1ScoreFinal; i++) {
     goals.push({
       minute: 5 + ((hash + i * 23) % 80),
       team: 1
     })
   }
-  
+
   for (let i = 0; i < t2ScoreFinal; i++) {
     goals.push({
       minute: 8 + ((hash + i * 31) % 78),
       team: 2
     })
   }
-  
+
   goals.sort((a, b) => a.minute - b.minute)
-  
+
   return { t1ScoreFinal, t2ScoreFinal, goals }
 }
 
@@ -340,7 +340,7 @@ export function WorldCupBracket() {
 
   const realStartRef = useRef(typeof window !== "undefined" ? Date.now() : new Date("2026-07-02T08:40:24-03:00").getTime())
   const SIMULATED_START = useMemo(() => new Date("2026-07-02T08:40:24-03:00").getTime(), [])
-  
+
   const getSimulatedNow = useCallback(() => {
     if (typeof window === "undefined") return SIMULATED_START
     return SIMULATED_START + (Date.now() - realStartRef.current)
@@ -362,7 +362,7 @@ export function WorldCupBracket() {
     const hours = Math.floor(diff / 3600000)
     const minutes = Math.floor((diff % 3600000) / 60000)
     const seconds = Math.floor((diff % 60000) / 1000)
-    
+
     const pad = (n: number) => String(n).padStart(2, "0")
     if (hours > 0) {
       return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
@@ -461,7 +461,7 @@ export function WorldCupBracket() {
       const dist = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY)
       pinchStartDistRef.current = dist
       scaleStartRef.current = scale
-      
+
       const midX = (touch1.clientX + touch2.clientX) / 2
       const midY = (touch1.clientY + touch2.clientY) / 2
       touchStartRef.current = { x: midX, y: midY }
@@ -486,11 +486,11 @@ export function WorldCupBracket() {
       const touch1 = e.touches[0]
       const touch2 = e.touches[1]
       const dist = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY)
-      
+
       const factor = dist / pinchStartDistRef.current
       const newScale = Math.max(0.5, Math.min(3, scaleStartRef.current * factor))
       setScale(newScale)
-      
+
       const midX = (touch1.clientX + touch2.clientX) / 2
       const midY = (touch1.clientY + touch2.clientY) / 2
       const deltaX = midX - touchStartRef.current.x
@@ -567,6 +567,7 @@ export function WorldCupBracket() {
     "2-0": TEAMS[2],   // França avançou (venceu Paraguai)
     "2-1": TEAMS[6],   // Marrocos avançou (venceu Canadá)
     "2-4": TEAMS[18],  // Noruega avançou (venceu Brasil)
+    "2-5": TEAMS[22],  // Inglaterra avançou (venceu México)
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -603,6 +604,7 @@ export function WorldCupBracket() {
         mappedWinners["2-0"] = TEAMS[2]   // França (avançou ontem)
         mappedWinners["2-1"] = TEAMS[6]   // Marrocos (avançou ontem)
         mappedWinners["2-4"] = TEAMS[18]  // Noruega (avançou)
+        mappedWinners["2-5"] = TEAMS[22]  // Inglaterra (avançou)
 
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
@@ -716,7 +718,7 @@ export function WorldCupBracket() {
 
     const checkMatches = () => {
       const now = getSimulatedNow()
-      
+
       // Busca atualizações de placar via SportMonks API (throttle 20s)
       if (now - lastXFetchRef.current > 20000) {
         lastXFetchRef.current = now
@@ -727,7 +729,7 @@ export function WorldCupBracket() {
               isXActiveRef.current = true
               const t1 = TEAMS.find(t => t.id === data.t1.id)
               const t2 = TEAMS.find(t => t.id === data.t2.id)
-              
+
               if (t1 && t2) {
                 // Só ativa o placar se o jogo estiver realmente em andamento
                 if (data.isActive) {
@@ -755,11 +757,11 @@ export function WorldCupBracket() {
                           const parentRing = ring + 1
                           const parentIndex = Math.floor(i / 2)
                           const key = `${parentRing}-${parentIndex}`
-                          
+
                           if (!winnersRef.current[key]) {
                             const winner = data.t1Score > data.t2Score ? t1 : t2
                             setWinners(prev => ({ ...prev, [key]: winner }))
-                            
+
                             const flagColors = TEAM_COLORS[winner.slug] || ["#e9b949", "#ffffff"]
                             confetti({
                               particleCount: 60,
@@ -795,12 +797,12 @@ export function WorldCupBracket() {
       if (activeItem) {
         const t1 = TEAMS[activeItem.t1_idx]
         const t2 = TEAMS[activeItem.t2_idx]
-        
+
         const elapsedMinutes = Math.floor((now - activeItem.timestamp) / 60000)
-        
+
         let gameMinute = 0
         let isHalftime = false
-        
+
         if (elapsedMinutes < 45) {
           gameMinute = elapsedMinutes
         } else if (elapsedMinutes >= 45 && elapsedMinutes < 60) {
@@ -840,26 +842,26 @@ export function WorldCupBracket() {
             } else {
               winner = result.t1ScoreFinal > result.t2ScoreFinal ? currentLive.t1 : currentLive.t2
             }
-            
+
             const parentRing = 1
             const parentIndex = Math.floor(finishedItem.t1_idx / 2)
             const key = `${parentRing}-${parentIndex}`
             setWinners(prev => {
-                if (prev[key]) return prev
-                return { ...prev, [key]: winner }
-              })
+              if (prev[key]) return prev
+              return { ...prev, [key]: winner }
+            })
 
-              // Celebração visual
-              const flagColors = TEAM_COLORS[winner.slug] || ["#e9b949", "#ffffff"]
-              confetti({
-                particleCount: 60,
-                spread: 70,
-                origin: { x: 0.5, y: 0.5 },
-                colors: flagColors,
-              })
-              
-              // Remove o placar imediatamente ao encerrar o tempo regulamentar simulado
-              setLiveMatch(null)
+            // Celebração visual
+            const flagColors = TEAM_COLORS[winner.slug] || ["#e9b949", "#ffffff"]
+            confetti({
+              particleCount: 60,
+              spread: 70,
+              origin: { x: 0.5, y: 0.5 },
+              colors: flagColors,
+            })
+
+            // Remove o placar imediatamente ao encerrar o tempo regulamentar simulado
+            setLiveMatch(null)
           }
         }
       }
@@ -874,7 +876,7 @@ export function WorldCupBracket() {
   // Avança automaticamente partidas passadas que ainda não têm vencedor definido
   useEffect(() => {
     if (!isLoaded) return
-    
+
     let updated = false
     const nextWinners = { ...winners }
     const now = getSimulatedNow()
@@ -884,7 +886,7 @@ export function WorldCupBracket() {
         const result = getDeterministicMatchResult(item.id)
         const t1 = TEAMS[item.t1_idx]
         const t2 = TEAMS[item.t2_idx]
-        
+
         let winner = t1
         if (result.t1ScoreFinal === result.t2ScoreFinal) {
           const t1Pen = 4 + (item.id.charCodeAt(0) % 2)
@@ -893,10 +895,10 @@ export function WorldCupBracket() {
         } else {
           winner = result.t1ScoreFinal > result.t2ScoreFinal ? t1 : t2
         }
-        
+
         nextWinners[item.parentWinnerKey] = winner
         updated = true
-        
+
         // Pequeno confete com cores da bandeira do vencedor automático!
         const flagColors = TEAM_COLORS[winner.slug] || ["#e9b949", "#ffffff"]
         confetti({
@@ -1171,27 +1173,27 @@ export function WorldCupBracket() {
 
   const getCalendarMatches = () => {
     const thirdPlace = getThirdPlaceTeams()
-    
+
     return [
       { phase: "Oitavas de final", date: "Sáb., 04/07", time: "14:00", stadium: "Estádio de Houston (TX)", t1: teamAt(1, 2), t2: teamAt(1, 3), score: winners["2-1"] ? "0 x 3" : null }, // Canadá x Marrocos
       { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", stadium: "Estádio de Filadélfia (PA)", t1: teamAt(1, 0), t2: teamAt(1, 1), score: winners["2-0"] ? "0 x 1" : null }, // Paraguai x França
       { phase: "Oitavas de final", date: "Dom., 05/07", time: "17:00", stadium: "Estádio de Nova York / Nova Jersey (NJ)", t1: teamAt(1, 8), t2: teamAt(1, 9), score: winners["2-4"] ? "1 x 2" : null }, // Brasil x Noruega
-      { phase: "Oitavas de final", date: "Dom., 05/07", time: "21:00", stadium: "Estádio da Cidade do México", t1: teamAt(1, 10), t2: teamAt(1, 11) }, // México x Inglaterra
+      { phase: "Oitavas de final", date: "Dom., 05/07", time: "21:00", stadium: "Estádio da Cidade do México", t1: teamAt(1, 10), t2: teamAt(1, 11), score: winners["2-5"] ? "0 x 2" : null }, // México x Inglaterra
       { phase: "Oitavas de final", date: "Seg., 06/07", time: "16:00", stadium: "Estádio de Dallas (TX)", t1: teamAt(1, 4), t2: teamAt(1, 5) }, // Portugal x Espanha
       { phase: "Oitavas de final", date: "Seg., 06/07", time: "21:00", stadium: "Estádio de Seattle (WA)", t1: teamAt(1, 6), t2: teamAt(1, 7) }, // EUA x Bélgica
       { phase: "Oitavas de final", date: "Ter., 07/07", time: "13:00", stadium: "Estádio de Atlanta (GA)", t1: teamAt(1, 12), t2: teamAt(1, 13) }, // Argentina x Egito
       { phase: "Oitavas de final", date: "Ter., 07/07", time: "17:00", stadium: "BC Place, Vancouver", t1: teamAt(1, 14), t2: teamAt(1, 15) }, // Suíça x Colômbia/Gana
-      
+
       { phase: "Quartas de final", date: "Qui., 09/07", time: "17:00", stadium: "", t1: teamAt(2, 0), t2: teamAt(2, 1) }, // QF-1: Paraguai/França x Canadá/Marrocos
       { phase: "Quartas de final", date: "Sex., 10/07", time: "16:00", stadium: "", t1: teamAt(2, 2), t2: teamAt(2, 3) }, // QF-2: Portugal/Espanha x EUA/Bélgica
       { phase: "Quartas de final", date: "Sáb., 11/07", time: "18:00", stadium: "", t1: teamAt(2, 4), t2: teamAt(2, 5) }, // QF-3: Brasil/Noruega x México/Inglaterra
       { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", stadium: "", t1: teamAt(2, 6), t2: teamAt(2, 7) }, // QF-4: Argentina/Egito x Suíça/A definir
-      
+
       { phase: "Semifinal", date: "Ter., 14/07", time: "16:00", stadium: "", t1: teamAt(3, 0), t2: teamAt(3, 1) }, // SF-1: Vencedor QF-1 x Vencedor QF-2
       { phase: "Semifinal", date: "Qua., 15/07", time: "16:00", stadium: "", t1: teamAt(3, 2), t2: teamAt(3, 3) }, // SF-2: Vencedor QF-3 x Vencedor QF-4
-      
+
       { phase: "Disputa 3º Lugar", date: "Sáb., 18/07", time: "18:00", stadium: "", t1: thirdPlace.teamA, t2: thirdPlace.teamB },
-      
+
       { phase: "Final", date: "Dom., 19/07", time: "16:00", stadium: "", t1: teamAt(4, 0), t2: teamAt(4, 1) }
     ]
   }
@@ -1319,7 +1321,7 @@ export function WorldCupBracket() {
                   <img src={flagUrl(nextMatch.t1)} alt="" className="size-5 shrink-0 rounded-full object-cover shadow-sm ring-1 ring-border" />
                   <span className="hidden sm:inline truncate max-w-[80px]">{nextMatch.t1.name}</span>
                 </span>
-                
+
                 <span className="text-muted-foreground font-normal text-[10px] shrink-0 whitespace-nowrap">vs</span>
 
                 <span className="flex items-center gap-1 font-semibold text-xs sm:text-sm shrink-0 whitespace-nowrap">
@@ -1338,7 +1340,7 @@ export function WorldCupBracket() {
       </header>
 
       {/* Palco radial com drag/zoom para mobile e desktop */}
-      <div 
+      <div
         ref={canvasRef}
         className="hidden-scrollbar absolute inset-0 w-full h-full overflow-hidden flex items-center justify-center z-10"
         style={{
@@ -1354,9 +1356,9 @@ export function WorldCupBracket() {
         onMouseLeave={handleMouseUp}
         onDoubleClick={handleDoubleClick}
       >
-        <div 
-          className="relative w-full max-w-[900px] aspect-square flex items-center justify-center" 
-          style={{ 
+        <div
+          className="relative w-full max-w-[900px] aspect-square flex items-center justify-center"
+          style={{
             transform: `translate(${dragPos.x}px, ${dragPos.y}px) scale(${scale})`,
             transformOrigin: "center",
             transition: isDragging ? "none" : "transform 0.1s ease-out",
@@ -1476,21 +1478,19 @@ export function WorldCupBracket() {
 
           {/* Brilho central + taça */}
           <div
-            className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold blur-2xl transition-all duration-700 ${
-              champion
+            className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold blur-2xl transition-all duration-700 ${champion
                 ? "size-[45%] opacity-60 animate-pulse"
                 : "size-[26%] opacity-20"
-            }`}
+              }`}
           />
           <div className="absolute left-1/2 top-1/2 z-10 flex size-[15%] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
             <img
               src="/images/trophy.png"
               alt="Taça da Copa do Mundo"
-              className={`size-full object-contain transition-all duration-700 ${
-                champion
+              className={`size-full object-contain transition-all duration-700 ${champion
                   ? "scale-110 drop-shadow-[0_0_38px_oklch(0.85_0.15_82/0.95)]"
                   : "drop-shadow-[0_0_18px_oklch(0.82_0.13_80/0.55)]"
-              }`}
+                }`}
             />
           </div>
 
@@ -1725,11 +1725,10 @@ export function WorldCupBracket() {
             {/* Linha do tempo / Agenda */}
             <div className="relative z-10 w-full flex flex-col gap-3 overflow-y-auto max-h-[50vh] pr-1.5 mt-2 hidden-scrollbar">
               {getCalendarMatches().map((match, idx) => (
-                <div 
-                  key={idx} 
-                  className={`flex flex-col gap-2 p-2.5 rounded-lg border border-border/40 bg-background/50 text-left transition-colors hover:bg-background/85 ${
-                    match.phase === "Final" ? "border-gold/30 bg-gold/5 shadow-[0_0_10px_oklch(0.82_0.13_80/0.1)] animate-pulse" : ""
-                  }`}
+                <div
+                  key={idx}
+                  className={`flex flex-col gap-2 p-2.5 rounded-lg border border-border/40 bg-background/50 text-left transition-colors hover:bg-background/85 ${match.phase === "Final" ? "border-gold/30 bg-gold/5 shadow-[0_0_10px_oklch(0.82_0.13_80/0.1)] animate-pulse" : ""
+                    }`}
                 >
                   <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
                     <span className={match.phase === "Final" ? "text-gold-soft" : ""}>{match.phase}</span>
@@ -1741,7 +1740,7 @@ export function WorldCupBracket() {
                       {(match as any).stadium}
                     </div>
                   )}
-                  
+
                   <div className="flex items-center justify-between gap-2 text-xs font-semibold text-foreground">
                     {/* Time 1 */}
                     <div className="flex items-center gap-1.5 flex-1 min-w-0 shrink-0">
@@ -1758,11 +1757,11 @@ export function WorldCupBracket() {
                         <span className="text-muted-foreground/60 italic font-normal">A definir</span>
                       )}
                     </div>
-                    
+
                     <span className="text-[10px] text-muted-foreground font-bold px-1.5 shrink-0">
                       {match.score ? match.score : "×"}
                     </span>
-                    
+
                     {/* Time 2 */}
                     <div className="flex items-center gap-1.5 flex-1 justify-end min-w-0 text-right shrink-0">
                       {match.t2 ? (
@@ -1803,9 +1802,9 @@ export function WorldCupBracket() {
               Adicione à sua tela de início para abrir como app: toque no botão de <strong>Compartilhar</strong> (ícone com seta <span className="inline-block translate-y-0.5">📤</span>) e selecione <strong>"Adicionar à Tela de Início"</strong> (ícone <span className="inline-block translate-y-0.5">➕</span>).
             </p>
           </div>
-          <button 
-            type="button" 
-            onClick={() => setShowIOSPrompt(false)} 
+          <button
+            type="button"
+            onClick={() => setShowIOSPrompt(false)}
             className="text-muted-foreground hover:text-foreground p-0.5"
             aria-label="Fechar dica"
           >
@@ -1903,22 +1902,20 @@ function Node({
         {team ? (
           <span
             title=""
-            className={`flex size-full items-center justify-center overflow-hidden rounded-full bg-card shadow-md ring-2 transition-all duration-500 ${
-              lost
+            className={`flex size-full items-center justify-center overflow-hidden rounded-full bg-card shadow-md ring-2 transition-all duration-500 ${lost
                 ? "ring-border opacity-50"
                 : advanced
                   ? "ring-gold shadow-[0_0_14px_oklch(0.82_0.13_80/0.6)]"
                   : "ring-border"
-            }`}
+              }`}
           >
             <img
               src={flagUrl(team) || "/placeholder.svg"}
               alt={`Bandeira ${team.name}`}
               title=""
               loading="lazy"
-              className={`size-full rounded-full object-cover transition-all duration-500 ${
-                lost ? "grayscale" : ""
-              }`}
+              className={`size-full rounded-full object-cover transition-all duration-500 ${lost ? "grayscale" : ""
+                }`}
             />
           </span>
         ) : null}
@@ -1926,7 +1923,7 @@ function Node({
 
       {/* Tooltip Premium */}
       {isHovered && (
-        <div 
+        <div
           className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2 pointer-events-none select-none"
           style={{ zIndex: 3000 }}
         >
