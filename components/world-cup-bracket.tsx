@@ -166,10 +166,16 @@ function getMatchInfo(
         score = "0 x 3" // Canadá x Marrocos
       } else if (matchIdx === 2) {
         score = "0 x 1" // Portugal x Espanha
+      } else if (matchIdx === 3) {
+        score = "1 x 2" // EUA x Bélgica
       } else if (matchIdx === 4) {
         score = "1 x 2" // Brasil x Noruega
       } else if (matchIdx === 5) {
         score = "0 x 2" // México x Inglaterra
+      } else if (matchIdx === 6) {
+        score = "2 x 1" // Argentina x Egito
+      } else if (matchIdx === 7) {
+        score = "1 (4) x 1 (3)" // Suíça x Colômbia
       }
     } else {
       status = "Agendado"
@@ -575,6 +581,9 @@ export function WorldCupBracket() {
     "2-4": TEAMS[18],  // Noruega avançou (venceu Brasil)
     "2-5": TEAMS[22],  // Inglaterra avançou (venceu México)
     "2-2": TEAMS[10],  // Espanha avançou (venceu Portugal)
+    "2-6": TEAMS[24],  // Argentina avançou (venceu Egito)
+    "2-3": TEAMS[14],  // Bélgica avançou (venceu EUA)
+    "2-7": TEAMS[28],  // Suíça avançou (venceu Colômbia)
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -613,6 +622,9 @@ export function WorldCupBracket() {
         mappedWinners["2-4"] = TEAMS[18]  // Noruega (avançou)
         mappedWinners["2-5"] = TEAMS[22]  // Inglaterra (avançou)
         mappedWinners["2-2"] = TEAMS[10]  // Espanha (avançou)
+        mappedWinners["2-6"] = TEAMS[24]  // Argentina (avançou)
+        mappedWinners["2-3"] = TEAMS[14]  // Bélgica (avançou)
+        mappedWinners["2-7"] = TEAMS[28]  // Suíça (avançou)
 
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
