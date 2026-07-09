@@ -1208,7 +1208,7 @@ export function WorldCupBracket() {
       { phase: "Oitavas de final", date: "Ter., 07/07", time: "13:00", stadium: "Estádio de Atlanta (GA)", t1: teamAt(1, 12), t2: teamAt(1, 13) }, // Argentina x Egito
       { phase: "Oitavas de final", date: "Ter., 07/07", time: "17:00", stadium: "BC Place, Vancouver", t1: teamAt(1, 14), t2: teamAt(1, 15) }, // Suíça x Colômbia/Gana
 
-      { phase: "Quartas de final", date: "Qui., 09/07", time: "17:00", stadium: "", t1: teamAt(2, 0), t2: teamAt(2, 1), score: winners["3-0"] ? "2 x 1" : null }, // QF-1: Paraguai/França x Canadá/Marrocos
+      { phase: "Quartas de final", date: "Qui., 09/07", time: "17:00", stadium: "", t1: teamAt(2, 0), t2: teamAt(2, 1), score: winners["3-0"] ? "2 x 0" : null }, // QF-1: Paraguai/França x Canadá/Marrocos
       { phase: "Quartas de final", date: "Sex., 10/07", time: "16:00", stadium: "", t1: teamAt(2, 2), t2: teamAt(2, 3) }, // QF-2: Portugal/Espanha x EUA/Bélgica
       { phase: "Quartas de final", date: "Sáb., 11/07", time: "18:00", stadium: "", t1: teamAt(2, 4), t2: teamAt(2, 5) }, // QF-3: Brasil/Noruega x México/Inglaterra
       { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", stadium: "", t1: teamAt(2, 6), t2: teamAt(2, 7) }, // QF-4: Argentina/Egito x Suíça/A definir
