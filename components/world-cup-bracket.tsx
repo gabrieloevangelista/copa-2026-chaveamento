@@ -584,6 +584,9 @@ export function WorldCupBracket() {
     "2-6": TEAMS[24],  // Argentina avançou (venceu Egito)
     "2-3": TEAMS[14],  // Bélgica avançou (venceu EUA)
     "2-7": TEAMS[28],  // Suíça avançou (venceu Colômbia)
+
+    // Quartas -> Semifinal
+    "3-0": TEAMS[2],   // França avançou (venceu Marrocos)
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -625,6 +628,7 @@ export function WorldCupBracket() {
         mappedWinners["2-6"] = TEAMS[24]  // Argentina (avançou)
         mappedWinners["2-3"] = TEAMS[14]  // Bélgica (avançou)
         mappedWinners["2-7"] = TEAMS[28]  // Suíça (avançou)
+        mappedWinners["3-0"] = TEAMS[2]   // França (avançou)
 
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
@@ -1204,7 +1208,7 @@ export function WorldCupBracket() {
       { phase: "Oitavas de final", date: "Ter., 07/07", time: "13:00", stadium: "Estádio de Atlanta (GA)", t1: teamAt(1, 12), t2: teamAt(1, 13) }, // Argentina x Egito
       { phase: "Oitavas de final", date: "Ter., 07/07", time: "17:00", stadium: "BC Place, Vancouver", t1: teamAt(1, 14), t2: teamAt(1, 15) }, // Suíça x Colômbia/Gana
 
-      { phase: "Quartas de final", date: "Qui., 09/07", time: "17:00", stadium: "", t1: teamAt(2, 0), t2: teamAt(2, 1) }, // QF-1: Paraguai/França x Canadá/Marrocos
+      { phase: "Quartas de final", date: "Qui., 09/07", time: "17:00", stadium: "", t1: teamAt(2, 0), t2: teamAt(2, 1), score: winners["3-0"] ? "2 x 1" : null }, // QF-1: Paraguai/França x Canadá/Marrocos
       { phase: "Quartas de final", date: "Sex., 10/07", time: "16:00", stadium: "", t1: teamAt(2, 2), t2: teamAt(2, 3) }, // QF-2: Portugal/Espanha x EUA/Bélgica
       { phase: "Quartas de final", date: "Sáb., 11/07", time: "18:00", stadium: "", t1: teamAt(2, 4), t2: teamAt(2, 5) }, // QF-3: Brasil/Noruega x México/Inglaterra
       { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", stadium: "", t1: teamAt(2, 6), t2: teamAt(2, 7) }, // QF-4: Argentina/Egito x Suíça/A definir
