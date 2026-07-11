@@ -46,28 +46,21 @@ function nodePos(ring: number, index: number) {
 
 function getMatchDate(ring: number, index: number): string | null {
   if (ring === 0) return null
+  const matchIdx = Math.floor(index / 2)
   if (ring === 1) {
-    const matchIdx = Math.floor(index / 2)
-    if (matchIdx === 0) return "04 de Julho"
-    if (matchIdx === 1) return "04 de Julho"
-    if (matchIdx === 2) return "07 de Julho"
-    if (matchIdx === 3) return "07 de Julho"
-    if (matchIdx === 4) return "05 de Julho"
-    if (matchIdx === 5) return "05 de Julho"
-    if (matchIdx === 6) return "06 de Julho"
-    if (matchIdx === 7) return "06 de Julho"
+    if (matchIdx === 0 || matchIdx === 1) return "04 de Julho"
+    if (matchIdx === 4 || matchIdx === 5) return "05 de Julho"
+    if (matchIdx === 2 || matchIdx === 3) return "06 de Julho"
+    if (matchIdx === 6 || matchIdx === 7) return "07 de Julho"
   }
   if (ring === 2) {
-    const matchIdx = Math.floor(index / 2)
-    if (matchIdx === 0) return "11 de Julho"
-    if (matchIdx === 1) return "11 de Julho"
-    if (matchIdx === 2) return "09 de Julho"
-    if (matchIdx === 3) return "10 de Julho"
+    if (matchIdx === 0) return "09 de Julho"
+    if (matchIdx === 1) return "10 de Julho"
+    if (matchIdx === 2 || matchIdx === 3) return "11 de Julho"
   }
   if (ring === 3) {
-    const matchIdx = Math.floor(index / 2)
-    if (matchIdx === 0) return "15 de Julho"
-    if (matchIdx === 1) return "14 de Julho"
+    if (matchIdx === 0) return "14 de Julho"
+    if (matchIdx === 1) return "15 de Julho"
   }
   if (ring === 4) {
     return "19 de Julho"
@@ -153,7 +146,7 @@ function getMatchInfo(
     }
   } else if (ring === 1) {
     const dates = ["Sáb., 04/07", "Sáb., 04/07", "Seg., 06/07", "Seg., 06/07", "Dom., 05/07", "Dom., 05/07", "Ter., 07/07", "Ter., 07/07"]
-    const times = ["18:00", "14:00", "16:00", "21:00", "17:00", "21:00", "13:00", "17:00"]
+    const times = ["20:00", "16:00", "16:00", "20:00", "16:00", "20:00", "16:00", "20:00"]
     date = dates[matchIdx] ?? ""
     time = times[matchIdx] ?? ""
 
@@ -181,14 +174,25 @@ function getMatchInfo(
       status = "Agendado"
     }
   } else if (ring === 2) {
-    const dates = ["Sáb., 11/07", "Sáb., 11/07", "Qui., 09/07", "Sex., 10/07"]
-    const times = ["18:00", "22:00", "17:00", "16:00"]
+    const dates = ["Qui., 09/07", "Sex., 10/07", "Sáb., 11/07", "Sáb., 11/07"]
+    const times = ["18:00", "16:00", "18:00", "22:00"]
     date = dates[matchIdx] ?? ""
     time = times[matchIdx] ?? ""
-    status = "Agendado"
+    
+    const isFinished = !!winners[`3-${matchIdx}`]
+    if (isFinished) {
+      status = "FIM"
+      if (matchIdx === 0) {
+        score = "2 x 0"
+      } else if (matchIdx === 1) {
+        score = "2 x 1"
+      }
+    } else {
+      status = "Agendado"
+    }
   } else if (ring === 3) {
-    const dates = ["Qua., 15/07", "Ter., 14/07"]
-    const times = ["16:00", "16:00"]
+    const dates = ["Ter., 14/07", "Qua., 15/07"]
+    const times = ["21:00", "21:00"]
     date = dates[matchIdx] ?? ""
     time = times[matchIdx] ?? ""
     status = "Agendado"
@@ -1211,7 +1215,7 @@ export function WorldCupBracket() {
       { phase: "Oitavas de final", date: "Ter., 07/07", time: "20:00", stadium: "BC Place, Vancouver", t1: teamAt(1, 14), t2: teamAt(1, 15) }, // Suíça x Colômbia/Gana
 
       { phase: "Quartas de final", date: "Qui., 09/07", time: "18:00", stadium: "Boston", t1: teamAt(2, 0), t2: teamAt(2, 1), score: winners["3-0"] ? "2 x 0" : null }, // QF-1: Paraguai/França x Canadá/Marrocos
-      { phase: "Quartas de final", date: "Sex., 10/07", time: "23:00", stadium: "Los Angeles", t1: teamAt(2, 2), t2: teamAt(2, 3), score: winners["3-1"] ? "2 x 1" : null }, // QF-2: Portugal/Espanha x EUA/Bélgica
+      { phase: "Quartas de final", date: "Sex., 10/07", time: "16:00", stadium: "Los Angeles", t1: teamAt(2, 2), t2: teamAt(2, 3), score: winners["3-1"] ? "2 x 1" : null }, // QF-2: Portugal/Espanha x EUA/Bélgica
       { phase: "Quartas de final", date: "Sáb., 11/07", time: "18:00", stadium: "Miami", t1: teamAt(2, 4), t2: teamAt(2, 5) }, // QF-3: Brasil/Noruega x México/Inglaterra
       { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", stadium: "Kansas City", t1: teamAt(2, 6), t2: teamAt(2, 7) }, // QF-4: Argentina/Egito x Suíça/A definir
 
@@ -1946,6 +1950,13 @@ function Node({
           </span>
         ) : null}
       </button>
+
+      {/* Placar Badge na chave (somente para quem jogou e tem placar) */}
+      {team && matchInfo.score && advanced && (
+        <div className="absolute -bottom-2 md:-bottom-2.5 left-1/2 -translate-x-1/2 z-30 rounded-full border border-gold/40 bg-background/95 px-1.5 py-px text-[7px] md:text-[8px] font-extrabold text-gold-soft whitespace-nowrap shadow-sm backdrop-blur-sm pointer-events-none">
+          {matchInfo.score}
+        </div>
+      )}
 
       {/* Tooltip Premium */}
       {isHovered && (
