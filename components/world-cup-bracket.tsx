@@ -186,6 +186,10 @@ function getMatchInfo(
         score = "2 x 0"
       } else if (matchIdx === 1) {
         score = "2 x 1"
+      } else if (matchIdx === 2) {
+        score = "1 x 2"
+      } else if (matchIdx === 3) {
+        score = "2 x 1"
       }
     } else {
       status = "Agendado"
@@ -592,6 +596,8 @@ export function WorldCupBracket() {
     // Quartas -> Semifinal
     "3-0": TEAMS[2],   // França avançou (venceu Marrocos)
     "3-1": TEAMS[10],  // Espanha avançou (venceu Bélgica)
+    "3-2": TEAMS[22],  // Inglaterra avançou (venceu Noruega)
+    "3-3": TEAMS[24],  // Argentina avançou (venceu Suíça)
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -635,6 +641,8 @@ export function WorldCupBracket() {
         mappedWinners["2-7"] = TEAMS[28]  // Suíça (avançou)
         mappedWinners["3-0"] = TEAMS[2]   // França (avançou)
         mappedWinners["3-1"] = TEAMS[10]  // Espanha (avançou)
+        mappedWinners["3-2"] = TEAMS[22]  // Inglaterra (avançou)
+        mappedWinners["3-3"] = TEAMS[24]  // Argentina (avançou)
 
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
