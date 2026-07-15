@@ -146,7 +146,7 @@ function getMatchInfo(
     }
   } else if (ring === 1) {
     const dates = ["Sáb., 04/07", "Sáb., 04/07", "Seg., 06/07", "Seg., 06/07", "Dom., 05/07", "Dom., 05/07", "Ter., 07/07", "Ter., 07/07"]
-    const times = ["20:00", "16:00", "16:00", "20:00", "16:00", "20:00", "16:00", "20:00"]
+    const times = ["18:00", "14:00", "16:00", "21:00", "17:00", "21:00", "13:00", "17:00"]
     date = dates[matchIdx] ?? ""
     time = times[matchIdx] ?? ""
 
@@ -175,7 +175,7 @@ function getMatchInfo(
     }
   } else if (ring === 2) {
     const dates = ["Qui., 09/07", "Sex., 10/07", "Sáb., 11/07", "Sáb., 11/07"]
-    const times = ["18:00", "16:00", "18:00", "22:00"]
+    const times = ["17:00", "16:00", "18:00", "22:00"]
     date = dates[matchIdx] ?? ""
     time = times[matchIdx] ?? ""
     
@@ -196,10 +196,19 @@ function getMatchInfo(
     }
   } else if (ring === 3) {
     const dates = ["Ter., 14/07", "Qua., 15/07"]
-    const times = ["21:00", "21:00"]
+    const times = ["16:00", "16:00"]
     date = dates[matchIdx] ?? ""
     time = times[matchIdx] ?? ""
-    status = "Agendado"
+    
+    const isFinished = !!winners[`4-${matchIdx}`]
+    if (isFinished) {
+      status = "FIM"
+      if (matchIdx === 0) {
+        score = "0 x 2" // França 0 x 2 Espanha
+      }
+    } else {
+      status = "Agendado"
+    }
   } else if (ring === 4) {
     date = "Dom., 19/07"
     time = "16:00"
@@ -212,12 +221,12 @@ type Winners = Record<string, Team>
 
 const SCHEDULE = [
   // R16-1: Paraguai x França
-  { id: "J74", dateLabel: "Seg., 29/06", timeLabel: "18:00", t1_idx: 0, t2_idx: 1, timestamp: new Date("2026-06-29T18:00:00-03:00").getTime(), parentWinnerKey: "1-0" },
-  { id: "J77", dateLabel: "Ter., 30/06", timeLabel: "17:00", t1_idx: 2, t2_idx: 3, timestamp: new Date("2026-06-30T17:00:00-03:00").getTime(), parentWinnerKey: "1-1" },
+  { id: "J74", dateLabel: "Seg., 29/06", timeLabel: "17:30", t1_idx: 0, t2_idx: 1, timestamp: new Date("2026-06-29T17:30:00-03:00").getTime(), parentWinnerKey: "1-0" },
+  { id: "J77", dateLabel: "Ter., 30/06", timeLabel: "18:00", t1_idx: 2, t2_idx: 3, timestamp: new Date("2026-06-30T18:00:00-03:00").getTime(), parentWinnerKey: "1-1" },
 
   // R16-2: Canadá x Marrocos
-  { id: "J73", dateLabel: "Dom., 28/06", timeLabel: "14:00", t1_idx: 4, t2_idx: 5, timestamp: new Date("2026-06-28T14:00:00-03:00").getTime(), parentWinnerKey: "1-2" },
-  { id: "J75", dateLabel: "Seg., 29/06", timeLabel: "14:00", t1_idx: 6, t2_idx: 7, timestamp: new Date("2026-06-29T14:00:00-03:00").getTime(), parentWinnerKey: "1-3" },
+  { id: "J73", dateLabel: "Dom., 28/06", timeLabel: "16:00", t1_idx: 4, t2_idx: 5, timestamp: new Date("2026-06-28T16:00:00-03:00").getTime(), parentWinnerKey: "1-2" },
+  { id: "J75", dateLabel: "Seg., 29/06", timeLabel: "22:00", t1_idx: 6, t2_idx: 7, timestamp: new Date("2026-06-29T22:00:00-03:00").getTime(), parentWinnerKey: "1-3" },
 
   // R16-5: Portugal x Espanha
   { id: "J83", dateLabel: "Qui., 02/07", timeLabel: "20:00", t1_idx: 8, t2_idx: 9, timestamp: new Date("2026-07-02T20:00:00-03:00").getTime(), parentWinnerKey: "1-4" },
@@ -228,20 +237,20 @@ const SCHEDULE = [
   { id: "J82", dateLabel: "Qua., 01/07", timeLabel: "17:00", t1_idx: 14, t2_idx: 15, timestamp: new Date("2026-07-01T17:00:00-03:00").getTime(), parentWinnerKey: "1-7" },
 
   // R16-3: Brasil x Noruega
-  { id: "J76", dateLabel: "Seg., 29/06", timeLabel: "21:00", t1_idx: 16, t2_idx: 17, timestamp: new Date("2026-06-29T21:00:00-03:00").getTime(), parentWinnerKey: "1-8" },
-  { id: "J78", dateLabel: "Ter., 30/06", timeLabel: "21:00", t1_idx: 18, t2_idx: 19, timestamp: new Date("2026-06-30T21:00:00-03:00").getTime(), parentWinnerKey: "1-9" },
+  { id: "J76", dateLabel: "Seg., 29/06", timeLabel: "14:00", t1_idx: 16, t2_idx: 17, timestamp: new Date("2026-06-29T14:00:00-03:00").getTime(), parentWinnerKey: "1-8" },
+  { id: "J78", dateLabel: "Ter., 30/06", timeLabel: "14:00", t1_idx: 18, t2_idx: 19, timestamp: new Date("2026-06-30T14:00:00-03:00").getTime(), parentWinnerKey: "1-9" },
 
   // R16-4: México x Inglaterra
-  { id: "J79", dateLabel: "Ter., 30/06", timeLabel: "22:55", t1_idx: 20, t2_idx: 21, timestamp: new Date("2026-06-30T22:55:00-03:00").getTime(), parentWinnerKey: "1-10" },
+  { id: "J79", dateLabel: "Ter., 30/06", timeLabel: "22:00", t1_idx: 20, t2_idx: 21, timestamp: new Date("2026-06-30T22:00:00-03:00").getTime(), parentWinnerKey: "1-10" },
   { id: "J80", dateLabel: "Qua., 01/07", timeLabel: "13:00", t1_idx: 22, t2_idx: 23, timestamp: new Date("2026-07-01T13:00:00-03:00").getTime(), parentWinnerKey: "1-11" },
 
   // R16-7: Argentina x Egito
-  { id: "J86", dateLabel: "Qui., 02/07", timeLabel: "19:00", t1_idx: 24, t2_idx: 25, timestamp: new Date("2026-07-02T19:00:00-03:00").getTime(), parentWinnerKey: "1-12" },
-  { id: "J88", dateLabel: "Qui., 02/07", timeLabel: "15:00", t1_idx: 26, t2_idx: 27, timestamp: new Date("2026-07-02T15:00:00-03:00").getTime(), parentWinnerKey: "1-13" },
+  { id: "J86", dateLabel: "Sex., 03/07", timeLabel: "19:00", t1_idx: 24, t2_idx: 25, timestamp: new Date("2026-07-03T19:00:00-03:00").getTime(), parentWinnerKey: "1-12" },
+  { id: "J88", dateLabel: "Sex., 03/07", timeLabel: "15:00", t1_idx: 26, t2_idx: 27, timestamp: new Date("2026-07-03T15:00:00-03:00").getTime(), parentWinnerKey: "1-13" },
 
   // R16-8: Suíça x Colômbia/Gana
-  { id: "J85", dateLabel: "Sex., 03/07", timeLabel: "FIM", t1_idx: 28, t2_idx: 29, timestamp: new Date("2026-07-03T00:00:00-03:00").getTime(), parentWinnerKey: "1-14" },
-  { id: "J87", dateLabel: "Sex., 03/07", timeLabel: "AO VIVO", t1_idx: 30, t2_idx: 31, timestamp: new Date("2026-07-03T22:30:00-03:00").getTime(), parentWinnerKey: "1-15" },
+  { id: "J85", dateLabel: "Sex., 03/07", timeLabel: "00:00", t1_idx: 28, t2_idx: 29, timestamp: new Date("2026-07-03T00:00:00-03:00").getTime(), parentWinnerKey: "1-14" },
+  { id: "J87", dateLabel: "Sex., 03/07", timeLabel: "22:30", t1_idx: 30, t2_idx: 31, timestamp: new Date("2026-07-03T22:30:00-03:00").getTime(), parentWinnerKey: "1-15" },
 ]
 
 function getDeterministicMatchResult(matchId: string) {
@@ -598,6 +607,9 @@ export function WorldCupBracket() {
     "3-1": TEAMS[10],  // Espanha avançou (venceu Bélgica)
     "3-2": TEAMS[22],  // Inglaterra avançou (venceu Noruega)
     "3-3": TEAMS[24],  // Argentina avançou (venceu Suíça)
+
+    // Semifinal -> Final
+    "4-0": TEAMS[10],  // Espanha avançou (venceu França)
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -643,6 +655,7 @@ export function WorldCupBracket() {
         mappedWinners["3-1"] = TEAMS[10]  // Espanha (avançou)
         mappedWinners["3-2"] = TEAMS[22]  // Inglaterra (avançou)
         mappedWinners["3-3"] = TEAMS[24]  // Argentina (avançou)
+        mappedWinners["4-0"] = TEAMS[10]  // Espanha (avançou)
 
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
@@ -1213,24 +1226,24 @@ export function WorldCupBracket() {
     const thirdPlace = getThirdPlaceTeams()
 
     return [
-      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "16:00", stadium: "Estádio de Houston (TX)", t1: teamAt(1, 2), t2: teamAt(1, 3), score: winners["2-1"] ? "0 x 3" : null }, // Canadá x Marrocos
-      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "20:00", stadium: "Estádio de Filadélfia (PA)", t1: teamAt(1, 0), t2: teamAt(1, 1), score: winners["2-0"] ? "0 x 1" : null }, // Paraguai x França
-      { phase: "Oitavas de final", date: "Dom., 05/07", time: "16:00", stadium: "Estádio de Nova York / Nova Jersey (NJ)", t1: teamAt(1, 8), t2: teamAt(1, 9), score: winners["2-4"] ? "1 x 2" : null }, // Brasil x Noruega
-      { phase: "Oitavas de final", date: "Dom., 05/07", time: "20:00", stadium: "Estádio da Cidade do México", t1: teamAt(1, 10), t2: teamAt(1, 11), score: winners["2-5"] ? "0 x 2" : null }, // México x Inglaterra
+      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "14:00", stadium: "Estádio de Houston (TX)", t1: teamAt(1, 2), t2: teamAt(1, 3), score: winners["2-1"] ? "0 x 3" : null }, // Canadá x Marrocos
+      { phase: "Oitavas de final", date: "Sáb., 04/07", time: "18:00", stadium: "Estádio de Filadélfia (PA)", t1: teamAt(1, 0), t2: teamAt(1, 1), score: winners["2-0"] ? "0 x 1" : null }, // Paraguai x França
+      { phase: "Oitavas de final", date: "Dom., 05/07", time: "17:00", stadium: "Estádio de Nova York / Nova Jersey (NJ)", t1: teamAt(1, 8), t2: teamAt(1, 9), score: winners["2-4"] ? "1 x 2" : null }, // Brasil x Noruega
+      { phase: "Oitavas de final", date: "Dom., 05/07", time: "21:00", stadium: "Estádio da Cidade do México", t1: teamAt(1, 10), t2: teamAt(1, 11), score: winners["2-5"] ? "0 x 2" : null }, // México x Inglaterra
       { phase: "Oitavas de final", date: "Seg., 06/07", time: "16:00", stadium: "Estádio de Dallas (TX)", t1: teamAt(1, 4), t2: teamAt(1, 5), score: winners["2-2"] ? "0 x 1" : null }, // Portugal x Espanha
-      { phase: "Oitavas de final", date: "Seg., 06/07", time: "20:00", stadium: "Estádio de Seattle (WA)", t1: teamAt(1, 6), t2: teamAt(1, 7) }, // EUA x Bélgica
-      { phase: "Oitavas de final", date: "Ter., 07/07", time: "16:00", stadium: "Estádio de Atlanta (GA)", t1: teamAt(1, 12), t2: teamAt(1, 13) }, // Argentina x Egito
-      { phase: "Oitavas de final", date: "Ter., 07/07", time: "20:00", stadium: "BC Place, Vancouver", t1: teamAt(1, 14), t2: teamAt(1, 15) }, // Suíça x Colômbia/Gana
+      { phase: "Oitavas de final", date: "Seg., 06/07", time: "21:00", stadium: "Estádio de Seattle (WA)", t1: teamAt(1, 6), t2: teamAt(1, 7), score: winners["2-3"] ? "1 x 2" : null }, // EUA x Bélgica
+      { phase: "Oitavas de final", date: "Ter., 07/07", time: "13:00", stadium: "Estádio de Atlanta (GA)", t1: teamAt(1, 12), t2: teamAt(1, 13), score: winners["2-6"] ? "2 x 1" : null }, // Argentina x Egito
+      { phase: "Oitavas de final", date: "Ter., 07/07", time: "17:00", stadium: "BC Place, Vancouver", t1: teamAt(1, 14), t2: teamAt(1, 15), score: winners["2-7"] ? "1 (4) x 1 (3)" : null }, // Suíça x Colômbia/Gana
 
-      { phase: "Quartas de final", date: "Qui., 09/07", time: "18:00", stadium: "Boston", t1: teamAt(2, 0), t2: teamAt(2, 1), score: winners["3-0"] ? "2 x 0" : null }, // QF-1: Paraguai/França x Canadá/Marrocos
+      { phase: "Quartas de final", date: "Qui., 09/07", time: "17:00", stadium: "Boston", t1: teamAt(2, 0), t2: teamAt(2, 1), score: winners["3-0"] ? "2 x 0" : null }, // QF-1: Paraguai/França x Canadá/Marrocos
       { phase: "Quartas de final", date: "Sex., 10/07", time: "16:00", stadium: "Los Angeles", t1: teamAt(2, 2), t2: teamAt(2, 3), score: winners["3-1"] ? "2 x 1" : null }, // QF-2: Portugal/Espanha x EUA/Bélgica
-      { phase: "Quartas de final", date: "Sáb., 11/07", time: "18:00", stadium: "Miami", t1: teamAt(2, 4), t2: teamAt(2, 5) }, // QF-3: Brasil/Noruega x México/Inglaterra
-      { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", stadium: "Kansas City", t1: teamAt(2, 6), t2: teamAt(2, 7) }, // QF-4: Argentina/Egito x Suíça/A definir
+      { phase: "Quartas de final", date: "Sáb., 11/07", time: "18:00", stadium: "Miami", t1: teamAt(2, 4), t2: teamAt(2, 5), score: winners["3-2"] ? "1 x 2" : null }, // QF-3: Brasil/Noruega x México/Inglaterra
+      { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", stadium: "Kansas City", t1: teamAt(2, 6), t2: teamAt(2, 7), score: winners["3-3"] ? "2 x 1" : null }, // QF-4: Argentina/Egito x Suíça/A definir
 
-      { phase: "Semifinal", date: "Ter., 14/07", time: "21:00", stadium: "Dallas", t1: teamAt(3, 0), t2: teamAt(3, 1) }, // SF-1: Vencedor QF-1 x Vencedor QF-2
-      { phase: "Semifinal", date: "Qua., 15/07", time: "21:00", stadium: "Atlanta", t1: teamAt(3, 2), t2: teamAt(3, 3) }, // SF-2: Vencedor QF-3 x Vencedor QF-4
+      { phase: "Semifinal", date: "Ter., 14/07", time: "16:00", stadium: "Dallas", t1: teamAt(3, 0), t2: teamAt(3, 1), score: winners["4-0"] ? "0 x 2" : null }, // SF-1: Vencedor QF-1 x Vencedor QF-2
+      { phase: "Semifinal", date: "Qua., 15/07", time: "16:00", stadium: "Atlanta", t1: teamAt(3, 2), t2: teamAt(3, 3) }, // SF-2: Vencedor QF-3 x Vencedor QF-4
 
-      { phase: "Disputa 3º Lugar", date: "Sáb., 18/07", time: "21:00", stadium: "Miami", t1: thirdPlace.teamA, t2: thirdPlace.teamB },
+      { phase: "Disputa 3º Lugar", date: "Sáb., 18/07", time: "18:00", stadium: "Miami", t1: thirdPlace.teamA, t2: thirdPlace.teamB },
 
       { phase: "Final", date: "Dom., 19/07", time: "16:00", stadium: "Nova York / Nova Jersey", t1: teamAt(4, 0), t2: teamAt(4, 1) }
     ]
