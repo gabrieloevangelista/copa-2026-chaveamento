@@ -205,6 +205,8 @@ function getMatchInfo(
       status = "FIM"
       if (matchIdx === 0) {
         score = "0 x 2" // França 0 x 2 Espanha
+      } else if (matchIdx === 1) {
+        score = "1 x 2" // Inglaterra 1 x 2 Argentina
       }
     } else {
       status = "Agendado"
@@ -256,24 +258,22 @@ const SCHEDULE = [
 function getDeterministicMatchResult(matchId: string) {
   // Resultados oficiais da imagem (16-avos)
   const officialResults: Record<string, { t1: number, t2: number, str?: string }> = {
-    "0-8": { t1: 2, t2: 0 }, // Suíça x Argélia
-    "0-9": { t1: 1, t2: 1, str: "1 (2) x 1 (4)" }, // Austrália x Egito
-    "0-12": { t1: 2, t2: 1 }, // Brasil x Japão
-    "J88": { t1: 1, t2: 1, str: "1 (2) x 1 (4)" }, // Austrália x Egito
-    "J78": { t1: 1, t2: 2 }, // Costa do Marfim x Noruega
+    "J73": { t1: 1, t2: 0 }, // Canadá x África do Sul
+    "J74": { t1: 1, t2: 1, str: "1 (4) x 1 (3)" }, // Paraguai x Alemanha
+    "J75": { t1: 1, t2: 1, str: "1 (3) x 1 (2)" }, // Marrocos x Países Baixos
+    "J76": { t1: 2, t2: 1 }, // Brasil x Japão
+    "J77": { t1: 3, t2: 0 }, // França x Suécia
+    "J78": { t1: 2, t2: 1 }, // Noruega x Costa do Marfim
     "J79": { t1: 2, t2: 0 }, // México x Equador
     "J80": { t1: 2, t2: 1 }, // Inglaterra x RD Congo
-    "J86": { t1: 3, t2: 2 }, // Argentina x Cabo Verde
-    "J74": { t1: 1, t2: 1, str: "1 (3) x 1 (4)" }, // Alemanha x Paraguai
-    "J77": { t1: 3, t2: 0 }, // França x Suécia
-    "J73": { t1: 0, t2: 1 }, // África do Sul x Canadá
-    "J75": { t1: 1, t2: 1, str: "1 (2) x 1 (3)" }, // Holanda x Marrocos
     "J81": { t1: 2, t2: 0 }, // EUA x Bósnia
     "J82": { t1: 3, t2: 2 }, // Bélgica x Senegal
     "J83": { t1: 2, t2: 1 }, // Portugal x Croácia
     "J84": { t1: 3, t2: 0 }, // Espanha x Áustria
     "J85": { t1: 2, t2: 0 }, // Suíça x Argélia
+    "J86": { t1: 3, t2: 2 }, // Argentina x Cabo Verde
     "J87": { t1: 1, t2: 0 }, // Colômbia x Gana (Ao vivo)
+    "J88": { t1: 1, t2: 1, str: "1 (4) x 1 (2)" }, // Egito x Austrália
   }
 
   if (officialResults[matchId]) {
