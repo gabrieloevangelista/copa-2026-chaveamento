@@ -610,6 +610,7 @@ export function WorldCupBracket() {
 
     // Semifinal -> Final
     "4-0": TEAMS[10],  // Espanha avançou (venceu França)
+    "4-1": TEAMS[24],  // Argentina avançou (venceu Inglaterra)
   }
 
   // Recupera o estado do localStorage ao montar.
@@ -656,6 +657,7 @@ export function WorldCupBracket() {
         mappedWinners["3-2"] = TEAMS[22]  // Inglaterra (avançou)
         mappedWinners["3-3"] = TEAMS[24]  // Argentina (avançou)
         mappedWinners["4-0"] = TEAMS[10]  // Espanha (avançou)
+        mappedWinners["4-1"] = TEAMS[24]  // Argentina (avançou)
 
         setWinners(mappedWinners)
         if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
@@ -1241,7 +1243,7 @@ export function WorldCupBracket() {
       { phase: "Quartas de final", date: "Sáb., 11/07", time: "22:00", stadium: "Kansas City", t1: teamAt(2, 6), t2: teamAt(2, 7), score: winners["3-3"] ? "2 x 1" : null }, // QF-4: Argentina/Egito x Suíça/A definir
 
       { phase: "Semifinal", date: "Ter., 14/07", time: "16:00", stadium: "Dallas", t1: teamAt(3, 0), t2: teamAt(3, 1), score: winners["4-0"] ? "0 x 2" : null }, // SF-1: Vencedor QF-1 x Vencedor QF-2
-      { phase: "Semifinal", date: "Qua., 15/07", time: "16:00", stadium: "Atlanta", t1: teamAt(3, 2), t2: teamAt(3, 3) }, // SF-2: Vencedor QF-3 x Vencedor QF-4
+      { phase: "Semifinal", date: "Qua., 15/07", time: "16:00", stadium: "Atlanta", t1: teamAt(3, 2), t2: teamAt(3, 3), score: winners["4-1"] ? "1 x 2" : null }, // SF-2: Vencedor QF-3 x Vencedor QF-4
 
       { phase: "Disputa 3º Lugar", date: "Sáb., 18/07", time: "18:00", stadium: "Miami", t1: thirdPlace.teamA, t2: thirdPlace.teamB },
 
