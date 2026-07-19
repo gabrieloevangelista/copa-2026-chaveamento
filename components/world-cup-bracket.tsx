@@ -214,7 +214,13 @@ function getMatchInfo(
   } else if (ring === 4) {
     date = "Dom., 19/07"
     time = "16:00"
-    status = "Agendado"
+    const isFinished = !!champion
+    if (isFinished) {
+      status = "FIM"
+      score = champion.id === TEAMS[10].id ? "2 x 1" : "1 x 2"
+    } else {
+      status = "Agendado"
+    }
   }
   return { phase, date, time, t1, t2, score, status }
 }
@@ -660,10 +666,15 @@ export function WorldCupBracket() {
         mappedWinners["4-1"] = TEAMS[24]  // Argentina (avançou)
 
         setWinners(mappedWinners)
-        if (c) setChampion(TEAMS.find((t) => t.id === c.id) || null)
+        if (c) {
+          setChampion(TEAMS.find((t) => t.id === c.id) || null)
+        } else {
+          setChampion(TEAMS[10]) // Se não houver campeão salvo, define Espanha
+        }
       } else {
         // Primeira vez: usar estado pré-carregado
         setWinners(DEFAULT_WINNERS)
+        setChampion(TEAMS[10]) // Espanha
       }
     } catch (e) {
       console.error("[v0] Erro ao recuperar estado:", e)
@@ -801,27 +812,33 @@ export function WorldCupBracket() {
                   setLiveMatch(null)
                   // Se o jogo encerrou, avança o vencedor automaticamente na chave
                   if (data.status === "finished") {
-                    for (let ring = 0; ring < 4; ring++) {
+                    for (let ring = 0; ring < 5; ring++) {
                       const count = RINGS[ring].count
                       for (let i = 0; i < count; i += 2) {
                         const pt1 = teamAt(ring, i)
                         const pt2 = teamAt(ring, i + 1)
                         if (pt1 && pt2 && ((pt1.id === t1.id && pt2.id === t2.id) || (pt1.id === t2.id && pt2.id === t1.id))) {
-                          const parentRing = ring + 1
-                          const parentIndex = Math.floor(i / 2)
-                          const key = `${parentRing}-${parentIndex}`
-
-                          if (!winnersRef.current[key]) {
+                          if (ring === 4) {
+                            // Se for a final, define o campeão
                             const winner = data.t1Score > data.t2Score ? t1 : t2
-                            setWinners(prev => ({ ...prev, [key]: winner }))
+                            setChampion(winner)
+                          } else {
+                            const parentRing = ring + 1
+                            const parentIndex = Math.floor(i / 2)
+                            const key = `${parentRing}-${parentIndex}`
 
-                            const flagColors = TEAM_COLORS[winner.slug] || ["#e9b949", "#ffffff"]
-                            confetti({
-                              particleCount: 60,
-                              spread: 70,
-                              origin: { x: 0.5, y: 0.5 },
-                              colors: flagColors,
-                            })
+                            if (!winnersRef.current[key]) {
+                              const winner = data.t1Score > data.t2Score ? t1 : t2
+                              setWinners(prev => ({ ...prev, [key]: winner }))
+
+                              const flagColors = TEAM_COLORS[winner.slug] || ["#e9b949", "#ffffff"]
+                              confetti({
+                                particleCount: 60,
+                                spread: 70,
+                                origin: { x: 0.5, y: 0.5 },
+                                colors: flagColors,
+                              })
+                            }
                           }
                           break
                         }
@@ -1082,7 +1099,7 @@ export function WorldCupBracket() {
 
   function reset() {
     setWinners(DEFAULT_WINNERS)
-    setChampion(null)
+    setChampion(TEAMS[10]) // Espanha campeã por padrão
     if (typeof window !== "undefined") {
       localStorage.removeItem(STORAGE_KEY)
     }
@@ -1247,7 +1264,7 @@ export function WorldCupBracket() {
 
       { phase: "Disputa 3º Lugar", date: "Sáb., 18/07", time: "18:00", stadium: "Miami", t1: thirdPlace.teamA, t2: thirdPlace.teamB },
 
-      { phase: "Final", date: "Dom., 19/07", time: "16:00", stadium: "Nova York / Nova Jersey", t1: teamAt(4, 0), t2: teamAt(4, 1) }
+      { phase: "Final", date: "Dom., 19/07", time: "16:00", stadium: "Nova York / Nova Jersey", t1: teamAt(4, 0), t2: teamAt(4, 1), score: champion ? (champion.id === TEAMS[10].id ? "2 x 1" : "1 x 2") : null }
     ]
   }
 
