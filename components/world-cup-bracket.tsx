@@ -217,7 +217,7 @@ function getMatchInfo(
     const isFinished = !!champion
     if (isFinished) {
       status = "FIM"
-      score = champion.id === TEAMS[10].id ? "2 x 1" : "1 x 2"
+      score = champion.id === TEAMS[10].id ? "1 x 0" : "0 x 1"
     } else {
       status = "Agendado"
     }
@@ -1264,7 +1264,7 @@ export function WorldCupBracket() {
 
       { phase: "Disputa 3º Lugar", date: "Sáb., 18/07", time: "18:00", stadium: "Miami", t1: thirdPlace.teamA, t2: thirdPlace.teamB },
 
-      { phase: "Final", date: "Dom., 19/07", time: "16:00", stadium: "Nova York / Nova Jersey", t1: teamAt(4, 0), t2: teamAt(4, 1), score: champion ? (champion.id === TEAMS[10].id ? "2 x 1" : "1 x 2") : null }
+      { phase: "Final", date: "Dom., 19/07", time: "16:00", stadium: "Nova York / Nova Jersey", t1: teamAt(4, 0), t2: teamAt(4, 1), score: champion ? (champion.id === TEAMS[10].id ? "1 x 0" : "0 x 1") : null }
     ]
   }
 
